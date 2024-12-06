@@ -6,10 +6,12 @@
   "exports": {
     "./button": "./src/components/button.tsx",
     "./card": "./src/components/card.tsx",
-    "./code": "./src/components/code.tsx",
+    "./input": "./src/components/input.tsx",
+    "./label": "./src/components/label.tsx",
     "./tailwind.config": "./tailwind.config.ts",
     "./postcss.config": "./postcss.config.mjs",
-    "./globals.css": "./src/styles/globals.css"
+    "./globals.css": "./src/styles/globals.css",
+    "./lib/*": "./src/lib/*.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
@@ -29,7 +31,14 @@
     "typescript": "5.5.4"
   },
   "dependencies": {
+    "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-slot": "^1.1.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.468.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "tailwind-merge": "^2.5.5",
+    "tailwindcss-animate": "^1.0.7"
   }
 }
