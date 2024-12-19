@@ -8,6 +8,9 @@
     "./card": "./src/components/card.tsx",
     "./input": "./src/components/input.tsx",
     "./label": "./src/components/label.tsx",
+    "./toast": "./src/components/toast.tsx",
+    "./use-toast": "./src/hooks/use-toast.ts",
+    "./toaster": "./src/providers/toaster.tsx",
     "./tailwind.config": "./tailwind.config.ts",
     "./postcss.config": "./postcss.config.mjs",
     "./globals.css": "./src/styles/globals.css",
@@ -15,13 +18,11 @@
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
-    "generate:component": "turbo gen react-component",
     "check-types": "tsc --noEmit"
   },
   "devDependencies": {
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",
-    "@turbo/gen": "^1.12.4",
     "@types/node": "^20.11.24",
     "@types/react": "18.3.0",
     "@types/react-dom": "18.3.1",
@@ -33,6 +34,7 @@
   "dependencies": {
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-toast": "^1.2.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.468.0",
