@@ -11,20 +11,19 @@ import {
 } from "@repo/ui/card";
 import { Input } from "@repo/ui/input";
 import { Label } from "@repo/ui/label";
-import { signIn } from "./actions";
+import { signUp } from "./actions";
 
-export function LoginForm() {
-
+export function SignUpForm() {
   return (
     <Card className="mx-auto max-w-sm">
       <CardHeader>
-        <CardTitle className="text-2xl">Login</CardTitle>
+        <CardTitle className="text-2xl">Get started</CardTitle>
         <CardDescription>
-          Enter your email below to login to your account
+          Enter your email below to create to your account
         </CardDescription>
       </CardHeader>
       <CardContent>
-      <form action={signIn}>
+        <form action={signUp}>
           <div className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
@@ -56,14 +55,14 @@ export function LoginForm() {
               />
             </div>
             <Button type="submit" className="w-full">
-              Login
+              Sign Up
             </Button>
           </div>
         </form>
-        <div className="mt-4 mr-2 text-center text-sm">
-          Don&apos;t have an account?
-          <Link href="/signup" className="ml-1 font-bold underline">
-            Sign up
+        <div className="mt-4 text-center text-sm">
+          Already have an account?
+          <Link href="/signin" className="ml-1 font-bold underline">
+            Sign in
           </Link>
         </div>
       </CardContent>
