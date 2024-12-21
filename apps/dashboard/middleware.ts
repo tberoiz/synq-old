@@ -1,5 +1,5 @@
-import { type NextRequest } from 'next/server';
-import { updateSession } from '@repo/supabase/middleware';
+import { type NextRequest } from "next/server";
+import { updateSession } from "@repo/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
   return await updateSession(request);
@@ -15,6 +15,6 @@ export const config = {
      * - signup (explicitly excluded)
      * Feel free to modify this pattern to include more paths.
      */
-    '/((?!_next/static|_next/image|favicon.ico|signup|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    "/((?!_next/static|_next/image|favicon.ico|error|signup|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

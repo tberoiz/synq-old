@@ -1,53 +1,69 @@
-'use server'
-import { redirect} from 'next/navigation'
-import { createClient } from '@repo/supabase/server'
-import { revalidatePath } from 'next/cache'
-const signIn = async (formData: FormData) => {
-  const supabase = await createClient()
+"use server";
+import { redirect } from "next/navigation";
+import { createClient } from "@repo/supabase/server";
+import { Provider } from "@repo/supabase/types";
+import { revalidatePath } from "next/cache";
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
+const signInWithPassword = async (formData: FormData) => {
+  const supabase = await createClient();
   const data = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
-  }
-
-  const { error } = await supabase.auth.signInWithPassword(data)
+    email: formData.get("email") as string,
+    password: formData.get("password") as string,
+  };
+  const { error } = await supabase.auth.signInWithPassword(data);
 
   if (error) {
-    redirect('/error')
+    redirect("/auth/signup");
   }
 
-  return redirect('/')
-}
+  return redirect("/");
+};
+
+const signInWithOAuth = async (provider: Provider) => {
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider,
+    options: {
+      redirectTo: "http://localhost:3000/auth/callback",
+    },
+  });
+
+  if (error) {
+    redirect("/auth/signup");
+  }
+
+  if (data?.url) {
+    return redirect(data.url);
+  }
+
+  return redirect("/");
+};
+
 const signOut = async () => {
-  const supabase = await createClient()
-  const { error } = await supabase.auth.signOut()
+  const supabase = await createClient();
+  const { error } = await supabase.auth.signOut();
 
   if (error) {
-    redirect('/error')
+    redirect("/error");
   }
 
-  return redirect('/login')
-}
-const signUp = async (formData: FormData) => {
-  const supabase = await createClient()
+  return redirect("/auth/signin");
+};
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
+const signUpWithPassword = async (formData: FormData) => {
+  const supabase = await createClient();
   const data = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
-  }
-
-  const { error } = await supabase.auth.signUp(data)
+    email: formData.get("email") as string,
+    password: formData.get("password") as string,
+  };
+  const { error } = await supabase.auth.signUp(data);
 
   if (error) {
-    redirect('/error')
+    redirect("/error");
   }
 
-  revalidatePath('/', 'layout')
-  redirect('/')
-}
+  revalidatePath("/", "layout");
+  return redirect("/");
+};
 
-export {signIn, signUp, signOut};
+export { signInWithPassword, signInWithOAuth, signUpWithPassword, signOut };

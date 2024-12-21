@@ -5,6 +5,10 @@
   "scripts": {
     "clean": "rm -rf .turbo node_modules"
   },
+  "devDependencies": {
+    "@supabase/supabase-js": "^2.46.1",
+    "typescript": "^5.5.4"
+  },
   "dependencies": {
     "@supabase/postgrest-js": "^1.17.3",
     "@supabase/ssr": "^0.5.1",
@@ -12,16 +16,13 @@
     "server-only": "^0.0.1",
     "supabase": "^1.219.2"
   },
-  "devDependencies": {
-    "@supabase/supabase-js": "^2.46.1",
-    "typescript": "^5.5.4"
-  },
   "peerDependencies": {
     "next": "15.0.3"
   },
   "exports": {
     "./server": "./src/client/server.ts",
     "./client": "./src/client/client.ts",
-    "./middleware": "./src/client/middleware.ts"
+    "./middleware": "./src/client/middleware.ts",
+    "./types": "./src/types/index.ts"
   }
 }
