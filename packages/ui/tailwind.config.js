@@ -1,9 +1,8 @@
-import type { Config } from "tailwindcss";
-import tailwindcssAnimate from "tailwindcss-animate";
+const tailwindcssAnimate = require("tailwindcss-animate");
 
 const config = {
   darkMode: ["class"],
-  // TODO:Check these paths
+  // TODO: Check these paths
   content: [
     "../../apps/dashboard/**/*.{ts,tsx}",
     "../../packages/ui/src/components/**/*.{ts,tsx}",
@@ -74,6 +73,6 @@ const config = {
     },
   },
   plugins: [tailwindcssAnimate],
-} satisfies Config;
+};
 
-export default config;
+module.exports = config;
