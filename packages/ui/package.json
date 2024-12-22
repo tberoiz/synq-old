@@ -3,23 +3,12 @@
   "version": "0.0.0",
   "type": "module",
   "private": true,
-  "exports": {
-    "./button": "./src/components/button.tsx",
-    "./card": "./src/components/card.tsx",
-    "./input": "./src/components/input.tsx",
-    "./label": "./src/components/label.tsx",
-    "./toast": "./src/components/toast.tsx",
-    "./use-toast": "./src/hooks/use-toast.ts",
-    "./toaster": "./src/providers/toaster.tsx",
-    "./tailwind.config": "./tailwind.config.ts",
-    "./postcss.config": "./postcss.config.mjs",
-    "./globals.css": "./src/styles/globals.css",
-    "./lib/*": "./src/lib/*.ts"
-  },
   "scripts": {
     "lint": "eslint . --max-warnings 200",
     "check-types": "tsc --noEmit",
-    "clean": "rm -rf .turbo node_modules"
+    "clean": "rm -rf .turbo node_modules dist",
+    "build": "tsc",
+    "dev": "tsc --watch"
   },
   "devDependencies": {
     "@repo/eslint-config": "*",
@@ -43,5 +32,39 @@
     "react-dom": "^19.0.0",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7"
+  },
+  "exports": {
+    "./button": {
+      "types": "./dist/components/button.d.ts",
+      "default": "./dist/components/button.js"
+    },
+    "./card": {
+      "types": "./dist/components/card.d.ts",
+      "default": "./dist/components/card.js"
+    },
+    "./input": {
+      "types": "./dist/components/input.d.ts",
+      "default": "./dist/components/input.js"
+    },
+    "./label": {
+      "types": "./dist/components/label.d.ts",
+      "default": "./dist/components/label.js"
+    },
+    "./use-toast": {
+      "types": "./dist/hooks/use-toast.d.ts",
+      "default": "./dist/hooks/use-toast.js"
+    },
+    "./toaster": {
+      "types": "./dist/providers/toaster.d.ts",
+      "default": "./dist/providers/toaster.js"
+    },
+    "./toast": {
+      "types": "./dist/components/toast.d.ts",
+      "default": "./dist/components/toast.js"
+    },
+    "./tailwind.config": "./tailwind.config.ts",
+    "./postcss.config": "./postcss.config.mjs",
+    "./globals.css": "./src/styles/globals.css",
+    "./lib/*": "./src/lib/*.ts"
   }
 }
