@@ -4,7 +4,6 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "lint": "eslint . --max-warnings 200",
     "check-types": "tsc --noEmit",
     "clean": "rm -rf .turbo node_modules dist",
     "build": "tsc",
@@ -15,7 +14,6 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",
     "@types/node": "^20.11.24",
     "@types/react": "18.3.1",
