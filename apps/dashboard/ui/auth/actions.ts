@@ -24,7 +24,7 @@ const signInWithOAuth = async (provider: Provider) => {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
     options: {
-      redirectTo: "http://localhost:3000/auth/callback",
+      redirectTo: "http://localhost:3000/api/auth/callback",
     },
   });
 
@@ -66,4 +66,19 @@ const signUpWithPassword = async (formData: FormData) => {
   return redirect("/");
 };
 
-export { signInWithPassword, signInWithOAuth, signUpWithPassword, signOut };
+const getUserInfo = async () => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  return user?.user_metadata;
+};
+
+export {
+  signInWithPassword,
+  signInWithOAuth,
+  signUpWithPassword,
+  signOut,
+  getUserInfo,
+};

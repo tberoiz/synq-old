@@ -33,7 +33,6 @@ export async function updateSession(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  console.log(user);
 
   // Redirect if no user and the path is not auth
   if (!user && !request.nextUrl.pathname.startsWith("/auth")) {

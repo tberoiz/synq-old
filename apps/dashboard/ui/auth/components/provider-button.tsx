@@ -2,6 +2,7 @@
 
 import { Button } from "@repo/ui/button";
 import { signInWithOAuth } from "../actions";
+import { JSX } from "react";
 
 type CustomProvider = "github" | "google";
 

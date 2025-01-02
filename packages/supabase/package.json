@@ -7,11 +7,9 @@
     "build": "tsc",
     "dev": "tsc --watch"
   },
-  "peerDependencies": {
-    "next": "15.0.3"
-  },
   "devDependencies": {
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "next": "15.0.3"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.1",
