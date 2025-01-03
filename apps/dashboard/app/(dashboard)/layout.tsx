@@ -1,6 +1,6 @@
 import { AppSidebar } from "@ui/layout/sidebar/app-sidebar";
-import { AppHeader } from "@ui/layout/header/app-header";
 import { SidebarInset, SidebarProvider } from "@repo/ui/sidebar";
+import AppHeader from "@ui/layout/header/app-header";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (

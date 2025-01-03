@@ -1,9 +1,10 @@
+import React, { memo } from "react";
+import NavUser from "./nav-user";
 import { Button } from "@repo/ui/button";
-import { NavUser } from "./nav-user";
 import { SidebarFooter, SidebarTrigger } from "@repo/ui/sidebar";
 import { Bell } from "lucide-react";
 
-export const AppHeader: React.FC = () => {
+const AppHeader: React.FC = () => {
   return (
     <header className="sticky top-0 flex shrink-0 items-center justify-between gap-2 border-b bg-background p-2">
       <div>
@@ -29,3 +30,5 @@ export const AppHeader: React.FC = () => {
     </header>
   );
 };
+
+export default memo(AppHeader);

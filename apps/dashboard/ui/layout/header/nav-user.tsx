@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo } from "react";
 import { BadgeCheck, Bell, LogOut, Sparkles, Palette } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
 import {
@@ -29,12 +29,11 @@ import { signOut } from "@ui/auth/actions";
 import { useTheme } from "next-themes";
 import { createClient } from "@repo/supabase/client";
 
-// Function to get the first character of the user's full name
 const getFirstCharacter = (fullName: string) => {
   return fullName.charAt(0).toUpperCase() || "";
 };
 
-export function NavUser() {
+const NavUser: React.FC = () => {
   const { theme, setTheme } = useTheme();
   const { isMobile } = useSidebar();
   const [userMetadata, setUserMetadata] = useState<{
@@ -167,4 +166,6 @@ export function NavUser() {
       </SidebarMenuItem>
     </SidebarMenu>
   );
-}
+};
+
+export default memo(NavUser);
