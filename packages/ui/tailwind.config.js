@@ -2,9 +2,9 @@ import tailwindcssAnimate from "tailwindcss-animate";
 
 const config = {
   darkMode: ["class"],
-  // TODO: Check these paths
   content: [
-    "../../apps/dashboard/**/*.{ts,tsx}",
+    "../../apps/dashboard/app/**/*.{ts,tsx}",
+    "../../apps/dashboard/ui/**/*.{ts,tsx}",
     "../../packages/ui/src/components/**/*.{ts,tsx}",
   ],
   theme: {
