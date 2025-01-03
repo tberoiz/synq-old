@@ -149,10 +149,6 @@ const NavUser: React.FC = () => {
                   </SelectContent>
                 </Select>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell />
-                Notifications
-              </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
