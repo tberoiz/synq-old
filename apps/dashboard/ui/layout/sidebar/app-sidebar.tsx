@@ -21,36 +21,37 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@repo/ui/sidebar";
+import Link from "next/link";
 
 const data = {
   navMain: [
     {
       title: "Overview",
-      url: "#",
+      url: "/overview",
       icon: ChartLine,
       isActive: true,
     },
     {
       title: "Orders",
-      url: "#",
+      url: "/orders",
       icon: WalletCards,
       isActive: false,
     },
     {
       title: "Inventory",
-      url: "#",
+      url: "/inventory",
       icon: Package,
       isActive: false,
     },
     {
       title: "Integrations",
-      url: "#",
+      url: "/integrations",
       icon: Blocks,
       isActive: false,
     },
     {
       title: "Settings",
-      url: "#",
+      url: "/settings",
       icon: Settings,
       isActive: false,
     },
@@ -70,7 +71,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton size="lg" asChild className="md:h-8 md:p-0">
-                <a href="#">
+                <Link href="/overview">
                   <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                     <Command />
                   </div>
@@ -80,7 +81,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       <span className="truncate text-xs">Enterprise</span>
                     </div>
                   )}
-                </a>
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
@@ -91,26 +92,28 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <SidebarMenu>
                 {data.navMain.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      tooltip={{
-                        children: item.title,
-                        hidden: false,
-                      }}
-                      onClick={() => {
-                        setActiveItem(item);
-                        //TODO: Close the sidebar when routing in mobile to enhance user experience
-                      }}
-                      isActive={activeItem.title === item.title}
-                      className={`px-2.5 md:px-2 ${isMobile ? "" : "size-12"}`}
-                    >
-                      <item.icon
-                        style={{
-                          width: isMobile ? undefined : "1.2rem",
-                          height: isMobile ? undefined : "1.2rem",
+                    <Link href={item.url} passHref>
+                      <SidebarMenuButton
+                        tooltip={{
+                          children: item.title,
+                          hidden: false,
                         }}
-                      />
-                      {isMobile && <span>{item.title}</span>}
-                    </SidebarMenuButton>
+                        onClick={() => {
+                          setActiveItem(item);
+                          //TODO: Close the sidebar when routing in mobile to enhance user experience
+                        }}
+                        isActive={activeItem.title === item.title}
+                        className={`px-2.5 md:px-2 ${isMobile ? "" : "size-12"}`}
+                      >
+                        <item.icon
+                          style={{
+                            width: isMobile ? undefined : "1.2rem",
+                            height: isMobile ? undefined : "1.2rem",
+                          }}
+                        />
+                        {isMobile && <span>{item.title}</span>}
+                      </SidebarMenuButton>
+                    </Link>
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>
