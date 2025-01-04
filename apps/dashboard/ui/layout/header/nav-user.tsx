@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState, memo } from "react";
-import { BadgeCheck, Bell, LogOut, Sparkles, Palette } from "lucide-react";
+import { BadgeCheck, LogOut, Palette } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/avatar";
 import {
   DropdownMenu,
@@ -28,6 +28,7 @@ import {
 import { signOut } from "@ui/auth/actions";
 import { useTheme } from "next-themes";
 import { createClient } from "@repo/supabase/client";
+import Link from "next/link";
 
 const getFirstCharacter = (fullName: string) => {
   return fullName.charAt(0).toUpperCase() || "";
@@ -123,23 +124,19 @@ const NavUser: React.FC = () => {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
-              </DropdownMenuItem>
+              <Link href="/settings/account">
+                <DropdownMenuItem>
+                  <BadgeCheck />
+                  Account
+                </DropdownMenuItem>
+              </Link>
               <DropdownMenuItem>
                 <Palette />
                 Theme
                 <Select value={theme} onValueChange={handleThemeChange}>
-                  <SelectTrigger className="w-[20px]">
+                  <SelectTrigger className="w-[140px]">
                     <SelectValue placeholder="Theme" />
                   </SelectTrigger>
                   <SelectContent>
