@@ -18,31 +18,31 @@ import {
   ChartTooltipContent,
 } from "@repo/ui/chart"
 const chartData = [
-  { browser: "chrome", visitors: 275, fill: "var(--color-chrome)" },
-  { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
-  { browser: "firefox", visitors: 187, fill: "var(--color-firefox)" },
-  { browser: "edge", visitors: 173, fill: "var(--color-edge)" },
-  { browser: "other", visitors: 90, fill: "var(--color-other)" },
+  { inventory: "Inventory A", sales: 275, fill: "hsl(var(--chart-1))" },
+  { inventory: "Inventory B", sales: 200, fill: "hsl(var(--chart-2))" },
+  { inventory: "Inventory C", sales: 187, fill: "hsl(var(--chart-3))" },
+  { inventory: "Inventory D", sales: 173, fill: "hsl(var(--chart-4))" },
+  { inventory: "Inventory E", sales: 90, fill: "hsl(var(--chart-5))" },
 ]
 
 const chartConfig = {
-  visitors: {
-    label: "Visitors",
+  sales: {
+    label: "sales",
   },
-  chrome: {
-    label: "Chrome",
+  "Inventory A": {
+    label: "Inventory A ",
     color: "hsl(var(--chart-1))",
   },
-  safari: {
-    label: "Safari",
+  "Inventory B": {
+    label: "Inventory B ",
     color: "hsl(var(--chart-2))",
   },
-  firefox: {
-    label: "Firefox",
+  "Inventory C": {
+    label: "Inventory C ",
     color: "hsl(var(--chart-3))",
   },
-  edge: {
-    label: "Edge",
+  "Inventory D": {
+    label: "Inventory D ",
     color: "hsl(var(--chart-4))",
   },
   other: {
@@ -51,11 +51,11 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function CollectionChart() {
+export function InventoryPerformanceChart() {
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Pie Chart - Label</CardTitle>
+        <CardTitle>Top Inventories</CardTitle>
         <CardDescription>January - June 2024</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
@@ -65,7 +65,7 @@ export function CollectionChart() {
         >
           <PieChart>
             <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-            <Pie data={chartData} dataKey="visitors" label nameKey="browser" />
+            <Pie data={chartData} dataKey="sales" label nameKey="inventory" />
           </PieChart>
         </ChartContainer>
       </CardContent>
@@ -74,7 +74,7 @@ export function CollectionChart() {
           Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
         </div>
         <div className="leading-none text-muted-foreground">
-          Showing total visitors for the last 6 months
+          Showing total sales for the last 6 months
         </div>
       </CardFooter>
     </Card>
