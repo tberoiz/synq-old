@@ -1,13 +1,13 @@
-import { AppSidebar } from "@ui/layout/sidebar/app-sidebar";
+import { AppSidebar } from "@ui/layouts/sidebar/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@repo/ui/sidebar";
-import AppHeader from "@ui/layout/header/app-header";
+import AppHeader from "@ui/layouts/header/app-header";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider
       style={
         {
-          "--sidebar-width": "50px",
+          "--sidebar-width": "4rem",
         } as React.CSSProperties
       }
     >

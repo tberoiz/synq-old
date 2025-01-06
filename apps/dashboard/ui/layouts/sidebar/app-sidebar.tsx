@@ -8,6 +8,7 @@ import {
   Command,
   Blocks,
   Settings,
+  Volleyball,
 } from "lucide-react";
 
 import {
@@ -22,6 +23,7 @@ import {
   useSidebar,
 } from "@repo/ui/sidebar";
 import Link from "next/link";
+import { cn } from "@repo/ui/utils";
 
 const data = {
   navMain: [
@@ -70,10 +72,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton size="lg" asChild className="md:h-8 md:p-0">
+              <SidebarMenuButton size="xl" asChild className="md:h-8 md:p-0 flex justify-center">
                 <Link href="/overview">
                   <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                    <Command />
+                    <Volleyball />
                   </div>
                   {isMobile && (
                     <div className="grid flex-1 text-left text-sm leading-tight">
@@ -103,8 +105,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           //TODO: Close the sidebar when routing in mobile to enhance user experience
                         }}
                         isActive={activeItem.title === item.title}
-                        className={`px-2.5 md:px-2 ${isMobile ? "" : "size-12"}`}
-                      >
+                        className={cn(
+                          "px-2.5 md:px-2 flex justify-center",
+                          {
+                            "size-12": !isMobile,
+                          }
+                        )}                      >
                         <item.icon
                           style={{
                             width: isMobile ? undefined : "1.2rem",
