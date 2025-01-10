@@ -72,7 +72,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton size="xl" asChild className="md:h-8 md:p-0 flex justify-center">
+              <SidebarMenuButton size="lg" asChild className="md:h-8 md:p-0 flex justify-center">
                 <Link href="/overview">
                   <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                     <Volleyball />
