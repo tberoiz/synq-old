@@ -68,7 +68,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <>
-      <Sidebar variant="sidebar" className="border-r py-2" {...props}>
+      <Sidebar variant="sidebar" className="border-r py-2 z-40" {...props}>
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>

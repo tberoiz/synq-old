@@ -1,6 +1,7 @@
 import { AppSidebar } from "@ui/layouts/sidebar/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@repo/ui/sidebar";
 import AppHeader from "@ui/layouts/header/app-header";
+import AppContent from "@ui/layouts/content/app-content";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -14,7 +15,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <AppSidebar />
       <SidebarInset>
         <AppHeader />
-        <div className="flex flex-1 flex-col gap-4 p-4">{children}</div>
+        <AppContent>{children}</AppContent>
       </SidebarInset>
     </SidebarProvider>
   );
