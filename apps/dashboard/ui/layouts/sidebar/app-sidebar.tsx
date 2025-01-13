@@ -64,7 +64,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   // TODO: I'm using state to show active item.
   // IRL you should use the url/router.
   const [activeItem, setActiveItem] = React.useState(data.navMain[0]!);
-  const { isMobile } = useSidebar();
+  const { isMobile, setOpenMobile } = useSidebar();
 
   return (
     <>
@@ -102,7 +102,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         }}
                         onClick={() => {
                           setActiveItem(item);
-                          //TODO: Close the sidebar when routing in mobile to enhance user experience
+                          if (isMobile) {
+                            setOpenMobile(false);
+                          }
                         }}
                         isActive={activeItem.title === item.title}
                         className={cn(

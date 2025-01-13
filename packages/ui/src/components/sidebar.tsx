@@ -10,7 +10,7 @@ import { cn } from "#lib/utils.js";
 import { Button } from "#components/button.js";
 import { Input } from "#components/input.js";
 import { Separator } from "#components/separator.js";
-import { Sheet, SheetContent } from "#components/sheet.js";
+import { Sheet, SheetContent, SheetTitle } from "#components/sheet.js";
 import { Skeleton } from "#components/skeleton.js";
 import {
   Tooltip,
@@ -19,10 +19,12 @@ import {
   TooltipTrigger,
 } from "#components/tooltip.js";
 
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
+
 const SIDEBAR_COOKIE_NAME = "sidebar:state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 const SIDEBAR_WIDTH = "16rem";
-const SIDEBAR_WIDTH_MOBILE = "18rem";
+const SIDEBAR_WIDTH_MOBILE = "12rem";
 const SIDEBAR_WIDTH_ICON = "3rem";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
 
@@ -203,10 +205,13 @@ const Sidebar = React.forwardRef<
     if (isMobile) {
       return (
         <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
+          <SheetTitle className="hidden">
+            <VisuallyHidden.Root>x</VisuallyHidden.Root>
+          </SheetTitle>
           <SheetContent
             data-sidebar="sidebar"
             data-mobile="true"
-            className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+            className="w-[--sidebar-width] p-0 text-sidebar-foreground [&>button]:hidden"
             style={
               {
                 "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
@@ -500,7 +505,7 @@ const SidebarMenu = React.forwardRef<
   <ul
     ref={ref}
     data-sidebar="menu"
-    className={cn("flex w-full min-w-0 flex-col gap-1", className)}
+    className={cn("flex w-full min-w-0 flex-col gap-1 items-start md:items-center", className)}
     {...props}
   />
 ));
