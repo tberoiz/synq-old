@@ -8,7 +8,6 @@ import {
   Command,
   Blocks,
   Settings,
-  Volleyball,
 } from "lucide-react";
 
 import {
@@ -75,7 +74,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <SidebarMenuButton size="lg" asChild className="md:h-8 md:p-0 flex justify-center">
                 <Link href="/overview">
                   <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                    <Volleyball />
+                    <Command strokeWidth={2} />
                   </div>
                   {isMobile && (
                     <div className="grid flex-1 text-left text-sm leading-tight">
@@ -114,6 +113,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           }
                         )}                      >
                         <item.icon
+                          strokeWidth={1}
                           style={{
                             width: isMobile ? undefined : "1.2rem",
                             height: isMobile ? undefined : "1.2rem",
