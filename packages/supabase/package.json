@@ -18,16 +18,16 @@
   },
   "exports": {
     "./client": {
-      "types": "./dist/client/client.d.ts",
-      "default": "./dist/client/client.js"
+      "types": "./dist/utils/client.d.ts",
+      "default": "./dist/utils/client.js"
     },
     "./middleware": {
-      "types": "./dist/client/middleware.d.ts",
-      "default": "./dist/client/middleware.js"
+      "types": "./dist/auth/middleware.d.ts",
+      "default": "./dist/auth/middleware.js"
     },
     "./server": {
-      "types": "./dist/client/server.d.ts",
-      "default": "./dist/client/server.js"
+      "types": "./dist/utils/server.d.ts",
+      "default": "./dist/utils/server.js"
     },
     "./types": {
       "types": "./dist/types/index.d.ts",
