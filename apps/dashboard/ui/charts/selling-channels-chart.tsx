@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { TrendingUp } from "lucide-react"
-import { Label, Pie, PieChart } from "recharts"
+import * as React from "react";
+import { TrendingUp } from "lucide-react";
+import { Label, Pie, PieChart } from "recharts";
 
 import {
   Card,
@@ -11,20 +11,20 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@repo/ui/card"
+} from "@repo/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@repo/ui/chart"
+} from "@repo/ui/chart";
 const chartData = [
   { sellingChanel: "Channel 1", orders: 275, fill: "hsl(var(--chart-1))" },
   { sellingChanel: "Channel 2", orders: 200, fill: "hsl(var(--chart-2))" },
   { sellingChanel: "Channel 3", orders: 287, fill: "hsl(var(--chart-3))" },
   { sellingChanel: "Channel 4", orders: 173, fill: "hsl(var(--chart-4))" },
   { sellingChanel: "other", orders: 190, fill: "hsl(var(--chart-5))" },
-]
+];
 
 const chartConfig = {
   orders: {
@@ -50,12 +50,12 @@ const chartConfig = {
     label: "Other",
     color: "hsl(var(--chart-5))",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 export function SellingChannelsChart() {
   const totalorders = React.useMemo(() => {
-    return chartData.reduce((acc, curr) => acc + curr.orders, 0)
-  }, [])
+    return chartData.reduce((acc, curr) => acc + curr.orders, 0);
+  }, []);
 
   return (
     <Card className="flex flex-col">
@@ -105,7 +105,7 @@ export function SellingChannelsChart() {
                           Orders
                         </tspan>
                       </text>
-                    )
+                    );
                   }
                 }}
               />
@@ -122,5 +122,5 @@ export function SellingChannelsChart() {
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }

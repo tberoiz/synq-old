@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { TrendingUp } from "lucide-react"
-import { Pie, PieChart } from "recharts"
+import { TrendingUp } from "lucide-react";
+import { Pie, PieChart } from "recharts";
 
 import {
   Card,
@@ -10,20 +10,20 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@repo/ui/card"
+} from "@repo/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@repo/ui/chart"
+} from "@repo/ui/chart";
 const chartData = [
   { inventory: "Inventory A", sales: 275, fill: "hsl(var(--chart-1))" },
   { inventory: "Inventory B", sales: 200, fill: "hsl(var(--chart-2))" },
   { inventory: "Inventory C", sales: 187, fill: "hsl(var(--chart-3))" },
   { inventory: "Inventory D", sales: 173, fill: "hsl(var(--chart-4))" },
   { inventory: "Inventory E", sales: 90, fill: "hsl(var(--chart-5))" },
-]
+];
 
 const chartConfig = {
   sales: {
@@ -49,7 +49,7 @@ const chartConfig = {
     label: "Other",
     color: "hsl(var(--chart-5))",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 export function InventoryPerformanceChart() {
   return (
@@ -78,5 +78,5 @@ export function InventoryPerformanceChart() {
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }

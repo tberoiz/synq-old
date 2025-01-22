@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { TrendingUp } from "lucide-react"
-import { CartesianGrid, LabelList, Line, LineChart, XAxis } from "recharts"
+import { TrendingUp } from "lucide-react";
+import { CartesianGrid, LabelList, Line, LineChart, XAxis } from "recharts";
 
 import {
   Card,
@@ -10,28 +10,28 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@repo/ui/card"
+} from "@repo/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@repo/ui/chart"
+} from "@repo/ui/chart";
 const chartData = [
   { month: "January", stock: 186 },
-  { month: "February", stock: 305  },
-  { month: "March", stock: 237  },
-  { month: "April", stock: 73  },
-  { month: "May", stock: 209  },
-  { month: "June", stock: 214  },
-]
+  { month: "February", stock: 305 },
+  { month: "March", stock: 237 },
+  { month: "April", stock: 73 },
+  { month: "May", stock: 209 },
+  { month: "June", stock: 214 },
+];
 
 const chartConfig = {
   stock: {
     label: "Total Stock",
     color: "hsl(var(--chart-1))",
-  }
-} satisfies ChartConfig
+  },
+} satisfies ChartConfig;
 
 export function StockChart() {
   return (
@@ -94,5 +94,5 @@ export function StockChart() {
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }

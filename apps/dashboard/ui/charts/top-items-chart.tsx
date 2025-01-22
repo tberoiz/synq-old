@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { TrendingUp } from "lucide-react"
-import { Bar, BarChart, XAxis, YAxis } from "recharts"
+import { TrendingUp } from "lucide-react";
+import { Bar, BarChart, XAxis, YAxis } from "recharts";
 
 import {
   Card,
@@ -10,13 +10,13 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@repo/ui/card"
+} from "@repo/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@repo/ui/chart"
+} from "@repo/ui/chart";
 
 const chartData = [
   { item: "Item A", sales: 300, fill: "hsl(var(--chart-1))" },
@@ -24,7 +24,7 @@ const chartData = [
   { item: "Item C", sales: 200, fill: "hsl(var(--chart-3))" },
   { item: "Item D", sales: 150, fill: "hsl(var(--chart-4))" },
   { item: "Item E", sales: 100, fill: "hsl(var(--chart-5))" },
-]
+];
 
 const chartConfig = {
   sales: {
@@ -50,7 +50,7 @@ const chartConfig = {
     label: "Item E",
     color: "hsl(var(--chart-5))",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 export function TopItemsChart() {
   return (
@@ -97,5 +97,5 @@ export function TopItemsChart() {
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }

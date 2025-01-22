@@ -6,12 +6,7 @@ import {
   TooltipTrigger,
 } from "@repo/ui/tooltip";
 
-import {
-  FolderKanban,
-  Tags,
-  GalleryVerticalEnd,
-  Grip,
-} from "lucide-react";
+import { FolderKanban, Tags, GalleryVerticalEnd, Grip } from "lucide-react";
 
 import Link from "next/link";
 import { memo } from "react";
@@ -67,4 +62,4 @@ function InventoryCard({
     </Link>
   );
 }
-export default memo(InventoryCard)
+export default memo(InventoryCard);

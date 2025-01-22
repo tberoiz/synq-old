@@ -71,7 +71,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton size="lg" asChild className="md:h-8 md:p-0 flex justify-center">
+              <SidebarMenuButton
+                size="lg"
+                asChild
+                className="md:h-8 md:p-0 flex justify-center"
+              >
                 <Link href="/overview">
                   <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                     <Command strokeWidth={2} />
@@ -106,12 +110,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           }
                         }}
                         isActive={activeItem.title === item.title}
-                        className={cn(
-                          "px-2.5 md:px-2 flex justify-center",
-                          {
-                            "size-12": !isMobile,
-                          }
-                        )}                      >
+                        className={cn("px-2.5 md:px-2 flex justify-center", {
+                          "size-12": !isMobile,
+                        })}
+                      >
                         <item.icon
                           strokeWidth={1}
                           style={{
