@@ -6,7 +6,7 @@ import {
   TooltipTrigger,
 } from "@repo/ui/tooltip";
 
-import { FolderKanban, Tags, GalleryVerticalEnd, Grip } from "lucide-react";
+import { FolderKanban, Tags, GalleryVerticalEnd, Grip, Package2, Package } from "lucide-react";
 
 import Link from "next/link";
 import { memo } from "react";
@@ -31,7 +31,7 @@ function InventoryCard({
       <Card className="cursor-pointer hover:shadow-md" draggable>
         <CardContent className="p-4">
           <div className="flex items-center space-x-4">
-            <FolderKanban />
+            <Package strokeWidth={1} />
             <div className="flex-1 space-y-1">
               <p className="text-sm font-medium leading-none">{name}</p>
               <div className="flex gap-2">

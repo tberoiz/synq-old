@@ -35,7 +35,7 @@ function ItemCard({
       <SheetTrigger asChild draggable>
         <div className="rounded-md border p-4 cursor-pointer hover:shadow-md">
           <div className="flex items-center space-x-4">
-            <Tag />
+            <Tag strokeWidth={1} />
             <div className="flex-1 space-y-1">
               <p className="text-sm font-medium leading-none text-left">
                 {name}
