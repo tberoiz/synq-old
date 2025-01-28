@@ -50,7 +50,7 @@ const NavUser: React.FC = () => {
   useEffect(() => {
     const storedTheme = localStorage.getItem("theme") || "system";
     setTheme(storedTheme);
-
+    // FIXME: Avoid calling too many times to the user fetch. Use a user provider instead.
     const fetchUserInfo = async () => {
       const supabase = await createClient();
       const {
