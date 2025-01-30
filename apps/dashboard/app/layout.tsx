@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "./providers";
 import "@repo/ui/globals.css";
+import { Toaster } from "@repo/ui/toaster";
 
 export const metadata: Metadata = {
   title: "Gaia",
@@ -23,6 +24,7 @@ export default function RootLayout({
         >
           {children}
         </ThemeProvider>
+        <Toaster />
       </body>
     </html>
   );

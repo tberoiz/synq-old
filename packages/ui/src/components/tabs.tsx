@@ -16,7 +16,7 @@ const TabsList = React.forwardRef<
     ref={ref}
     className={cn(
       "inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground",
-      className
+      className,
     )}
     {...props}
   />
@@ -28,7 +28,8 @@ const tabsTriggerVariants = cva(
   {
     variants: {
       variant: {
-        default: "data-[state=active]:bg-background data-[state=active]:text-foreground",
+        default:
+          "data-[state=active]:bg-background data-[state=active]:text-foreground",
         outline:
           "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
         ghost: "hover:bg-accent hover:text-accent-foreground",
@@ -44,7 +45,7 @@ const tabsTriggerVariants = cva(
       variant: "default",
       size: "default",
     },
-  }
+  },
 );
 
 interface TabsTriggerProps
@@ -71,7 +72,7 @@ const TabsContent = React.forwardRef<
     ref={ref}
     className={cn(
       "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-      className
+      className,
     )}
     {...props}
   />

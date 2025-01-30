@@ -6,7 +6,14 @@ import {
   TooltipTrigger,
 } from "@repo/ui/tooltip";
 
-import { FolderKanban, Tags, GalleryVerticalEnd, Grip, Package2, Package } from "lucide-react";
+import {
+  FolderKanban,
+  Tags,
+  GalleryVerticalEnd,
+  Grip,
+  Package2,
+  Package,
+} from "lucide-react";
 
 import Link from "next/link";
 import { memo } from "react";
