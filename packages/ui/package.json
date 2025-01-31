@@ -57,6 +57,7 @@
     "react-day-picker": "^9.5.0",
     "react-hook-form": "^7.54.2",
     "recharts": "^2.15.0",
+    "vaul": "^1.1.2",
     "zod": "^3.24.1"
   },
   "imports": {
@@ -122,6 +123,10 @@
     "./dialog": {
       "types": "./dist/components/dialog.d.ts",
       "default": "./dist/components/dialog.js"
+    },
+    "./drawer": {
+      "types": "./dist/components/drawer.d.ts",
+      "default": "./dist/components/drawer.js"
     },
     "./dropdown-menu": {
       "types": "./dist/components/dropdown-menu.d.ts",
