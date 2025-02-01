@@ -1,13 +1,10 @@
 "use client";
-
-import { TrendingUp } from "lucide-react";
 import { CartesianGrid, LabelList, Line, LineChart, XAxis } from "recharts";
 
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@repo/ui/card";
@@ -36,7 +33,7 @@ const chartConfig = {
 export function StockChart() {
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="items-center">
         <CardTitle>Total Stock</CardTitle>
         <CardDescription>January - June 2024</CardDescription>
       </CardHeader>

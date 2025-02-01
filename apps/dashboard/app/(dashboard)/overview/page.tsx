@@ -1,4 +1,3 @@
-import { Card, CardHeader, CardTitle, CardContent } from "@repo/ui/card";
 import { SellingChannelsChart } from "@ui/charts/selling-channels-chart";
 import { InventoryPerformanceChart } from "@ui/charts/inventory-performance-chart";
 import { OverviewChart } from "@ui/charts/total-revenue-chart";

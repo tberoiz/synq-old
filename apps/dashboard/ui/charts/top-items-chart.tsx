@@ -1,6 +1,4 @@
 "use client";
-
-import { TrendingUp } from "lucide-react";
 import { Bar, BarChart, XAxis, YAxis } from "recharts";
 
 import {
@@ -55,7 +53,7 @@ const chartConfig = {
 export function TopItemsChart() {
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="items-center">
         <CardTitle>Top Selling Items</CardTitle>
         <CardDescription>Sales Data for January - June 2024</CardDescription>
       </CardHeader>
