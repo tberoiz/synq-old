@@ -1,4 +1,10 @@
-import { Card, CardHeader, CardContent } from "@repo/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardTitle,
+  CardDescription,
+} from "@repo/ui/card";
 import {
   Drawer,
   DrawerContent,
@@ -8,65 +14,81 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@repo/ui/drawer";
-
 import { Button } from "@repo/ui/button";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Blocks } from "lucide-react";
 
-export default function IntegrationCard() {
+export default function IntegrationCard({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) {
   return (
-    <Card>
-      <CardHeader className="flex flex-row justify-start space-y-2 space-x-2 pb-2">
-        <h3 className="text-2xl font-extralight">Integration A</h3>
+    <Card className="w-full max-w-md">
+      <CardHeader className="flex flex-row items-center space-x-4 pb-4">
+        <Blocks className="h-8 w-8 text-primary" strokeWidth={1} />
+        <CardTitle>{title}</CardTitle>
       </CardHeader>
-      <CardContent>
-        <p className="text-xs text-muted-foreground">
-          Sync your inventory, track orders, and update stock levels in
-          real-time by connecting your Integration A account. Manage listings and view
-          sales data seamlessly.
-        </p>
-        <div className="mt-4">
+      <CardContent className="space-y-4">
+        <p className="text-sm text-muted-foreground">{description}</p>
+        <div className="mt-6 flex space-x-4">
           <Drawer>
             <DrawerTrigger asChild>
-              <Button className="mr-2" variant="outline">
+              <Button variant="outline" className="flex-1">
                 See Details
               </Button>
             </DrawerTrigger>
             <DrawerContent>
               <div className="mx-auto w-full max-w-sm">
                 <DrawerHeader>
-                  <DrawerTitle>Integration A Details</DrawerTitle>
+                  <DrawerTitle className="text-xl">
+                    Integration Details
+                  </DrawerTitle>
                   <DrawerDescription>
-                    Enhance your Integration A experience with seamless integration.
+                    Enhance your experience with seamless integration.
                   </DrawerDescription>
                 </DrawerHeader>
-              </div>
-              <div className="p-4 pb-0">
-                <div className="flex items-center justify-center space-x-2">
-                  <ul className="list-none space-y-2">
-                    <li className="flex items-center">
-                      <CheckCircle className="mr-2" />
-                      Sync your Integration A inventory with ease.
+                <div className="p-4 pb-0">
+                  <ul className="space-y-4">
+                    <li className="flex items-start">
+                      <CheckCircle className="mt-1 mr-8 h-5 w-5 flex-shrink-0" />
+                      <span className="text-sm text-foreground">
+                        Sync your Integration inventory with ease.
+                      </span>
                     </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="mr-2" />
-                      Track orders automatically and update stock in real-time.
+                    <li className="flex items-start">
+                      <CheckCircle className="mt-1 mr-8 h-5 w-5 flex-shrink-0" />
+                      <span className="text-sm text-foreground">
+                        Track orders automatically and update stock in
+                        real-time.
+                      </span>
                     </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="mr-2" />
-                      Manage listings directly from your dashboard.
+                    <li className="flex items-start">
+                      <CheckCircle className="mt-1 mr-8 h-5 w-5 flex-shrink-0" />
+                      <span className="text-sm text-foreground">
+                        Manage listings directly from your dashboard.
+                      </span>
                     </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="mr-2" />
-                      View detailed sales data and analytics.
+                    <li className="flex items-start">
+                      <CheckCircle className="mt-1 mr-8 h-5 w-5 flex-shrink-0" />
+                      <span className="text-sm text-foreground">
+                        View detailed sales data and analytics.
+                      </span>
                     </li>
                   </ul>
                 </div>
               </div>
               <DrawerFooter>
+                <Button variant="default" className="w-full">
+                  Get Started
+                </Button>
               </DrawerFooter>
             </DrawerContent>
           </Drawer>
-          <Button variant="default">Install</Button>
+          <Button variant="default" className="flex-1">
+            Install
+          </Button>
         </div>
       </CardContent>
     </Card>
