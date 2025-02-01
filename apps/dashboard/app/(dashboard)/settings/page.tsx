@@ -27,7 +27,7 @@ const tabsNavItems = [
 
 export default function SettingsPage() {
   return (
-    <Card className="w-full h-full">
+    <Card className="w-full h-full border-0 shadow-none">
       <Tabs
         defaultValue={
           tabsNavItems.length > 0 && tabsNavItems[0]?.key
@@ -47,17 +47,17 @@ export default function SettingsPage() {
           </TabsList>
         </CardHeader>
         <Separator className="w-full" />
-        <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6 w-1/4">
+        <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6 w-1/4 border-none">
           {tabsNavItems.map((tab) => (
             <TabsContent key={tab.key} value={tab.key}>
               <div className="space-y-6">
-                <div>
+                {/* <div>
                   <h3 className="text-lg font-medium">{tab.title}</h3>
                   <p className="text-sm text-muted-foreground">
                     {tab.description}
                   </p>
                 </div>
-                <Separator />
+                <Separator /> */}
                 {tab.content}
               </div>
             </TabsContent>

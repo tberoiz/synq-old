@@ -125,7 +125,7 @@ const NavUser: React.FC = () => {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <Link href="/settings/account">
+              <Link href="/settings">
                 <DropdownMenuItem>
                   <BadgeCheck />
                   Account
