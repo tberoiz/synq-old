@@ -73,6 +73,33 @@
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
+  .neon {
+    --background: 232 92% 8%;
+    --foreground: 210 30% 98%;
+    --card: 232 92% 8%;
+    --card-foreground: 210 30% 98%;
+    --popover: 232 92% 8%;
+    --popover-foreground: 210 30% 98%;
+    --primary: 265 85% 55%;
+    --primary-foreground: 210 30% 98%;
+    --secondary: 217 45% 20%;
+    --secondary-foreground: 210 30% 98%;
+    --muted: 217 40% 22%;
+    --muted-foreground: 217.9 12% 70%;
+    --accent: 267 90% 65%;
+    --accent-foreground: 210 30% 98%;
+    --destructive: 350 75% 45%;
+    --destructive-foreground: 210 30% 98%;
+    --border: 217 40% 22%;
+    --input: 217 40% 22%;
+    --ring: 267 90% 55%;
+    --chart-1: 220 80% 55%;
+    --chart-2: 150 70% 50%;
+    --chart-3: 35 90% 60%;
+    --chart-4: 280 75% 65%;
+    --chart-5: 340 85% 60%;
+}
 }
 
 @layer base {
