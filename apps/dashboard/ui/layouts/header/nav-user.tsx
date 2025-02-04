@@ -24,12 +24,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/select";
-
 import { signOut } from "@ui/auth/actions";
 import { useTheme } from "next-themes";
 import { createClient } from "@repo/supabase/client";
 import Link from "next/link";
 
+// Helper function to get the first character of a name
 const getFirstCharacter = (fullName: string) => {
   return fullName.charAt(0).toUpperCase() || "";
 };
@@ -47,12 +47,10 @@ const NavUser: React.FC = () => {
     avatar_url: "",
   });
 
+  // Fetch user info on mount
   useEffect(() => {
-    const storedTheme = localStorage.getItem("theme") || "system";
-    setTheme(storedTheme);
-    // FIXME: Avoid calling too many times to the user fetch. Use a user provider instead.
     const fetchUserInfo = async () => {
-      const supabase = await createClient();
+      const supabase = createClient();
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -65,8 +63,15 @@ const NavUser: React.FC = () => {
     };
 
     fetchUserInfo();
+  }, []);
+
+  // Set theme from localStorage on mount
+  useEffect(() => {
+    const storedTheme = localStorage.getItem("theme") || "system";
+    setTheme(storedTheme);
   }, [setTheme]);
 
+  // Handle theme change
   const handleThemeChange = (newTheme: string) => {
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme);
@@ -127,12 +132,12 @@ const NavUser: React.FC = () => {
             <DropdownMenuGroup>
               <Link href="/settings">
                 <DropdownMenuItem>
-                  <BadgeCheck />
+                  <BadgeCheck className="mr-2 h-4 w-4" />
                   Account
                 </DropdownMenuItem>
               </Link>
               <DropdownMenuItem>
-                <Palette />
+                <Palette className="mr-2 h-4 w-4" />
                 Theme
                 <Select value={theme} onValueChange={handleThemeChange}>
                   <SelectTrigger className="w-[140px]">
@@ -141,6 +146,7 @@ const NavUser: React.FC = () => {
                   <SelectContent>
                     <SelectItem value="light">Light</SelectItem>
                     <SelectItem value="dark">Dark</SelectItem>
+                    <SelectItem value="neon">Neon</SelectItem>
                     <SelectItem value="system">System</SelectItem>
                   </SelectContent>
                 </Select>
@@ -148,7 +154,10 @@ const NavUser: React.FC = () => {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <button onClick={signOut} className="flex items-center gap-2">
+              <button
+                onClick={signOut}
+                className="flex w-full items-center gap-2"
+              >
                 <LogOut className="h-4 w-4" />
                 <span>Log out</span>
               </button>
