@@ -1,5 +1,5 @@
 {
-  "name": "@repo/ui",
+  "name": "@refrom/ui",
   "version": "0.0.0",
   "type": "module",
   "private": true,
@@ -13,7 +13,7 @@
     "react-is": "^19.0.0-rc-69d4b800-20241021"
   },
   "devDependencies": {
-    "@repo/typescript-config": "*",
+    "@refrom/typescript-config": "*",
     "@types/node": "^20.11.24",
     "@types/react": "19.0.0",
     "@types/react-dom": "19.0.0",

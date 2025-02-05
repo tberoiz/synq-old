@@ -1,9 +1,9 @@
 import { GalleryVerticalEnd } from "lucide-react";
 
-import { cn } from "@repo/ui/utils";
-import { Button } from "@repo/ui/button";
-import { Input } from "@repo/ui/input";
-import { Label } from "@repo/ui/label";
+import { cn } from "@refrom/ui/utils";
+import { Button } from "@refrom/ui/button";
+import { Input } from "@refrom/ui/input";
+import { Label } from "@refrom/ui/label";
 
 import { signUpWithPassword } from "../actions";
 import { OAuthButton } from "../components/provider-button";

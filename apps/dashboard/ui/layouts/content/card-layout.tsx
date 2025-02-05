@@ -4,7 +4,7 @@ import {
   CardTitle,
   CardDescription,
   CardContent,
-} from "@repo/ui/card";
+} from "@refrom/ui/card";
 import { ReactNode } from "react";
 
 interface CardLayoutProps {

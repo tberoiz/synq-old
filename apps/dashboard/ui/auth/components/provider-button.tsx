@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@repo/ui/button";
+import { Button } from "@refrom/ui/button";
 import { signInWithOAuth } from "../actions";
 import { JSX } from "react";
 

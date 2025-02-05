@@ -20,9 +20,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@repo/ui/sidebar";
+} from "@refrom/ui/sidebar";
 import Link from "next/link";
-import { cn } from "@repo/ui/utils";
+import { cn } from "@refrom/ui/utils";
 
 const data = {
   navMain: [

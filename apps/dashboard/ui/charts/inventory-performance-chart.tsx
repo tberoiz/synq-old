@@ -10,13 +10,13 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@repo/ui/card";
+} from "@refrom/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@repo/ui/chart";
+} from "@refrom/ui/chart";
 const chartData = [
   { inventory: "Inventory A", sales: 275, fill: "hsl(var(--chart-1))" },
   { inventory: "Inventory B", sales: 200, fill: "hsl(var(--chart-2))" },

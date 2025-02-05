@@ -1,7 +1,7 @@
 import React, { memo } from "react";
 import NavUser from "./nav-user";
-import { Button } from "@repo/ui/button";
-import { SidebarFooter, SidebarTrigger } from "@repo/ui/sidebar";
+import { Button } from "@refrom/ui/button";
+import { SidebarFooter, SidebarTrigger } from "@refrom/ui/sidebar";
 import { Bell } from "lucide-react";
 
 const AppHeader: React.FC = () => {
@@ -12,7 +12,7 @@ const AppHeader: React.FC = () => {
       </div>
       <SidebarFooter>
         <div className="flex gap-2 items-center">
-          <Button
+          {/* <Button
             size="icon"
             variant="outline"
             className="rounded-full h-8 w-8 px-4 relative"
@@ -22,7 +22,7 @@ const AppHeader: React.FC = () => {
               className="absolute right-0 top-0 w-2 h-2 rounded-full"
               style={{ backgroundColor: "rgb(255, 208, 43)" }}
             />
-          </Button>
+          </Button> */}
 
           <NavUser />
         </div>

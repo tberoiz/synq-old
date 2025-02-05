@@ -8,13 +8,13 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@repo/ui/card";
+} from "@refrom/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@repo/ui/chart";
+} from "@refrom/ui/chart";
 
 const chartData = [
   { item: "Item A", sales: 300, fill: "hsl(var(--chart-1))" },

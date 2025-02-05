@@ -1,4 +1,4 @@
-import { Label } from "@repo/ui/label";
+import { Label } from "@refrom/ui/label";
 import { memo } from "react";
 
 function ItemDetailsForm() {

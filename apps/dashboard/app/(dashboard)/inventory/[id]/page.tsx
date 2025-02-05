@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@repo/ui/button";
+import { Button } from "@refrom/ui/button";
 import InventoryCard from "@ui/cards/inventory-card";
 import ItemCard from "@ui/cards/item-card";
 import { ArrowLeft } from "lucide-react";

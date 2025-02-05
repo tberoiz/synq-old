@@ -7,13 +7,13 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@repo/ui/card";
+} from "@refrom/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@repo/ui/chart";
+} from "@refrom/ui/chart";
 const chartData = [
   { month: "January", stock: 186 },
   { month: "February", stock: 305 },

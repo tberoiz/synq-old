@@ -1,10 +1,10 @@
-import { Card, CardContent } from "@repo/ui/card";
+import { Card, CardContent } from "@refrom/ui/card";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@repo/ui/tooltip";
+} from "@refrom/ui/tooltip";
 
 import {
   FolderKanban,

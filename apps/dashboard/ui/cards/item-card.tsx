@@ -6,7 +6,7 @@ import {
   SheetTitle,
   SheetFooter,
   SheetDescription,
-} from "@repo/ui/sheet";
+} from "@refrom/ui/sheet";
 import { memo } from "react";
 import { GalleryVerticalEnd, EllipsisVertical, Tag, Grip } from "lucide-react";
 import {
@@ -14,10 +14,10 @@ import {
   Tooltip,
   TooltipTrigger,
   TooltipContent,
-} from "@repo/ui/tooltip";
+} from "@refrom/ui/tooltip";
 import ItemDetailsForm from "@ui/forms/item-details-form";
-import { Separator } from "@repo/ui/separator";
-import { Button } from "@repo/ui/button";
+import { Separator } from "@refrom/ui/separator";
+import { Button } from "@refrom/ui/button";
 
 function ItemCard({
   name,

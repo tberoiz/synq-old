@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "./providers";
-import "@repo/ui/globals.css";
-import { Toaster } from "@repo/ui/toaster";
+import "@refrom/ui/globals.css";
+import { Toaster } from "@refrom/ui/toaster";
 
 export const metadata: Metadata = {
   title: "ReFrom",

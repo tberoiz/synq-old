@@ -4,7 +4,7 @@ import {
   CardContent,
   CardTitle,
   CardDescription,
-} from "@repo/ui/card";
+} from "@refrom/ui/card";
 import {
   Drawer,
   DrawerContent,
@@ -13,10 +13,10 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@repo/ui/drawer";
-import { Button } from "@repo/ui/button";
+} from "@refrom/ui/drawer";
+import { Button } from "@refrom/ui/button";
 import { CheckCircle, Blocks } from "lucide-react";
-import { Badge } from "@repo/ui/badge";
+import { Badge } from "@refrom/ui/badge";
 
 export default function IntegrationCard({
   name,

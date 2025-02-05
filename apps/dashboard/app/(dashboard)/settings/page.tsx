@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@refrom/ui/tabs";
 import { AccountForm } from "@ui/forms/settings/account-form";
 import { NotificationsForm } from "@ui/forms/settings/notifications-form";
 import { User, Bell } from "lucide-react";
