@@ -4,8 +4,8 @@ import "@repo/ui/globals.css";
 import { Toaster } from "@repo/ui/toaster";
 
 export const metadata: Metadata = {
-  title: "Gaia",
-  description: "description",
+  title: "ReFrom",
+  description: "Sell everywhere. Sync in one place.",
 };
 
 export default function RootLayout({

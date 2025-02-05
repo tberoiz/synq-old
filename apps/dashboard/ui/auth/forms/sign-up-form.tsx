@@ -24,9 +24,9 @@ export function SignUpForm({
               <div className="flex h-8 w-8 items-center justify-center rounded-md">
                 <GalleryVerticalEnd className="size-6" />
               </div>
-              <span className="sr-only">Gaia.com</span>
+              <span className="sr-only">Refrom.com</span>
             </a>
-            <h1 className="text-xl font-bold">Welcome to Gaia.com</h1>
+            <h1 className="text-xl font-bold">Welcome to ReFrom.com</h1>
             <div className="text-center text-sm">
               Already have an account?{" "}
               <a href="/auth/signin" className="underline underline-offset-4">
