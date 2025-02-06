@@ -39,6 +39,7 @@
     "@radix-ui/react-dropdown-menu": "^2.1.4",
     "@radix-ui/react-label": "^2.1.1",
     "@radix-ui/react-popover": "^1.1.5",
+    "@radix-ui/react-progress": "^1.1.1",
     "@radix-ui/react-radio-group": "^1.2.2",
     "@radix-ui/react-select": "^2.1.4",
     "@radix-ui/react-separator": "^1.1.1",
@@ -150,6 +151,10 @@
       "default": "./dist/components/popover.js"
     },
     "./postcss.config": "./postcss.config.mjs",
+    "./progress": {
+      "types": "./dist/components/progress.d.ts",
+      "default": "./dist/components/progress.js"
+    },
     "./radio-group": {
       "types": "./dist/components/radio-group.d.ts",
       "default": "./dist/components/radio-group.js"

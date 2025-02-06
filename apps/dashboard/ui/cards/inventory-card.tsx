@@ -1,72 +1,123 @@
+import { Button } from "@refrom/ui/button";
 import { Card, CardContent } from "@refrom/ui/card";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@refrom/ui/tooltip";
-
-import {
-  FolderKanban,
-  Tags,
-  GalleryVerticalEnd,
-  Grip,
-  Package2,
-  Package,
-} from "lucide-react";
-
+import { Tooltip, TooltipTrigger, TooltipContent } from "@refrom/ui/tooltip";
+import { cn } from "@refrom/ui/utils";
 import Link from "next/link";
-import { memo } from "react";
+import { AlertCircle, Package, Pencil, RefreshCw } from "lucide-react";
+import { CardMarketIcon, EbayIcon, EtsyIcon, GumroadIcon, ShopifyIcon, TCGPlayerIcon } from "@ui/icons/icons";
+import { Progress } from "@refrom/ui/progress";
 
 function InventoryCard({
   name,
   items,
   stock,
+  channel = [],
+  lowStockThreshold = 10,
 }: {
   name: string;
   items: number;
-  stock: number;
+  stock: number | undefined;
+  channel?: ("tcgplayer" | "ebay" | "shopify" | "gumroad" | "etsy" | "cardmarket")[];
+  lowStockThreshold?: number;
+  lastSynced?: Date;
 }) {
-  // TODO: Add more fields such as related active listing, total sales, etc.
-  const inventoryCardFields = [
-    { icon: Tags, tooltip: "Total items", value: items },
-    { icon: GalleryVerticalEnd, tooltip: "Total stock", value: stock },
-  ];
+  let isLowStock = null;
+  if (stock && stock !== undefined) {
+    isLowStock = stock <= lowStockThreshold;
+  }
+
+  // Platform icons mapping
+  const platformIcons = {
+    tcgplayer: <TCGPlayerIcon className="w-3 h-3" />,
+    ebay: <EbayIcon className="w-3 h-3" />,
+    shopify: <ShopifyIcon className="w-3 h-3" />,
+    gumroad: <GumroadIcon className="w-3 h-3" />,
+    etsy: <EtsyIcon className="w-3 h-3" />,
+    cardmarket: <CardMarketIcon className="w-3 h-3" />,
+  };
 
   return (
     <Link href={`/inventory/${name}`}>
-      <Card className="cursor-pointer hover:shadow-md" draggable>
-        <CardContent className="p-4">
-          <div className="flex items-center space-x-4">
-            <Package strokeWidth={1} />
-            <div className="flex-1 space-y-1">
-              <p className="text-sm font-medium leading-none">{name}</p>
-              <div className="flex gap-2">
-                {inventoryCardFields.map((field) => (
-                  <TooltipProvider key={field.tooltip}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span className="text-sm text-muted-foreground flex items-center cursor-pointer">
-                          <field.icon
-                            size={14}
-                            className="inline-flex mr-1 items-center"
-                          />
-                          {field.value}
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{field.tooltip}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                ))}
+      <Card className="relative hover:shadow-md transition-shadow group">
+        {/* Low Stock Alert */}
+        {isLowStock && stock !== undefined && (
+          <div className="absolute top-1 right-1">
+            <Tooltip>
+              <TooltipTrigger>
+                <AlertCircle className="h-3 w-3 text-red-500" />
+              </TooltipTrigger>
+              <TooltipContent className="text-xs">
+                Low stock alert! Only {stock} items remaining.
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        )}
+
+        <CardContent className="p-3">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              {/* Inventory Name */}
+              <div className="flex items-center gap-2 mb-2">
+                <Package className="h-4 w-4 text-primary" />
+                <h3 className="font-semibold text-sm">{name}</h3>
+                {channel.length > 0 && (
+                  <div className="flex gap-1">
+                    {channel.map((platform) => (
+                      <Tooltip key={platform}>
+                        <TooltipTrigger>
+                          <div className="p-1 bg-muted rounded-md">
+                            {platformIcons[platform]}
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent className="text-xs">
+                          Synced with {platform}
+                        </TooltipContent>
+                      </Tooltip>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Stock Information */}
+              <div className="space-y-1 mb-3 mt-3">
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">Stock</span>
+                  <span
+                    className={cn(
+                      "font-medium",
+                      isLowStock ? "text-red-600" : "text-muted-foreground"
+                    )}
+                  >
+                    {stock === undefined ? "Unlimited" : `${stock} remaining`}
+                  </span>
+                </div>
+                {/* Progress Bar */}
+                <Progress
+                  value={stock === undefined ? 100 : (stock / items) * 100}
+                  className={cn(
+                    "h-1.5",
+                    isLowStock ? "bg-red-200" : "bg-primary/20"
+                  )}
+                />
+              </div>
+
+              {/* Quick Actions */}
+              <div className="flex gap-1 opacity-100 group-hover:opacity-100 transition-opacity mt-3">
+                <Button variant="outline" size="sm" className="flex-1 text-xs">
+                  <RefreshCw className="h-3 w-3 mr-1" />
+                  Sync Now
+                </Button>
+                <Button variant="outline" size="sm" className="flex-1 text-xs">
+                  <Pencil className="h-3 w-3 mr-1" />
+                  Edit
+                </Button>
               </div>
             </div>
-            <Grip size={14} />
           </div>
         </CardContent>
       </Card>
     </Link>
   );
 }
-export default memo(InventoryCard);
+
+export default InventoryCard;

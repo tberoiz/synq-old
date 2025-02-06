@@ -1,6 +1,5 @@
 "use client";
 import { Button } from "@refrom/ui/button";
-import InventoryCard from "@ui/cards/inventory-card";
 import ItemCard from "@ui/cards/item-card";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -9,29 +8,28 @@ import { useRouter } from "next/navigation";
 const data = [
   {
     id: 1,
-    name: "Item A",
-    stock: 200,
+    name: "Black Lotus",
+    sku: "MTG-ALPHA-BL",
+    stock: 2,
+    platforms: ["tcgplayer", "ebay"],
+    listingsCount: 3,
+    lastSold: new Date('2024-03-15'),
+    lastSynced: new Date(),
+    priceHistory: [
+      { date: '2024-01-01', price: 25000 },
+      { date: '2024-03-01', price: 27500 }
+    ]
   },
   {
     id: 2,
-    name: "Item B",
-    stock: 300,
-  },
-  {
-    id: 3,
-    name: "Item C",
-    stock: 400,
-  },
-  {
-    id: 4,
-    name: "Item D",
-    stock: 100,
-  },
-  {
-    id: 5,
-    name: "Item E",
-    stock: 250,
-  },
+    name: "Charizard (1st Ed.)",
+    sku: "POKE-BS-4",
+    stock: 5,
+    platforms: ["ebay", "shopify"],
+    listingsCount: 2,
+    lastSold: new Date('2024-03-14'),
+    lastSynced: new Date()
+  }
 ];
 
 export default function InventoryPage() {
@@ -48,7 +46,6 @@ export default function InventoryPage() {
         Back
       </Button>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <InventoryCard name="Inventory 1" items={150} stock={200} />
         {data.map((item) => (
           <ItemCard key={item.id} name={item.name} stock={item.stock} />
         ))}
