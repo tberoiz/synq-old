@@ -5,7 +5,6 @@ import {
   ChartLine,
   Package,
   WalletCards,
-  Command,
   Blocks,
   Settings,
 } from "lucide-react";
@@ -23,114 +22,81 @@ import {
 } from "@refrom/ui/sidebar";
 import Link from "next/link";
 import { cn } from "@refrom/ui/utils";
+import { ReFromIcon } from "@ui/icons/icons";
+import { usePathname } from "next/navigation";
 
 const data = {
   navMain: [
-    {
-      title: "Overview",
-      url: "/overview",
-      icon: ChartLine,
-      isActive: true,
-    },
-    {
-      title: "Orders",
-      url: "/orders",
-      icon: WalletCards,
-      isActive: false,
-    },
-    {
-      title: "Inventory",
-      url: "/inventory",
-      icon: Package,
-      isActive: false,
-    },
-    {
-      title: "Integrations",
-      url: "/integrations",
-      icon: Blocks,
-      isActive: false,
-    },
-    {
-      title: "Settings",
-      url: "/settings",
-      icon: Settings,
-      isActive: false,
-    },
+    { title: "Overview", url: "/overview", icon: ChartLine },
+    { title: "Orders", url: "/orders", icon: WalletCards },
+    { title: "Inventory", url: "/inventory", icon: Package },
+    { title: "Integrations", url: "/integrations", icon: Blocks },
+    { title: "Settings", url: "/settings", icon: Settings },
   ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  // TODO: I'm using state to show active item.
-  // IRL you should use the url/router.
-  const [activeItem, setActiveItem] = React.useState(data.navMain[0]!);
+  const pathname = usePathname();
   const { isMobile, setOpenMobile } = useSidebar();
 
   return (
-    <>
-      <Sidebar variant="sidebar" className="border-r py-2 z-40" {...props}>
-        <SidebarHeader>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                size="lg"
-                asChild
-                className="md:h-8 md:p-0 flex justify-center"
-              >
-                <Link href="/overview">
-                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                    <Command strokeWidth={2} />
+    <Sidebar variant="sidebar" className="border-r py-4 z-40" {...props}>
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              size="lg"
+              asChild
+              className="md:h-10 md:p-0 flex justify-center"
+            >
+              <Link href="/overview">
+                <div className="flex aspect-square size-10 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                  <ReFromIcon />
+                </div>
+                {isMobile && (
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-semibold">ReFrom</span>
                   </div>
-                  {isMobile && (
-                    <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">Acme Inc</span>
-                      <span className="truncate text-xs">Enterprise</span>
-                    </div>
-                  )}
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarHeader>
-        <SidebarContent>
-          <SidebarGroup>
-            <SidebarGroupContent className="px-1.5 md:px-0">
-              <SidebarMenu>
-                {data.navMain.map((item) => (
+                )}
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent className="px-1.5 md:px-0">
+            <SidebarMenu className="flex flex-col gap-4">
+              {data.navMain.map((item) => {
+                const isActive = pathname === item.url;
+                return (
                   <SidebarMenuItem key={item.title}>
                     <Link href={item.url} passHref>
                       <SidebarMenuButton
-                        tooltip={{
-                          children: item.title,
-                          hidden: false,
-                        }}
-                        onClick={() => {
-                          setActiveItem(item);
-                          if (isMobile) {
-                            setOpenMobile(false);
-                          }
-                        }}
-                        isActive={activeItem.title === item.title}
-                        className={cn("px-2.5 md:px-2 flex justify-center", {
-                          "size-12": !isMobile,
-                        })}
+                        tooltip={{ children: item.title, hidden: false }}
+                        onClick={() => isMobile && setOpenMobile(false)}
+                        isActive={isActive}
+                        className={cn(
+                          "p-4 md:p-2 flex items-center gap-3 rounded-lg transition-colors",
+                          isActive
+                            ? "bg-primary text-white dark:text-black "
+                            : "hover:bg-gray-100 dark:hover:bg-gray-800"
+                        )}
                       >
                         <item.icon
                           strokeWidth={1}
-                          style={{
-                            width: isMobile ? undefined : "1.2rem",
-                            height: isMobile ? undefined : "1.2rem",
-                          }}
+                          className="w-6 h-6"
                         />
                         {isMobile && <span>{item.title}</span>}
                       </SidebarMenuButton>
                     </Link>
                   </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        </SidebarContent>
-      </Sidebar>
-    </>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+    </Sidebar>
   );
 }
