@@ -35,48 +35,146 @@ import {
   TableHeader,
   TableRow,
 } from "@refrom/ui/table";
+import Image from "next/image";
+import { Badge } from "@refrom/ui/badge";
 
-const data: Payment[] = [
+const data: Order[] = [
+  {
+    id: "5kma53ae",
+    amount: 874,
+    provider: "Ebay",
+    email: "Silas22@gmail.com",
+    status: "completed",
+    date: "2024-03-12",
+    channel: "Ebay",
+    items: [
+      { id: "7", name: "Gengar VMAX", quantity: 1 },
+      { id: "8", name: "Umbreon GX", quantity: 2 },
+    ],
+  },
+  {
+    id: "gum12345",
+    amount: 150,
+    provider: "Gumroad",
+    email: "jason@example.com",
+    status: "completed",
+    date: "2024-03-11",
+    channel: "Gumroad",
+    items: [
+      { id: "9", name: "Exclusive Art Pikachu", quantity: 1 },
+      { id: "10", name: "Charizard Sketch Print", quantity: 1 },
+    ],
+  },
+  {
+    id: "cmk90876",
+    amount: 310,
+    provider: "CardMarket",
+    email: "sophia.cm@gmail.com",
+    status: "completed",
+    date: "2024-03-10",
+    channel: "CardMarket",
+    items: [
+      { id: "11", name: "Sylveon V", quantity: 2 },
+      { id: "12", name: "Espeon GX", quantity: 1 },
+    ],
+  },
   {
     id: "m5gr84i9",
     amount: 316,
     provider: "TCGPlayer",
     email: "ken99@yahoo.com",
+    status: "delivered",
+    date: "2024-03-15",
+    channel: "TCGPlayer",
+    items: [
+      { id: "1", name: "Charizard Holo", quantity: 2 },
+      { id: "2", name: "Blastoise EX", quantity: 1 },
+    ],
   },
   {
     id: "3u1reuv4",
     amount: 242,
-    provider: "TCGPlayer",
+    provider: "CardMarket",
     email: "Abe45@gmail.com",
+    status: "processing",
+    date: "2024-03-14",
+    channel: "CardMarket",
+    items: [
+      { id: "3", name: "Pikachu VMAX", quantity: 3 },
+      { id: "4", name: "Mewtwo GX", quantity: 1 },
+    ],
   },
   {
     id: "derv1ws0",
     amount: 837,
-    provider: "CardMarket",
+    provider: "Shopify",
     email: "Monserrat44@gmail.com",
+    status: "shipped",
+    date: "2024-03-13",
+    channel: "Shopify",
+    items: [
+      { id: "5", name: "Lugia Legend", quantity: 1 },
+      { id: "6", name: "Rayquaza EX", quantity: 2 },
+    ],
   },
   {
     id: "5kma53ae",
     amount: 874,
-    provider: "Shopify",
+    provider: "Ebay",
     email: "Silas22@gmail.com",
+    status: "pending",
+    date: "2024-03-12",
+    channel: "Ebay",
+    items: [
+      { id: "7", name: "Gengar VMAX", quantity: 1 },
+      { id: "8", name: "Umbreon GX", quantity: 2 },
+    ],
   },
   {
-    id: "bhqecj4p",
-    amount: 721,
-    provider: "Ebay",
-    email: "carmella@hotmail.com",
+    id: "gum12345",
+    amount: 150,
+    provider: "Gumroad",
+    email: "jason@example.com",
+    status: "completed",
+    date: "2024-03-11",
+    channel: "Gumroad",
+    items: [
+      { id: "9", name: "Exclusive Art Pikachu", quantity: 1 },
+      { id: "10", name: "Charizard Sketch Print", quantity: 1 },
+    ],
+  },
+  {
+    id: "cmk90876",
+    amount: 310,
+    provider: "CardMarket",
+    email: "sophia.cm@gmail.com",
+    status: "shipped",
+    date: "2024-03-10",
+    channel: "CardMarket",
+    items: [
+      { id: "11", name: "Sylveon V", quantity: 2 },
+      { id: "12", name: "Espeon GX", quantity: 1 },
+    ],
   },
 ];
 
-export type Payment = {
+
+export type Order = {
   id: string;
   amount: number;
   provider: "Ebay" | "Shopify" | "CardMarket" | "TCGPlayer";
   email: string;
+  status: "pending" | "processing" | "shipped" | "delivered";
+  date: string;
+  channel: string;
+  items: {
+    id: string;
+    name: string;
+    quantity: number;
+  }[];
 };
 
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<Order>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -100,44 +198,81 @@ export const columns: ColumnDef<Payment>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "provider",
-    header: ({ column }) => {
+    accessorKey: "channel",
+    header: "Channel",
+    cell: ({ row }) => {
+      const channel = row.getValue("channel") as string;
       return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Provider
-          <ArrowUpDown />
-        </Button>
+        <div className="flex items-center justify-center gap-2">
+          <Image
+            src={`/icons/${channel.toLowerCase()}.svg`}
+            width={24}
+            height={24}
+            alt={channel}
+            className="h-6 w-6"
+          />
+          <span className="font-medium">{channel}</span>
+        </div>
       );
     },
-    cell: ({ row }) => (
-      <div className="lowercase">{row.getValue("provider")}</div>
-    ),
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => {
+      const status = row.getValue("status") as keyof typeof statusColors;
+      const statusColors = {
+        delivered: "bg-green-500",
+        shipped: "bg-blue-500",
+        processing: "bg-yellow-500",
+        pending: "bg-gray-500",
+      };
+
+      return (
+        <Badge
+          className={`${statusColors[status]} hover:${statusColors[status]} text-white`}
+        >
+          {status}
+        </Badge>
+      );
+    },
+  },
+  {
+    id: "updatedItems",
+    header: "Items",
+    cell: ({ row }) => {
+      const items = row.original.items;
+      const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
+
+      return <span className="font-medium text-primary">{totalQuantity}</span>;
+    },
   },
   {
     accessorKey: "email",
-    header: ({ column }) => {
+    header: "Customer",
+    cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
+  },
+  {
+    accessorKey: "date",
+    header: "Order Date",
+    cell: ({ row }) => {
+      const date = new Date(row.getValue("date"));
       return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Email
-          <ArrowUpDown />
-        </Button>
+        <div className="text-muted-foreground">
+          {date.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          })}
+        </div>
       );
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
   },
   {
     accessorKey: "amount",
     header: () => <div className="text-right">Amount</div>,
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("amount"));
-
-      // Format the amount as a dollar amount
       const formatted = new Intl.NumberFormat("en-US", {
         style: "currency",
         currency: "USD",
@@ -150,7 +285,7 @@ export const columns: ColumnDef<Payment>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const payment = row.original;
+      const order = row.original;
 
       return (
         <DropdownMenu>
@@ -163,13 +298,13 @@ export const columns: ColumnDef<Payment>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
+              onClick={() => navigator.clipboard.writeText(order.id)}
             >
-              Copy payment ID
+              Copy Order ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
+            <DropdownMenuItem>View Customer</DropdownMenuItem>
+            <DropdownMenuItem>View Order Details</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
@@ -180,7 +315,7 @@ export const columns: ColumnDef<Payment>[] = [
 export function OrdersTable() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
+    []
   );
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
@@ -209,7 +344,7 @@ export function OrdersTable() {
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter emails..."
+          placeholder="Filter customers..."
           value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("email")?.setFilterValue(event.target.value)
@@ -226,20 +361,16 @@ export function OrdersTable() {
             {table
               .getAllColumns()
               .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
+              .map((column) => (
+                <DropdownMenuCheckboxItem
+                  key={column.id}
+                  className="capitalize"
+                  checked={column.getIsVisible()}
+                  onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                >
+                  {column.id}
+                </DropdownMenuCheckboxItem>
+              ))}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -248,18 +379,14 @@ export function OrdersTable() {
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                    </TableHead>
-                  );
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id} className="text-center">
+                    {flexRender(
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
@@ -268,13 +395,14 @@ export function OrdersTable() {
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
+                  className="text-center"
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext(),
+                        cell.getContext()
                       )}
                     </TableCell>
                   ))}
