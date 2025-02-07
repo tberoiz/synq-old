@@ -13,7 +13,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import { ChevronDown, MoreHorizontal } from "lucide-react";
 
 import { Button } from "@refrom/ui/button";
 import { Checkbox } from "@refrom/ui/checkbox";
@@ -39,45 +39,6 @@ import Image from "next/image";
 import { Badge } from "@refrom/ui/badge";
 
 const data: Order[] = [
-  {
-    id: "5kma53ae",
-    amount: 874,
-    provider: "Ebay",
-    email: "Silas22@gmail.com",
-    status: "completed",
-    date: "2024-03-12",
-    channel: "Ebay",
-    items: [
-      { id: "7", name: "Gengar VMAX", quantity: 1 },
-      { id: "8", name: "Umbreon GX", quantity: 2 },
-    ],
-  },
-  {
-    id: "gum12345",
-    amount: 150,
-    provider: "Gumroad",
-    email: "jason@example.com",
-    status: "completed",
-    date: "2024-03-11",
-    channel: "Gumroad",
-    items: [
-      { id: "9", name: "Exclusive Art Pikachu", quantity: 1 },
-      { id: "10", name: "Charizard Sketch Print", quantity: 1 },
-    ],
-  },
-  {
-    id: "cmk90876",
-    amount: 310,
-    provider: "CardMarket",
-    email: "sophia.cm@gmail.com",
-    status: "completed",
-    date: "2024-03-10",
-    channel: "CardMarket",
-    items: [
-      { id: "11", name: "Sylveon V", quantity: 2 },
-      { id: "12", name: "Espeon GX", quantity: 1 },
-    ],
-  },
   {
     id: "m5gr84i9",
     amount: 316,
@@ -131,19 +92,6 @@ const data: Order[] = [
     ],
   },
   {
-    id: "gum12345",
-    amount: 150,
-    provider: "Gumroad",
-    email: "jason@example.com",
-    status: "completed",
-    date: "2024-03-11",
-    channel: "Gumroad",
-    items: [
-      { id: "9", name: "Exclusive Art Pikachu", quantity: 1 },
-      { id: "10", name: "Charizard Sketch Print", quantity: 1 },
-    ],
-  },
-  {
     id: "cmk90876",
     amount: 310,
     provider: "CardMarket",
@@ -157,7 +105,6 @@ const data: Order[] = [
     ],
   },
 ];
-
 
 export type Order = {
   id: string;
