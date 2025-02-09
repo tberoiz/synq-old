@@ -4,8 +4,6 @@ VALUES
     ('TCGPlayer', 'Sync your TCGPlayer inventory effortlessly. Track sales, manage listings, and update stock levels in real-time. Perfect for TCG sellers looking to streamline their operations and maximize profits.', 'active', '/icons/tcgplayer.svg'),
     ('Cardmarket', 'Connect your Cardmarket account to automate inventory updates and sales tracking. Stay on top of your orders and stock levels with seamless integration designed for TCG and collectible sellers.', 'active', '/icons/cardmarket.svg'),
     ('eBay', 'Integrate your eBay store to sync inventory, track orders, and manage listings from one dashboard. Ideal for sellers who want to simplify multi-channel selling and focus on growing their business.', 'active', '/icons/ebay.svg'),
-    ('Wallapop', 'Coming soon! Sync your Wallapop inventory and sales data to manage your listings and stock levels effortlessly. Perfect for local sellers looking to expand their reach.', 'coming_soon', '/icons/wallapop.svg'),
-    ('Gumroad', 'Sync your Gumroad account to track sales and manage digital products with ease. Designed for creators selling digital templates, assets, and downloads.', 'beta', '/icons/gumroad.svg');
 
 -- Insert user integrations for the test user
 DO $$
