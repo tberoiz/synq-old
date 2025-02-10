@@ -8,7 +8,6 @@ const AppHeader: React.FC = () => {
   return (
     <header className="sticky top-0 z-50 flex shrink-0 items-center justify-between gap-2 border-b bg-background p-2">
       <div>
-        <SidebarTrigger className="ml-1" />
       </div>
       <SidebarFooter>
         <div className="flex gap-2 items-center">
