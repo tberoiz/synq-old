@@ -8,13 +8,13 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@refrom/ui/card";
+} from "@decko/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@refrom/ui/chart";
+} from "@decko/ui/chart";
 
 const chartData = [
   { item: "Item A", sales: 300, fill: "hsl(var(--chart-1))" },

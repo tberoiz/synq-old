@@ -9,7 +9,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@refrom/ui/card";
+} from "@decko/ui/card";
 import {
   ChartConfig,
   ChartContainer,
@@ -17,14 +17,14 @@ import {
   ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
-} from "@refrom/ui/chart";
+} from "@decko/ui/chart";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@refrom/ui/select";
+} from "@decko/ui/select";
 const chartData = [
   { date: "2024-04-01", desktop: 222, mobile: 150 },
   { date: "2024-04-02", desktop: 97, mobile: 180 },

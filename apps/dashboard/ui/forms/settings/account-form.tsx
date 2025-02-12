@@ -4,8 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { useToast } from "@refrom/ui/use-toast";
-import { Button } from "@refrom/ui/button";
+import { useToast } from "@decko/ui/use-toast";
+import { Button } from "@decko/ui/button";
 import {
   Form,
   FormControl,
@@ -14,8 +14,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@refrom/ui/form";
-import { Input } from "@refrom/ui/input";
+} from "@decko/ui/form";
+import { Input } from "@decko/ui/input";
 
 const accountFormSchema = z.object({
   name: z

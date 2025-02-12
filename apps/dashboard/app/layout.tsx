@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "./providers";
-import "@refrom/ui/globals.css";
-import { Toaster } from "@refrom/ui/toaster";
+import "@decko/ui/globals.css";
+import { Toaster } from "@decko/ui/toaster";
 
 export const metadata: Metadata = {
-  title: "ReFrom",
+  title: "decko",
   description: "Sell everywhere. Sync in one place.",
 };
 

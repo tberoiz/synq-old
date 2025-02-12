@@ -7,13 +7,13 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@refrom/ui/card";
+} from "@decko/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@refrom/ui/chart";
+} from "@decko/ui/chart";
 const chartData = [
   { month: "January", stock: 186 },
   { month: "February", stock: 305 },

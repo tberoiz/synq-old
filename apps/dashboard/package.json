@@ -12,8 +12,8 @@
     "clean": "rm -rf .turbo node_modules"
   },
   "dependencies": {
-    "@refrom/supabase": "*",
-    "@refrom/ui": "*",
+    "@decko/supabase": "*",
+    "@decko/ui": "*",
     "@tanstack/react-table": "^8.20.6",
     "next": "15.0.3",
     "next-themes": "^0.4.4",
@@ -21,8 +21,8 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@refrom/eslint-config": "*",
-    "@refrom/typescript-config": "*",
+    "@decko/eslint-config": "*",
+    "@decko/typescript-config": "*",
     "@types/node": "^20",
     "@types/react": "19.0.0",
     "@types/react-dom": "19.0.0",

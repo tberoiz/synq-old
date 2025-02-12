@@ -1,34 +1,53 @@
-import { Button } from "@refrom/ui/button";
-import { Input } from "@refrom/ui/input";
+"use client";
+
+import { useEffect, useState } from "react";
+import { Button } from "@decko/ui/button";
+import { Input } from "@decko/ui/input";
+import { createClient } from "@decko/supabase/client";
+
 import {
   Select,
   SelectTrigger,
   SelectContent,
   SelectItem,
-} from "@refrom/ui/select";
+} from "@decko/ui/select";
 import InventoryCard from "@ui/cards/inventory-card";
 import { Plus, Filter, Package2 } from "lucide-react";
 
-const inventoryData = [
-  {
-    id: 1,
-    name: "Digital Products",
-    items: 15,
-    stock: undefined,
-    platforms: ["gumroad" as const, "etsy" as const],
-    lastSynced: new Date(Date.now() - 3600000), // 1 hour ago
-  },
-  {
-    id: 2,
-    name: "Pokemon TCG",
-    items: 8,
-    stock: 5, // Low stock
-    platforms: ["ebay" as const, "tcgplayer" as const, "cardmarket" as const],
-    lastSynced: new Date(Date.now() - 86400000), // 24 hours ago
-  },
-];
+// Initialize Supabase client
+const supabase = createClient();
 
 export default function InventoryPage() {
+  const [inventoryData, setInventoryData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchInventory() {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("inventories")
+        .select("id, name, created_at");
+
+      if (error) {
+        console.error("Error fetching inventory:", error.message);
+      } else {
+        setInventoryData(
+          data.map((item) => ({
+            id: item.id,
+            name: item.name,
+            items: Math.floor(Math.random() * 20),
+            stock: Math.random(),
+            platforms: ["tcgplayer", "ebay"],
+            lastSynced: new Date(item.created_at),
+          }))
+        );
+      }
+      setLoading(false);
+    }
+
+    fetchInventory();
+  }, []);
+
   return (
     <div className="space-y-4">
       {/* Inventory Controls */}
@@ -55,21 +74,25 @@ export default function InventoryPage() {
       </div>
 
       {/* Inventory Grid */}
-      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-        {inventoryData.map((inventory) => (
-          <InventoryCard
-            key={inventory.id}
-            name={inventory.name}
-            items={inventory.items}
-            stock={inventory.stock}
-            channel={inventory.platforms}
-            lastSynced={new Date()}
-          />
-        ))}
-      </div>
+      {loading ? (
+        <p className="text-center text-muted-foreground">Loading inventory...</p>
+      ) : (
+        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+          {inventoryData.map((inventory) => (
+            <InventoryCard
+              key={inventory.id}
+              name={inventory.name}
+              items={inventory.items}
+              stock={inventory.stock}
+              channel={inventory.platforms}
+              lastSynced={inventory.lastSynced}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Empty State */}
-      {inventoryData.length === 0 && (
+      {!loading && inventoryData.length === 0 && (
         <div className="text-center py-8">
           <Package2 className="h-8 w-8 mx-auto text-muted-foreground mb-3" />
           <h3 className="font-medium mb-1 text-sm">No inventories found</h3>

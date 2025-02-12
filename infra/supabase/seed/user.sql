@@ -26,13 +26,13 @@ BEGIN
         extensions.uuid_generate_v4(), -- Unique ID
         'authenticated',
         'authenticated',
-        'test@refrom.com', -- Specific email
+        'test@decko.com', -- Specific email
         extensions.crypt('test', extensions.gen_salt('bf')), -- Specific password
         current_timestamp,
         current_timestamp,
         current_timestamp,
         '{"provider":"email","providers":["email"]}', -- App metadata
-        '{"full_name":"Test User","avatar_url":"https://i.pravatar.cc/300", "email":"test@refrom.com"}', -- User metadata
+        '{"full_name":"Test User","avatar_url":"https://i.pravatar.cc/300", "email":"test@decko.com"}', -- User metadata
         current_timestamp,
         current_timestamp,
         '',
@@ -55,7 +55,7 @@ BEGIN
         extensions.uuid_generate_v4(),
         user_uuid,
         user_uuid,
-        format('{"sub":"%s","email":"%s"}', user_uuid::text, 'test@refrom.com')::jsonb,
+        format('{"sub":"%s","email":"%s"}', user_uuid::text, 'test@decko.com')::jsonb,
         'email',
         current_timestamp,
         current_timestamp,

@@ -1,7 +1,7 @@
 "use server";
 import { redirect } from "next/navigation";
-import { createClient } from "@refrom/supabase/server";
-import { Provider } from "@refrom/supabase/types";
+import { createClient } from "@decko/supabase/server";
+import { Provider } from "@decko/supabase/types";
 import { revalidatePath } from "next/cache";
 
 const signInWithPassword = async (formData: FormData) => {

@@ -1,4 +1,4 @@
-import { Skeleton } from "@refrom/ui/skeleton";
+import { Skeleton } from "@decko/ui/skeleton";
 
 export default function Loading() {
   return <Skeleton className="w-[100px] h-[20px] rounded-full" />;

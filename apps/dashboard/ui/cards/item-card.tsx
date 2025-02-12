@@ -1,7 +1,7 @@
-import { Button } from "@refrom/ui/button";
-import { Progress } from "@refrom/ui/progress";
-import { Sheet, SheetContent, SheetTrigger } from "@refrom/ui/sheet";
-import { cn } from "@refrom/ui/utils";
+import { Button } from "@decko/ui/button";
+import { Progress } from "@decko/ui/progress";
+import { Sheet, SheetContent, SheetTrigger } from "@decko/ui/sheet";
+import { cn } from "@decko/ui/utils";
 import { TCGPlayerIcon, EbayIcon, ShopifyIcon } from "@ui/icons/icons";
 import ItemDetailsSheetContent from "@ui/sheets/item-details-sheet";
 import { Pencil, Tag, Zap } from "lucide-react";

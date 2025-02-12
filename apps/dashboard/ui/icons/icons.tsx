@@ -1,17 +1,13 @@
 'use client'
-import { useTheme } from "next-themes";
 import Image from "next/image";
 
-export const ReFromIcon = (props: React.ComponentProps<any>) => {
-  const { theme } = useTheme();
-  const isDark = theme === "dark" || theme === "neon";
+export const DeckoIcon = (props: React.ComponentProps<any>) => {
   return (
     <Image
-      src={isDark ? "/svg/refrom/refrom-icon.svg" : "/svg/refrom/refrom-icon.svg"}
-      alt="ReFrom Icon"
-      width={16}
-      height={16}
-      className="w-8 h-8"
+      src="/brand/decko.png"
+      alt="decko Icon"
+      width={44}
+      height={44}
       {...props}
     />
   );

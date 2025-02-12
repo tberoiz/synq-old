@@ -1,5 +1,5 @@
 {
-  "name": "@refrom/supabase",
+  "name": "@decko/supabase",
   "version": "0.0.1",
   "private": true,
   "scripts": {

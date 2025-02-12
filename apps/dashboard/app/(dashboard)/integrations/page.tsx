@@ -1,5 +1,5 @@
 import IntegrationCard from "@ui/cards/integration-card";
-import { createClient } from "@refrom/supabase/server";
+import { createClient } from "@decko/supabase/server";
 
 export default async function IntegrationsPage() {
   // Initialize Supabase client

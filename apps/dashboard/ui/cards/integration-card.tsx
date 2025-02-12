@@ -4,10 +4,10 @@ import {
   CardContent,
   CardTitle,
   CardDescription,
-} from "@refrom/ui/card";
-import { Button } from "@refrom/ui/button";
+} from "@decko/ui/card";
+import { Button } from "@decko/ui/button";
 import Image from "next/image";
-import { Badge } from "@refrom/ui/badge";
+import { Badge } from "@decko/ui/badge";
 
 export default function IntegrationCard({
   name,

@@ -1,5 +1,5 @@
 {
-  "extends": "@refrom/typescript-config/react-library.json",
+  "extends": "@decko/typescript-config/react-library.json",
   "compilerOptions": {
     "sourceMap": true,
     "rootDir": "src",

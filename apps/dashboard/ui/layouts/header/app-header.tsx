@@ -1,7 +1,7 @@
 import React, { memo } from "react";
 import NavUser from "./nav-user";
-import { Button } from "@refrom/ui/button";
-import { SidebarFooter, SidebarTrigger } from "@refrom/ui/sidebar";
+import { Button } from "@decko/ui/button";
+import { SidebarFooter, SidebarTrigger } from "@decko/ui/sidebar";
 import { Bell } from "lucide-react";
 
 const AppHeader: React.FC = () => {

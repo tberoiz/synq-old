@@ -1,11 +1,11 @@
-import { Button } from "@refrom/ui/button";
-import { Card, CardContent } from "@refrom/ui/card";
-import { Tooltip, TooltipTrigger, TooltipContent } from "@refrom/ui/tooltip";
-import { cn } from "@refrom/ui/utils";
+import { Button } from "@decko/ui/button";
+import { Card, CardContent } from "@decko/ui/card";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@decko/ui/tooltip";
+import { cn } from "@decko/ui/utils";
 import Link from "next/link";
 import { AlertCircle, Package, Pencil, RefreshCw } from "lucide-react";
 import { CardMarketIcon, EbayIcon, EtsyIcon, GumroadIcon, ShopifyIcon, TCGPlayerIcon } from "@ui/icons/icons";
-import { Progress } from "@refrom/ui/progress";
+import { Progress } from "@decko/ui/progress";
 
 function InventoryCard({
   name,
@@ -16,7 +16,7 @@ function InventoryCard({
 }: {
   name: string;
   items: number;
-  stock: number | undefined;
+  stock: number;
   channel?: ("tcgplayer" | "ebay" | "shopify" | "gumroad" | "etsy" | "cardmarket")[];
   lowStockThreshold?: number;
   lastSynced?: Date;
@@ -88,7 +88,7 @@ function InventoryCard({
                       isLowStock ? "text-red-600" : "text-muted-foreground"
                     )}
                   >
-                    {stock === undefined ? "Unlimited" : `${stock} remaining`}
+                    {`${stock} remaining`}
                   </span>
                 </div>
                 {/* Progress Bar */}
@@ -99,18 +99,6 @@ function InventoryCard({
                     isLowStock ? "bg-red-200" : "bg-primary/20"
                   )}
                 />
-              </div>
-
-              {/* Quick Actions */}
-              <div className="flex gap-1 opacity-100 group-hover:opacity-100 transition-opacity mt-3">
-                <Button variant="outline" size="sm" className="flex-1 text-xs">
-                  <RefreshCw className="h-3 w-3 mr-1" />
-                  Sync Now
-                </Button>
-                <Button variant="outline" size="sm" className="flex-1 text-xs">
-                  <Pencil className="h-3 w-3 mr-1" />
-                  Edit
-                </Button>
               </div>
             </div>
           </div>

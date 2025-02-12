@@ -1,1 +1,1 @@
-export { default } from "@refrom/ui/postcss.config";
+export { default } from "@decko/ui/postcss.config";

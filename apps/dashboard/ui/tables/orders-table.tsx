@@ -15,8 +15,8 @@ import {
 } from "@tanstack/react-table";
 import { ChevronDown, MoreHorizontal } from "lucide-react";
 
-import { Button } from "@refrom/ui/button";
-import { Checkbox } from "@refrom/ui/checkbox";
+import { Button } from "@decko/ui/button";
+import { Checkbox } from "@decko/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -25,8 +25,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@refrom/ui/dropdown-menu";
-import { Input } from "@refrom/ui/input";
+} from "@decko/ui/dropdown-menu";
+import { Input } from "@decko/ui/input";
 import {
   Table,
   TableBody,
@@ -34,9 +34,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@refrom/ui/table";
+} from "@decko/ui/table";
 import Image from "next/image";
-import { Badge } from "@refrom/ui/badge";
+import { Badge } from "@decko/ui/badge";
 
 const data: Order[] = [
   {

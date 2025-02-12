@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@refrom/ui/button";
+import { Button } from "@decko/ui/button";
 import ItemCard from "@ui/cards/item-card";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
