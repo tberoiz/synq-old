@@ -13,7 +13,7 @@ DECLARE
     ebay_id UUID;
 BEGIN
     -- Retrieve the UUID of the test user
-    SELECT id INTO test_user_uuid FROM auth.users WHERE email = 'test@decko.com';
+    SELECT id INTO test_user_uuid FROM auth.users WHERE email = 'test@synq.com';
     RAISE NOTICE 'Test User UUID: %', test_user_uuid;
 
     -- Retrieve the IDs of the integrations

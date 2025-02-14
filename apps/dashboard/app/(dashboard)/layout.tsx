@@ -1,5 +1,5 @@
 import { AppSidebar } from "@ui/layouts/sidebar/app-sidebar";
-import { SidebarInset, SidebarProvider } from "@decko/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@synq/ui/sidebar";
 import AppHeader from "@ui/layouts/header/app-header";
 import AppContent from "@ui/layouts/content/app-content";
 

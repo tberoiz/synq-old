@@ -1,9 +1,9 @@
 import { GalleryVerticalEnd } from "lucide-react";
 
-import { cn } from "@decko/ui/utils";
-import { Button } from "@decko/ui/button";
-import { Input } from "@decko/ui/input";
-import { Label } from "@decko/ui/label";
+import { cn } from "@synq/ui/utils";
+import { Button } from "@synq/ui/button";
+import { Input } from "@synq/ui/input";
+import { Label } from "@synq/ui/label";
 
 import { signInWithPassword } from "../actions";
 import { OAuthButton } from "../components/provider-button";
@@ -24,9 +24,9 @@ export function SignInForm({
               <div className="flex h-8 w-8 items-center justify-center rounded-md">
                 <GalleryVerticalEnd className="size-6" />
               </div>
-              <span className="sr-only">decko.com</span>
+              <span className="sr-only">synq.com</span>
             </a>
-            <h1 className="text-xl font-bold">Welcome to decko.com</h1>
+            <h1 className="text-xl font-bold">Welcome to synq.com</h1>
             <div className="text-center text-sm">
               Don&apos;t have an account?{" "}
               <a href="/auth/signup" className="underline underline-offset-4">

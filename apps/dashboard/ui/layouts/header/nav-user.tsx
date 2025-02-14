@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, memo } from "react";
 import { BadgeCheck, LogOut, Palette } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@decko/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@synq/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,23 +10,23 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@decko/ui/dropdown-menu";
+} from "@synq/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@decko/ui/sidebar";
+} from "@synq/ui/sidebar";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@decko/ui/select";
+} from "@synq/ui/select";
 import { signOut } from "@ui/auth/actions";
 import { useTheme } from "next-themes";
-import { createClient } from "@decko/supabase/client";
+import { createClient } from "@synq/supabase/client";
 import Link from "next/link";
 
 // Helper function to get the first character of a name

@@ -1,6 +1,6 @@
 "use client";
 
-import { useToast } from "@decko/ui/use-toast";
+import { useToast } from "@synq/ui/use-toast";
 import {
   Toast,
   ToastClose,
@@ -8,7 +8,7 @@ import {
   ToastProvider,
   ToastTitle,
   ToastViewport,
-} from "@decko/ui/toast";
+} from "@synq/ui/toast";
 
 export function Toaster() {
   const { toasts } = useToast();

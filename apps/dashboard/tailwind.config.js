@@ -1,1 +1,1 @@
-export * from "@decko/ui/tailwind.config";
+export * from "@synq/ui/tailwind.config";

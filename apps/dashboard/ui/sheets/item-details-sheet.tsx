@@ -1,11 +1,11 @@
-import { Button } from "@decko/ui/button";
+import { Button } from "@synq/ui/button";
 import { JSX } from "react";
 import {
   SheetHeader,
   SheetTitle,
   SheetDescription,
   SheetFooter,
-} from "@decko/ui/sheet";
+} from "@synq/ui/sheet";
 import { format } from "date-fns";
 import { Pencil, Tag } from "lucide-react";
 import { TCGPlayerIcon, EbayIcon, ShopifyIcon } from "@ui/icons/icons";

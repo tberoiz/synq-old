@@ -19,10 +19,10 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@decko/ui/sidebar";
+} from "@synq/ui/sidebar";
 import Link from "next/link";
-import { cn } from "@decko/ui/utils";
-import { DeckoIcon } from "@ui/icons/icons";
+import { cn } from "@synq/ui/utils";
+import { SynqIcon } from "@ui/icons/icons";
 import { usePathname } from "next/navigation";
 
 const data = {
@@ -51,11 +51,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             >
               <Link href="/overview">
                 <div className="flex aspect-square size-10 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <DeckoIcon />
+                  <SynqIcon />
                 </div>
                 {isMobile && (
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">decko</span>
+                    <span className="truncate font-semibold">synq</span>
                   </div>
                 )}
               </Link>

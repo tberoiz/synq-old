@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@decko/ui/button";
+import { Button } from "@synq/ui/button";
 import { signInWithOAuth } from "../actions";
 import { JSX } from "react";
 

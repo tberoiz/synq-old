@@ -1,5 +1,5 @@
 {
-  "extends": "@decko/typescript-config/react-library.json",
+  "extends": "@synq/typescript-config/react-library.json",
   "compilerOptions": {
     "sourceMap": true,
     "rootDir": "src",

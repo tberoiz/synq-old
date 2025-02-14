@@ -10,13 +10,13 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@decko/ui/card";
+} from "@synq/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@decko/ui/chart";
+} from "@synq/ui/chart";
 const chartData = [
   { inventory: "Inventory A", sales: 275, fill: "hsl(var(--chart-1))" },
   { inventory: "Inventory B", sales: 200, fill: "hsl(var(--chart-2))" },
@@ -55,7 +55,7 @@ export function InventoryPerformanceChart() {
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Top Inventories</CardTitle>
+        <CardTitle className="text-lg">Top Inventories</CardTitle>
         <CardDescription>January - June 2024</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">

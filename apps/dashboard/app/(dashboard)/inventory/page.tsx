@@ -1,16 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "@decko/ui/button";
-import { Input } from "@decko/ui/input";
-import { createClient } from "@decko/supabase/client";
+import { Button } from "@synq/ui/button";
+import { Input } from "@synq/ui/input";
+import { createClient } from "@synq/supabase/client";
 
 import {
   Select,
   SelectTrigger,
   SelectContent,
   SelectItem,
-} from "@decko/ui/select";
+} from "@synq/ui/select";
 import InventoryCard from "@ui/cards/inventory-card";
 import { Plus, Filter, Package2 } from "lucide-react";
 

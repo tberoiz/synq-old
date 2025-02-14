@@ -3,8 +3,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useToast } from "@decko/ui/use-toast";
-import { Button } from "@decko/ui/button";
+import { useToast } from "@synq/ui/use-toast";
+import { Button } from "@synq/ui/button";
 import {
   Form,
   FormControl,
@@ -13,9 +13,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@decko/ui/form";
-import { Input } from "@decko/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@decko/ui/popover";
+} from "@synq/ui/form";
+import { Input } from "@synq/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@synq/ui/popover";
 
 const integrationFormSchema = z.object({
   name: z

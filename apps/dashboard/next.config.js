@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ["@decko/ui"],
+  transpilePackages: ["@synq/ui"],
 };
 
 export default nextConfig;

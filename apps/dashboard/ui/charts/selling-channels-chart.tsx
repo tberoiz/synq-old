@@ -11,13 +11,13 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@decko/ui/card";
+} from "@synq/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@decko/ui/chart";
+} from "@synq/ui/chart";
 const chartData = [
   { sellingChanel: "Channel 1", orders: 275, fill: "hsl(var(--chart-1))" },
   { sellingChanel: "Channel 2", orders: 200, fill: "hsl(var(--chart-2))" },
@@ -60,7 +60,7 @@ export function SellingChannelsChart() {
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Top Selling Channels</CardTitle>
+        <CardTitle className="text-lg">Top Selling Channels</CardTitle>
         <CardDescription>January - June 2024</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">

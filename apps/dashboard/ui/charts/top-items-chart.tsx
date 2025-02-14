@@ -8,13 +8,13 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@decko/ui/card";
+} from "@synq/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@decko/ui/chart";
+} from "@synq/ui/chart";
 
 const chartData = [
   { item: "Item A", sales: 300, fill: "hsl(var(--chart-1))" },
@@ -54,7 +54,7 @@ export function TopItemsChart() {
   return (
     <Card>
       <CardHeader className="items-center">
-        <CardTitle>Top Selling Items</CardTitle>
+        <CardTitle className="text-lg">Top Selling Items</CardTitle>
         <CardDescription>Sales Data for January - June 2024</CardDescription>
       </CardHeader>
       <CardContent>

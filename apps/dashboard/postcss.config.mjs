@@ -1,1 +1,1 @@
-export { default } from "@decko/ui/postcss.config";
+export { default } from "@synq/ui/postcss.config";

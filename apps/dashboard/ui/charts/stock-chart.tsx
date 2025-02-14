@@ -7,13 +7,13 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@decko/ui/card";
+} from "@synq/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@decko/ui/chart";
+} from "@synq/ui/chart";
 const chartData = [
   { month: "January", stock: 186 },
   { month: "February", stock: 305 },
@@ -34,7 +34,7 @@ export function StockChart() {
   return (
     <Card>
       <CardHeader className="items-center">
-        <CardTitle>Total Stock</CardTitle>
+        <CardTitle className="text-lg">Total Stock</CardTitle>
         <CardDescription>January - June 2024</CardDescription>
       </CardHeader>
       <CardContent>

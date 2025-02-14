@@ -1,13 +1,13 @@
 'use client'
 import Image from "next/image";
 
-export const DeckoIcon = (props: React.ComponentProps<any>) => {
+export const SynqIcon = (props: React.ComponentProps<any>) => {
   return (
     <Image
-      src="/brand/decko.png"
-      alt="decko Icon"
-      width={44}
-      height={44}
+      src="/brand/icon.png"
+      alt="synq Icon"
+      width={64}
+      height={64}
       {...props}
     />
   );

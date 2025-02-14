@@ -1,11 +1,11 @@
-import { Button } from "@decko/ui/button";
-import { Card, CardContent } from "@decko/ui/card";
-import { Tooltip, TooltipTrigger, TooltipContent } from "@decko/ui/tooltip";
-import { cn } from "@decko/ui/utils";
+import { Button } from "@synq/ui/button";
+import { Card, CardContent } from "@synq/ui/card";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@synq/ui/tooltip";
+import { cn } from "@synq/ui/utils";
 import Link from "next/link";
 import { AlertCircle, Package, Pencil, RefreshCw } from "lucide-react";
 import { CardMarketIcon, EbayIcon, EtsyIcon, GumroadIcon, ShopifyIcon, TCGPlayerIcon } from "@ui/icons/icons";
-import { Progress } from "@decko/ui/progress";
+import { Progress } from "@synq/ui/progress";
 
 function InventoryCard({
   name,

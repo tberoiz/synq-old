@@ -4,7 +4,7 @@ import {
   CardTitle,
   CardDescription,
   CardContent,
-} from "@decko/ui/card";
+} from "@synq/ui/card";
 import { ReactNode } from "react";
 
 interface CardLayoutProps {

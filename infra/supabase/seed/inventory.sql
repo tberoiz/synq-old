@@ -6,7 +6,7 @@ BEGIN
     -- Retrieve the UUID of the test user (assuming only one user exists for seeding purposes)
     SELECT id INTO test_user_uuid
     FROM auth.users
-    WHERE email = 'test@decko.com';
+    WHERE email = 'test@synq.com';
 
     -- Insert inventory records for the test user
     INSERT INTO public.inventories (user_id, name, description, created_at, updated_at)
