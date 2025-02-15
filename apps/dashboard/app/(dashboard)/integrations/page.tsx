@@ -11,20 +11,24 @@ export default async function IntegrationsPage() {
     .select("*");
 
   // Fetch the user's installed integrations
-  const { data: userIntegrations, error: userIntegrationsError } = await supabase
-    .from("user_integrations")
-    .select("integration_channel_id")
-    .eq("is_enabled", true);
+  const { data: userIntegrations, error: userIntegrationsError } =
+    await supabase
+      .from("user_integrations")
+      .select("integration_channel_id")
+      .eq("is_enabled", true);
 
   // Handle errors
   if (integrationsError || userIntegrationsError) {
-    console.error("Error fetching data:", integrationsError || userIntegrationsError);
+    console.error(
+      "Error fetching data:",
+      integrationsError || userIntegrationsError,
+    );
     return <div>Failed to load integrations. Please try again later.</div>;
   }
 
   // Extract the IDs of installed integrations
   const installedIntegrationIds = userIntegrations.map(
-    (ui) => ui.integration_channel_id
+    (ui) => ui.integration_channel_id,
   );
 
   // Map the fetched data to the expected format

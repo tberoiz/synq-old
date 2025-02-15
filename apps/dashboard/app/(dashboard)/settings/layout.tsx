@@ -7,7 +7,11 @@ export default function SettingsLayout({
   children: React.ReactNode;
 }) {
   return (
-    <CardLayout title="Settings" icon={<Settings strokeWidth={1} />} description="Manage your account settings and preferences.">
+    <CardLayout
+      title="Settings"
+      icon={<Settings strokeWidth={1} />}
+      description="Manage your account settings and preferences."
+    >
       {children}
     </CardLayout>
   );

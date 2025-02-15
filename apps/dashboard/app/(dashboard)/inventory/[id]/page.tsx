@@ -13,12 +13,12 @@ const data = [
     stock: 2,
     platforms: ["tcgplayer", "ebay"],
     listingsCount: 3,
-    lastSold: new Date('2024-03-15'),
+    lastSold: new Date("2024-03-15"),
     lastSynced: new Date(),
     priceHistory: [
-      { date: '2024-01-01', price: 25000 },
-      { date: '2024-03-01', price: 27500 }
-    ]
+      { date: "2024-01-01", price: 25000 },
+      { date: "2024-03-01", price: 27500 },
+    ],
   },
   {
     id: 2,
@@ -27,9 +27,9 @@ const data = [
     stock: 5,
     platforms: ["ebay", "shopify"],
     listingsCount: 2,
-    lastSold: new Date('2024-03-14'),
-    lastSynced: new Date()
-  }
+    lastSold: new Date("2024-03-14"),
+    lastSynced: new Date(),
+  },
 ];
 
 export default function InventoryPage() {

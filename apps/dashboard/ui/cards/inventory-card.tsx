@@ -4,7 +4,14 @@ import { Tooltip, TooltipTrigger, TooltipContent } from "@synq/ui/tooltip";
 import { cn } from "@synq/ui/utils";
 import Link from "next/link";
 import { AlertCircle, Package, Pencil, RefreshCw } from "lucide-react";
-import { CardMarketIcon, EbayIcon, EtsyIcon, GumroadIcon, ShopifyIcon, TCGPlayerIcon } from "@ui/icons/icons";
+import {
+  CardMarketIcon,
+  EbayIcon,
+  EtsyIcon,
+  GumroadIcon,
+  ShopifyIcon,
+  TCGPlayerIcon,
+} from "@ui/icons/icons";
 import { Progress } from "@synq/ui/progress";
 
 function InventoryCard({
@@ -17,7 +24,14 @@ function InventoryCard({
   name: string;
   items: number;
   stock: number;
-  channel?: ("tcgplayer" | "ebay" | "shopify" | "gumroad" | "etsy" | "cardmarket")[];
+  channel?: (
+    | "tcgplayer"
+    | "ebay"
+    | "shopify"
+    | "gumroad"
+    | "etsy"
+    | "cardmarket"
+  )[];
   lowStockThreshold?: number;
   lastSynced?: Date;
 }) {
@@ -85,7 +99,7 @@ function InventoryCard({
                   <span
                     className={cn(
                       "font-medium",
-                      isLowStock ? "text-red-600" : "text-muted-foreground"
+                      isLowStock ? "text-red-600" : "text-muted-foreground",
                     )}
                   >
                     {`${stock} remaining`}
@@ -96,7 +110,7 @@ function InventoryCard({
                   value={stock === undefined ? 100 : (stock / items) * 100}
                   className={cn(
                     "h-1.5",
-                    isLowStock ? "bg-red-200" : "bg-primary/20"
+                    isLowStock ? "bg-red-200" : "bg-primary/20",
                   )}
                 />
               </div>

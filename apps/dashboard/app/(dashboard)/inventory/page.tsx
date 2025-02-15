@@ -39,7 +39,7 @@ export default function InventoryPage() {
             stock: Math.random(),
             platforms: ["tcgplayer", "ebay"],
             lastSynced: new Date(item.created_at),
-          }))
+          })),
         );
       }
       setLoading(false);
@@ -53,7 +53,10 @@ export default function InventoryPage() {
       {/* Inventory Controls */}
       <div className="flex justify-between items-center">
         <div className="flex gap-2">
-          <Input placeholder="Search inventories..." className="max-w-xs text-sm" />
+          <Input
+            placeholder="Search inventories..."
+            className="max-w-xs text-sm"
+          />
           <Select>
             <SelectTrigger className="w-[160px] text-sm">
               <Filter className="h-3 w-6 mr-2" />
@@ -75,7 +78,9 @@ export default function InventoryPage() {
 
       {/* Inventory Grid */}
       {loading ? (
-        <p className="text-center text-muted-foreground">Loading inventory...</p>
+        <p className="text-center text-muted-foreground">
+          Loading inventory...
+        </p>
       ) : (
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           {inventoryData.map((inventory) => (

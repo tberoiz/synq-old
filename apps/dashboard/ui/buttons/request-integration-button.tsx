@@ -50,7 +50,8 @@ export function RequestIntegrationButton() {
 
   function onSubmit(data: IntegrationFormValues) {
     toast({
-      title: "Thank you for your request! We appreciate your support and will consider it for future updates ✨",
+      title:
+        "Thank you for your request! We appreciate your support and will consider it for future updates ✨",
       description: (
         <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
           <code className="text-white">{JSON.stringify(data, null, 2)}</code>

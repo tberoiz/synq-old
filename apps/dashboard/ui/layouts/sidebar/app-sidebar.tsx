@@ -80,13 +80,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           "p-4 md:p-2 flex items-center gap-3 rounded-lg transition-colors",
                           isActive
                             ? "bg-primary text-white dark:text-black "
-                            : "hover:bg-gray-100 dark:hover:bg-gray-800"
+                            : "hover:bg-gray-100 dark:hover:bg-gray-800",
                         )}
                       >
-                        <item.icon
-                          strokeWidth={1}
-                          className="w-6 h-6"
-                        />
+                        <item.icon strokeWidth={1} className="w-6 h-6" />
                         {isMobile && <span>{item.title}</span>}
                       </SidebarMenuButton>
                     </Link>

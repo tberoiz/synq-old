@@ -70,7 +70,7 @@ export default function ItemCard({
                 <span
                   className={cn(
                     "font-medium",
-                    isLowStock ? "text-red-600" : "text-foreground"
+                    isLowStock ? "text-red-600" : "text-foreground",
                   )}
                 >
                   {stock} units

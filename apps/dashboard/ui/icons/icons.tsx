@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import Image from "next/image";
 
 export const SynqIcon = (props: React.ComponentProps<any>) => {
@@ -12,7 +12,6 @@ export const SynqIcon = (props: React.ComponentProps<any>) => {
     />
   );
 };
-
 
 export const EbayIcon = (props: React.ComponentProps<any>) => (
   <Image

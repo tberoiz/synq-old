@@ -7,7 +7,11 @@ export default function InventoryLayout({
   children: React.ReactNode;
 }) {
   return (
-    <CardLayout title="Inventory" description="Manage your inventory and track stock levels." icon={<Package strokeWidth={1} />}>
+    <CardLayout
+      title="Inventory"
+      description="Manage your inventory and track stock levels."
+      icon={<Package strokeWidth={1} />}
+    >
       {children}
     </CardLayout>
   );

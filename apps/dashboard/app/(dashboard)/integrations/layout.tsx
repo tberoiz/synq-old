@@ -9,11 +9,16 @@ export default function IntegrationsLayout({
 }) {
   const actions = (
     <>
-       <RequestIntegrationButton />
+      <RequestIntegrationButton />
     </>
   );
   return (
-    <CardLayout title="Integrations" description="Connect your favorite tools and services to streamline your workflow." icon={<Blocks strokeWidth={1} />} actions={actions}>
+    <CardLayout
+      title="Integrations"
+      description="Connect your favorite tools and services to streamline your workflow."
+      icon={<Blocks strokeWidth={1} />}
+      actions={actions}
+    >
       {children}
     </CardLayout>
   );
