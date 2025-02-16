@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState, memo } from "react";
-import { BadgeCheck, LogOut, Palette } from "lucide-react";
+import { BadgeCheck, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@synq/ui/avatar";
 import {
   DropdownMenu,
@@ -17,15 +17,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@synq/ui/sidebar";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@synq/ui/select";
 import { signOut } from "@ui/auth/actions";
-import { useTheme } from "next-themes";
 import { createClient } from "@synq/supabase/client";
 import Link from "next/link";
 
@@ -35,7 +27,6 @@ const getFirstCharacter = (fullName: string) => {
 };
 
 const NavUser: React.FC = () => {
-  const { theme, setTheme } = useTheme();
   const { isMobile } = useSidebar();
   const [userMetadata, setUserMetadata] = useState<{
     name: string;
@@ -65,17 +56,6 @@ const NavUser: React.FC = () => {
     fetchUserInfo();
   }, []);
 
-  // Set theme from localStorage on mount
-  useEffect(() => {
-    const storedTheme = localStorage.getItem("theme") || "system";
-    setTheme(storedTheme);
-  }, [setTheme]);
-
-  // Handle theme change
-  const handleThemeChange = (newTheme: string) => {
-    setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
-  };
 
   return (
     <SidebarMenu>
@@ -136,21 +116,6 @@ const NavUser: React.FC = () => {
                   Account
                 </DropdownMenuItem>
               </Link>
-              <DropdownMenuItem>
-                <Palette className="mr-2 h-4 w-4" />
-                Theme
-                <Select value={theme} onValueChange={handleThemeChange}>
-                  <SelectTrigger className="w-[140px]">
-                    <SelectValue placeholder="Theme" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="light">Light</SelectItem>
-                    <SelectItem value="dark">Dark</SelectItem>
-                    <SelectItem value="neon">Neon</SelectItem>
-                    <SelectItem value="system">System</SelectItem>
-                  </SelectContent>
-                </Select>
-              </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem>

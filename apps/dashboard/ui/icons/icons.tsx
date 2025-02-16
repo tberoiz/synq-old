@@ -4,10 +4,10 @@ import Image from "next/image";
 export const SynqIcon = (props: React.ComponentProps<any>) => {
   return (
     <Image
-      src="/brand/icon.png"
+      src="/brand/logo.png"
       alt="synq Icon"
-      width={64}
-      height={64}
+      width={42}
+      height={42}
       {...props}
     />
   );
@@ -40,28 +40,6 @@ export const TCGPlayerIcon = (props: React.ComponentProps<any>) => (
   <Image
     src="/icons/tcgplayer.svg"
     alt="TCGPlayer Icon"
-    width={16}
-    height={16}
-    className="w-4 h-4"
-    {...props}
-  />
-);
-
-export const GumroadIcon = (props: React.ComponentProps<any>) => (
-  <Image
-    src="/icons/gumroad.svg"
-    alt="Gumroad Icon"
-    width={16}
-    height={16}
-    className="w-4 h-4"
-    {...props}
-  />
-);
-
-export const EtsyIcon = (props: React.ComponentProps<any>) => (
-  <Image
-    src="/icons/etsy.svg"
-    alt="Etsy Icon"
     width={16}
     height={16}
     className="w-4 h-4"

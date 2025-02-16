@@ -2,24 +2,45 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@synq/ui/button";
-import { Input } from "@synq/ui/input";
 import { createClient } from "@synq/supabase/client";
-
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-} from "@synq/ui/select";
 import InventoryCard from "@ui/cards/inventory-card";
-import { Plus, Filter, Package2 } from "lucide-react";
+import { Plus, Package2 } from "lucide-react";
+// import { CardTable } from "@ui/tables/cards-table";
 
-// Initialize Supabase client
 const supabase = createClient();
+
+// TODO: Fetch data from the db
+const itemsData = [
+  {
+    id: 1,
+    name: "Black Lotus",
+    sku: "MTG-ALPHA-BL",
+    stock: 2,
+    platforms: ["tcgplayer", "ebay"],
+    listingsCount: 3,
+    lastSold: new Date("2024-03-15"),
+    lastSynced: new Date(),
+    priceHistory: [
+      { date: "2024-01-01", price: 25000 },
+      { date: "2024-03-01", price: 27500 },
+    ],
+  },
+  {
+    id: 2,
+    name: "Charizard (1st Ed.)",
+    sku: "POKE-BS-4",
+    stock: 5,
+    platforms: ["ebay", "shopify"],
+    listingsCount: 2,
+    lastSold: new Date("2024-03-14"),
+    lastSynced: new Date(),
+  },
+];
 
 export default function InventoryPage() {
   const [inventoryData, setInventoryData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedInventory, setSelectedInventory] = useState<any>(null);
 
   useEffect(() => {
     async function fetchInventory() {
@@ -36,8 +57,8 @@ export default function InventoryPage() {
             id: item.id,
             name: item.name,
             items: Math.floor(Math.random() * 20),
-            stock: Math.random(),
-            platforms: ["tcgplayer", "ebay"],
+            stock: Math.round(Math.random() * 100),
+            platforms: ["shopify", "cardmarket"],
             lastSynced: new Date(item.created_at),
           })),
         );
@@ -48,33 +69,26 @@ export default function InventoryPage() {
     fetchInventory();
   }, []);
 
+  const handleInventoryClick = (inventory: any) => {
+    setSelectedInventory(inventory);
+  };
+
   return (
     <div className="space-y-4">
       {/* Inventory Controls */}
-      <div className="flex justify-between items-center">
+      {/* <div className="flex justify-between items-center">
         <div className="flex gap-2">
           <Input
             placeholder="Search inventories..."
             className="max-w-xs text-sm"
           />
-          <Select>
-            <SelectTrigger className="w-[160px] text-sm">
-              <Filter className="h-3 w-6 mr-2" />
-              Filter by Platform
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Inventories</SelectItem>
-              <SelectItem value="tcgplayer">TCGplayer</SelectItem>
-              <SelectItem value="ebay">eBay</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
 
         <Button className="text-sm">
           <Plus className="h-3 w-3 mr-2" />
           New Inventory
         </Button>
-      </div>
+      </div> */}
 
       {/* Inventory Grid */}
       {loading ? (
@@ -91,6 +105,8 @@ export default function InventoryPage() {
               stock={inventory.stock}
               channel={inventory.platforms}
               lastSynced={inventory.lastSynced}
+              isActive={selectedInventory?.id === inventory.id}
+              onClick={() => handleInventoryClick(inventory)}
             />
           ))}
         </div>
@@ -108,6 +124,16 @@ export default function InventoryPage() {
             <Plus className="h-3 w-3 mr-2" />
             Create Inventory
           </Button>
+        </div>
+      )}
+
+      {/* Display Items for Selected Inventory */}
+      {selectedInventory && (
+        <div className="mt-8">
+          <h2 className="text-xl font-semibold mb-4">
+            Items in {selectedInventory.name}
+          </h2>
+          {/* <CardTable data={itemsData} loading={loading} /> */}
         </div>
       )}
     </div>

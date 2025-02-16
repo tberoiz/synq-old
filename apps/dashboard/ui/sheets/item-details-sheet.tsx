@@ -20,15 +20,15 @@ const platformIcons: {
 };
 
 export default function ItemDetailsSheetContent({
-  name,
-  stock,
-  sku,
-  platforms,
+  name = "",
+  stock = 0,
+  sku = "",
+  platforms= ["tcgplayer"],
   lastSold,
   lastSynced,
 }: {
-  name: string;
-  stock: number;
+  name?: string;
+  stock?: number;
   sku?: string;
   platforms?: ("tcgplayer" | "ebay" | "shopify")[];
   lastSold?: Date;
