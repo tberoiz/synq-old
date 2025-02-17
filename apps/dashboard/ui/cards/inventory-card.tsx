@@ -1,22 +1,29 @@
-// TODO: Needs refactoring
-
 import { Card, CardContent, CardTitle } from "@synq/ui/card";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@synq/ui/tooltip";
 import { cn } from "@synq/ui/utils";
 import { Package } from "lucide-react";
+import { Progress } from "@synq/ui/progress";
+import { Inventory } from "@synq/supabase/models";
+import { InventorySettingsButton } from "@ui/buttons/inventory-settings-button";
 import {
   CardMarketIcon,
   EbayIcon,
   ShopifyIcon,
   TCGPlayerIcon,
 } from "@ui/icons/icons";
-import { Progress } from "@synq/ui/progress";
-import { Inventory } from "@synq/supabase/models";
-import { InventorySettingsButton } from "@ui/buttons/inventory-settings-button";
+import { JSX } from "react";
 
-interface InventoryCardProps extends Pick<Inventory, 'id' | 'name'> {
+// Extracted Platform Icons Mapping
+const platformIcons: Record<string, JSX.Element> = {
+  tcgplayer: <TCGPlayerIcon className="w-3 h-3" />,
+  ebay: <EbayIcon className="w-3 h-3" />,
+  shopify: <ShopifyIcon className="w-3 h-3" />,
+  cardmarket: <CardMarketIcon className="w-3 h-3" />,
+};
+
+interface InventoryCardProps extends Pick<Inventory, "id" | "name"> {
   stock?: number;
-  channel?: ("tcgplayer" | "ebay" | "shopify" | "cardmarket")[];
+  channel?: ("TCGPlayer" | "eBay" | "Shopify" | "Cardmarket")[];
   isActive?: boolean;
   onClick?: () => void;
 }
@@ -25,19 +32,11 @@ function InventoryCard({
   id,
   name,
   stock = 100,
-  channel = ['shopify'],
+  channel = ["Shopify"],
   isActive = false,
   onClick,
 }: InventoryCardProps) {
   const isLowStock = stock && stock <= 10;
-
-  // Platform icons mapping
-  const platformIcons = {
-    tcgplayer: <TCGPlayerIcon className="w-3 h-3" />,
-    ebay: <EbayIcon className="w-3 h-3" />,
-    shopify: <ShopifyIcon className="w-3 h-3" />,
-    cardmarket: <CardMarketIcon className="w-3 h-3" />,
-  };
 
   return (
     <Card
@@ -59,20 +58,22 @@ function InventoryCard({
             <div className="flex items-center gap-2 mb-2">
               <Package className="h-4 w-4 text-primary" strokeWidth={1} />
               <CardTitle className="text-sm">{name}</CardTitle>
+
               {channel?.length > 0 && (
                 <div className="flex gap-1">
-                  {channel.map((platform) => (
-                    <Tooltip key={platform}>
-                      <TooltipTrigger>
-                        <div className="p-1 bg-muted rounded-md">
-                          {platformIcons[platform]}
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent className="text-xs">
-                        Selling in {platform}
-                      </TooltipContent>
-                    </Tooltip>
-                  ))}
+                  {channel.map((platform) => {
+                    const icon = platformIcons[platform.toLowerCase()] || <Package className="w-3 h-3" />; // Fallback icon
+                    return (
+                      <Tooltip key={platform}>
+                        <TooltipTrigger>
+                          <div className="p-1 bg-muted rounded-md">{icon}</div>
+                        </TooltipTrigger>
+                        <TooltipContent className="text-xs">
+                          Selling in {platform}
+                        </TooltipContent>
+                      </Tooltip>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -92,11 +93,8 @@ function InventoryCard({
               </div>
               {/* Progress Bar */}
               <Progress
-                value={stock === undefined ? 100 : (stock / 100) * 100}
-                className={cn(
-                  "h-1.5",
-                  isLowStock ? "bg-red-200" : "bg-primary/20"
-                )}
+                value={(stock / 100) * 100}
+                className={cn("h-1.5", isLowStock ? "bg-red-200" : "bg-primary/20")}
               />
             </div>
           </div>

@@ -1,5 +1,4 @@
-"use client";
-
+'use client'
 import * as React from "react";
 import {
   ColumnDef,
@@ -13,7 +12,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ChevronDown, MoreHorizontal } from "lucide-react";
+import { ChevronDown, MoreHorizontal, Check, X } from "lucide-react";
 
 import { Button } from "@synq/ui/button";
 import { Checkbox } from "@synq/ui/checkbox";
@@ -51,6 +50,7 @@ const data: Order[] = [
       { id: "1", name: "Charizard Holo", quantity: 2 },
       { id: "2", name: "Blastoise EX", quantity: 1 },
     ],
+    inventoryUpdated: true,
   },
   {
     id: "3u1reuv4",
@@ -64,6 +64,7 @@ const data: Order[] = [
       { id: "3", name: "Pikachu VMAX", quantity: 3 },
       { id: "4", name: "Mewtwo GX", quantity: 1 },
     ],
+    inventoryUpdated: false,
   },
   {
     id: "derv1ws0",
@@ -77,6 +78,7 @@ const data: Order[] = [
       { id: "5", name: "Lugia Legend", quantity: 1 },
       { id: "6", name: "Rayquaza EX", quantity: 2 },
     ],
+    inventoryUpdated: true,
   },
   {
     id: "5kma53ae",
@@ -90,6 +92,8 @@ const data: Order[] = [
       { id: "7", name: "Gengar VMAX", quantity: 1 },
       { id: "8", name: "Umbreon GX", quantity: 2 },
     ],
+    inventoryUpdated: false,
+    useClient: true,
   },
   {
     id: "cmk90876",
@@ -103,6 +107,7 @@ const data: Order[] = [
       { id: "11", name: "Sylveon V", quantity: 2 },
       { id: "12", name: "Espeon GX", quantity: 1 },
     ],
+    inventoryUpdated: true,
   },
 ];
 
@@ -119,6 +124,8 @@ export type Order = {
     name: string;
     quantity: number;
   }[];
+  inventoryUpdated: boolean;
+  useClient?: boolean;
 };
 
 export const columns: ColumnDef<Order>[] = [
@@ -192,6 +199,29 @@ export const columns: ColumnDef<Order>[] = [
       const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
 
       return <span className="font-medium text-primary">{totalQuantity}</span>;
+    },
+  },
+  {
+    id: "inventoryStatus",
+    header: "Inventory",
+    cell: ({ row }) => {
+      const order = row.original;
+      const isEbay = order.channel === "Ebay";
+      const inventoryUpdated = order.inventoryUpdated;
+
+      return (
+        <div className="flex items-center justify-center gap-2">
+          {isEbay && order.useClient ? (
+            <Badge variant="outline" className="bg-yellow-100 text-yellow-800">
+              Use Client
+            </Badge>
+          ) : inventoryUpdated ? (
+            <Check className="h-4 w-4 text-green-500" />
+          ) : (
+            <X className="h-4 w-4 text-red-500" />
+          )}
+        </div>
+      );
     },
   },
   {
@@ -342,7 +372,7 @@ export function OrdersTable() {
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  className="text-center"
+                  className="text-center cursor-pointer"
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (

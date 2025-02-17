@@ -1,6 +1,7 @@
 import { CardLayout } from "@ui/layouts/content/card-layout";
 import { AddInventoryDialog } from "@ui/dialog/add-inventory-dialog";
 import { Package } from "lucide-react";
+import { AddItemDialog } from "@ui/dialog/add-items-dialog";
 
 export default function InventoryLayout({
   children,
@@ -9,7 +10,8 @@ export default function InventoryLayout({
 }) {
   const actions = (
     <>
-     <AddInventoryDialog />
+      <AddItemDialog />
+      <AddInventoryDialog />
     </>
   );
 
