@@ -1,50 +1,35 @@
-import { Card, CardContent } from "@synq/ui/card";
+// TODO: Needs refactoring
+
+import { Card, CardContent, CardTitle } from "@synq/ui/card";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@synq/ui/tooltip";
 import { cn } from "@synq/ui/utils";
-import { AlertCircle, Package } from "lucide-react";
-import { CardMarketIcon, EbayIcon, ShopifyIcon, TCGPlayerIcon } from "@ui/icons/icons";
+import { Package } from "lucide-react";
+import {
+  CardMarketIcon,
+  EbayIcon,
+  ShopifyIcon,
+  TCGPlayerIcon,
+} from "@ui/icons/icons";
 import { Progress } from "@synq/ui/progress";
+import { Inventory } from "@synq/supabase/models";
+import { InventorySettingsButton } from "@ui/buttons/inventory-settings-button";
 
-interface InventoryCardProps {
-  name: string;
-  items: number;
-  stock: number;
-  channel?: (
-    | "tcgplayer"
-    | "ebay"
-    | "shopify"
-    | "cardmarket"
-  )[];
-  lowStockThreshold?: number;
-  lastSynced?: Date;
-  isActive?: boolean;
-  onClick?: () => void;
-}
-
-interface InventoryCardProps {
-  name: string;
-  items: number;
-  stock: number;
+interface InventoryCardProps extends Pick<Inventory, 'id' | 'name'> {
+  stock?: number;
   channel?: ("tcgplayer" | "ebay" | "shopify" | "cardmarket")[];
-  lowStockThreshold?: number;
-  lastSynced?: Date;
   isActive?: boolean;
   onClick?: () => void;
 }
 
 function InventoryCard({
+  id,
   name,
-  items,
-  stock,
-  channel = [],
-  lowStockThreshold = 10,
+  stock = 100,
+  channel = ['shopify'],
   isActive = false,
   onClick,
 }: InventoryCardProps) {
-  let isLowStock = null;
-  if (stock && stock !== undefined) {
-    isLowStock = stock <= lowStockThreshold;
-  }
+  const isLowStock = stock && stock <= 10;
 
   // Platform icons mapping
   const platformIcons = {
@@ -62,19 +47,10 @@ function InventoryCard({
       )}
       onClick={onClick}
     >
-      {/* Low Stock Alert */}
-      {isLowStock && stock !== undefined && (
-        <div className="absolute top-1 right-1">
-          <Tooltip>
-            <TooltipTrigger>
-              <AlertCircle className="h-3 w-3 text-red-500" />
-            </TooltipTrigger>
-            <TooltipContent className="text-xs">
-              Low stock alert! Only {stock} items remaining.
-            </TooltipContent>
-          </Tooltip>
-        </div>
-      )}
+      {/* Inventory Settings Button */}
+      <div className="absolute top-1 right-1">
+        <InventorySettingsButton inventoryId={id} />
+      </div>
 
       <CardContent className="p-3">
         <div className="flex items-start justify-between">
@@ -82,8 +58,8 @@ function InventoryCard({
             {/* Inventory Name */}
             <div className="flex items-center gap-2 mb-2">
               <Package className="h-4 w-4 text-primary" strokeWidth={1} />
-              <h3 className="font-light text-sm">{name}</h3>
-              {channel.length > 0 && (
+              <CardTitle className="text-sm">{name}</CardTitle>
+              {channel?.length > 0 && (
                 <div className="flex gap-1">
                   {channel.map((platform) => (
                     <Tooltip key={platform}>
@@ -93,7 +69,7 @@ function InventoryCard({
                         </div>
                       </TooltipTrigger>
                       <TooltipContent className="text-xs">
-                        Synced with {platform}
+                        Selling in {platform}
                       </TooltipContent>
                     </Tooltip>
                   ))}
@@ -116,7 +92,7 @@ function InventoryCard({
               </div>
               {/* Progress Bar */}
               <Progress
-                value={stock === undefined ? 100 : (stock / items) * 100}
+                value={stock === undefined ? 100 : (stock / 100) * 100}
                 className={cn(
                   "h-1.5",
                   isLowStock ? "bg-red-200" : "bg-primary/20"

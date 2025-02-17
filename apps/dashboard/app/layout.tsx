@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ThemeProvider } from "./providers";
+import { SynqProviders } from "./providers";
 import "@synq/ui/globals.css";
 import { Toaster } from "@synq/ui/toaster";
 
@@ -10,21 +10,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-          themes={["light", "dark", "neon", "system"]}
-        >
+        <SynqProviders>
           {children}
-        </ThemeProvider>
+        </SynqProviders>
         <Toaster />
       </body>
     </html>
