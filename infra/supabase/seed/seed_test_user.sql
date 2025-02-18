@@ -1,4 +1,6 @@
+-- seeds/seed_test_user.sql
 -- Create a single test user in the "auth.users" table
+
 DO $$
 DECLARE
     user_uuid UUID;
