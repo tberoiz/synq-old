@@ -1,0 +1,51 @@
+{
+  "name": "electron-desktop",
+  "version": "1.0.0",
+  "description": "Electron desktop wrapper for Next.js web app",
+  "author": "Telmo Beroiz",
+  "license": "MIT",
+  "main": "main.js",
+  "scripts": {
+    "dev": "concurrently \"cd ../web && yarn dev\" \"wait-on http://localhost:3000 && electron .\"",
+    "build": "cd ../web && yarn build && yarn export && electron-builder",
+    "start": "electron .",
+    "package": "electron-builder --dir",
+    "make": "electron-builder"
+  },
+  "dependencies": {
+    "electron": "^27.0.0",
+    "electron-is-dev": "^2.0.0"
+  },
+  "devDependencies": {
+    "electron-builder": "^24.6.0",
+    "concurrently": "^8.2.0",
+    "wait-on": "^7.0.1"
+  },
+  "build": {
+    "appId": "com.synq.app",
+    "productName": "SynqApp",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "!node_modules",
+      "!package-lock.json",
+      "!yarn.lock",
+      "main.js",
+      "preload.js",
+      "../web/out/**"
+    ],
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/icon.icns"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "assets/"
+    }
+  }
+}
