@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@synq/ui/button";
 import { Input } from "@synq/ui/input";
 import { useQueryClient } from "@tanstack/react-query";
-import { createInventory } from "@synq/supabase/queries/inventory";
+import { createInventoryGroup } from "@synq/supabase/queries/inventory";
 import { useToast } from "@synq/ui/use-toast";
 import {
   Form,
@@ -41,8 +41,8 @@ export const CreateInventoryForm = ({
 
   const onSubmit = async (data: InventoryFormValues) => {
     try {
-      await createInventory(data.name);
-      queryClient.invalidateQueries({ queryKey: ["inventories"] });
+      await createInventoryGroup(data.name);
+      queryClient.invalidateQueries({ queryKey: ["inventory_groups"] });
       form.reset();
       toast({
         title: "Success",

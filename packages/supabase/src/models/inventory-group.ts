@@ -1,5 +1,5 @@
-export interface Inventory {
-  id: number;
+export interface InventoryGroup {
+  id: string;
   user_id: string;
   name: string;
   created_at: string;

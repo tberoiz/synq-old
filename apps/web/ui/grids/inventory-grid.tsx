@@ -1,13 +1,14 @@
-import { Inventory } from "@synq/supabase/models";
+import { InventoryGroup } from "@synq/supabase/models";
 import { Package2 } from "lucide-react";
 import InventoryCard from "@ui/cards/inventory-card";
 
 interface InventoryGridProps {
-  inventoryData: Inventory[];
+  inventoryData: InventoryGroup[];
   isFetching: boolean;
-  selectedInventory: Inventory | null;
-  handleInventoryClick: (inventory: Inventory) => void;
+  selectedInventory: InventoryGroup | null;
+  handleInventoryClick: (inventory: InventoryGroup) => void;
 }
+
 const InventoryGrid = ({
   inventoryData,
   isFetching,
@@ -18,18 +19,18 @@ const InventoryGrid = ({
   if (isFetching) {
     return (
       <p className="text-center text-muted-foreground">
-        Loading inventory...
+        Loading inventory groups...
       </p>
     );
   }
 
-  if (inventoryData?.length === 0) {
+  if (!inventoryData || inventoryData.length === 0) {
     return <EmptyState />;
   }
 
   return (
     <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-      {inventoryData?.map((inventory) => (
+      {inventoryData.map((inventory) => (
         <InventoryCard
           key={inventory.id}
           id={inventory.id}
@@ -46,9 +47,9 @@ const InventoryGrid = ({
 const EmptyState = () => (
   <div className="text-center py-8">
     <Package2 className="h-8 w-8 mx-auto text-muted-foreground mb-3" />
-    <h3 className="font-medium mb-1 text-sm">No inventories found</h3>
+    <h3 className="font-medium mb-1 text-sm">No inventory groups found</h3>
     <p className="text-muted-foreground mb-3 text-sm">
-      Start by creating a new inventory or connecting a platform.
+      Start by creating a new inventory group or connecting a platform.
     </p>
   </div>
 );

@@ -1,30 +1,37 @@
-import { Inventory } from "models";
+import { InventoryGroup } from "models";
 import { createClient } from "../utils/client";
 import { getUserId } from "./user";
 
 const supabase = createClient();
 
-export const fetchInventories = async (): Promise<Inventory[]> => {
+export const fetchInventoryGroups = async (): Promise<InventoryGroup[]> => {
   const userId = await getUserId();
   const { data, error } = await supabase
-    .from("inventories")
-    .select("id, user_id, name")
+    .from("inventory_groups")
+    .select("id, user_id, name, created_at, updated_at")
     .eq("user_id", userId)
     .throwOnError();
 
   if (error) throw error;
-  return data as Inventory[];
+  return data as InventoryGroup[];
 };
 
-export const createInventory = async (name: string) => {
+
+export const createInventoryGroup = async (name: string) => {
   const userId = await getUserId();
-  const { data, error } = await supabase.from("inventories").insert([{ name, user_id: userId }]);
+  const { data, error } = await supabase.from("inventory_groups").insert([{ name, user_id: userId }]);
   if (error) throw error;
   return data;
 };
 
-export const deleteInventory = async (id: number) => {
+
+export const deleteInventoryGroup = async (id: string) => {
   const userId = await getUserId();
-  const { error } = await supabase.from("inventories").delete().eq("id", id).eq("user_id", userId);
+  const { error } = await supabase
+    .from("inventory_groups")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", userId);
+
   if (error) throw error;
 };

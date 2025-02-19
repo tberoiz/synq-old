@@ -1,2 +1,2 @@
-export type { Inventory } from './inventory';
+export type { InventoryGroup } from './inventory-group';
 export type { Item } from './item';

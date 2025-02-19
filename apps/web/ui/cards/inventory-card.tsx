@@ -3,27 +3,21 @@ import { Tooltip, TooltipTrigger, TooltipContent } from "@synq/ui/tooltip";
 import { cn } from "@synq/ui/utils";
 import { Package } from "lucide-react";
 import { Progress } from "@synq/ui/progress";
-import { Inventory } from "@synq/supabase/models";
+import { InventoryGroup } from "@synq/supabase/models";
 import { InventorySettingsButton } from "@ui/buttons/inventory-settings-button";
 import {
-  CardMarketIcon,
   EbayIcon,
-  ShopifyIcon,
-  TCGPlayerIcon,
 } from "@ui/icons/icons";
 import { JSX } from "react";
 
 // Extracted Platform Icons Mapping
 const platformIcons: Record<string, JSX.Element> = {
-  tcgplayer: <TCGPlayerIcon className="w-3 h-3" />,
   ebay: <EbayIcon className="w-3 h-3" />,
-  shopify: <ShopifyIcon className="w-3 h-3" />,
-  cardmarket: <CardMarketIcon className="w-3 h-3" />,
 };
 
-interface InventoryCardProps extends Pick<Inventory, "id" | "name"> {
+interface InventoryCardProps extends Pick<InventoryGroup, "id" | "name"> {
   stock?: number;
-  channel?: ("TCGPlayer" | "eBay" | "Shopify" | "Cardmarket")[];
+  channel?: ("eBay")[];
   isActive?: boolean;
   onClick?: () => void;
 }
@@ -32,7 +26,7 @@ function InventoryCard({
   id,
   name,
   stock = 100,
-  channel = ["Shopify"],
+  channel = ["eBay"],
   isActive = false,
   onClick,
 }: InventoryCardProps) {
@@ -69,7 +63,7 @@ function InventoryCard({
                           <div className="p-1 bg-muted rounded-md">{icon}</div>
                         </TooltipTrigger>
                         <TooltipContent className="text-xs">
-                          Selling in {platform}
+                          Selling on {platform}
                         </TooltipContent>
                       </Tooltip>
                     );

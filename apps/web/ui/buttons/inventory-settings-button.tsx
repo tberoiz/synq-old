@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@synq/ui/use-toast";
-import { deleteInventory } from "@synq/supabase/queries/inventory";
+import { deleteInventoryGroup } from "@synq/supabase/queries/inventory";
 import { DeleteInventoryDialog } from "@ui/dialog/delete-inventory-dialog";
 import { InventoryDropdownMenu } from "@ui/dropdowns/inventory-dropdown-menu";
 
 interface InventorySettingsButtonProps {
-  inventoryId: number;
+  inventoryId: string;
 }
 
 export const InventorySettingsButton = ({ inventoryId }: InventorySettingsButtonProps) => {
@@ -18,8 +18,8 @@ export const InventorySettingsButton = ({ inventoryId }: InventorySettingsButton
 
   const handleDeleteInventory = async () => {
     try {
-      await deleteInventory(inventoryId);
-      queryClient.invalidateQueries({ queryKey: ["inventories"] });
+      await deleteInventoryGroup(inventoryId);
+      queryClient.invalidateQueries({ queryKey: ["inventory_groups"] });
       toast({
         title: "Inventory deleted",
         description: "The inventory was successfully deleted.",

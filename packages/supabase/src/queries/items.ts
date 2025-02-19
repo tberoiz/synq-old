@@ -3,7 +3,7 @@ import { createClient } from "../utils/client";
 
 const supabase = createClient();
 
-export const fetchItemsByInventory = async (inventoryId: number): Promise<Item[]> => {
+export const fetchItemsByInventory = async (inventoryId: string): Promise<Item[]> => {
 
   const { data, error } = await supabase
     .from("items")

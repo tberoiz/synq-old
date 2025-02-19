@@ -8,7 +8,7 @@ import { Input } from "@synq/ui/input";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useToast } from "@synq/ui/use-toast";
 import { createItem } from "@synq/supabase/queries/items";
-import { fetchInventories } from "@synq/supabase/queries/inventory";
+import { fetchInventoryGroups } from "@synq/supabase/queries/inventory";
 import {
   Form,
   FormControl,
@@ -66,7 +66,7 @@ export const CreateItemForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   // Fetch inventories
   const { data: inventories, isLoading: isInventoriesLoading } = useQuery({
     queryKey: ["inventories"],
-    queryFn: fetchInventories,
+    queryFn: fetchInventoryGroups,
   });
 
   const onSubmit = async (data: ItemFormValues) => {
@@ -79,7 +79,7 @@ export const CreateItemForm = ({ onSuccess }: { onSuccess?: () => void }) => {
         inventoryId: Number(data.inventoryId),
       });
 
-      queryClient.invalidateQueries({ queryKey: ["items"] });
+      queryClient.invalidateQueries({ queryKey: ["inventory_groups"] });
       form.reset();
 
       toast({
