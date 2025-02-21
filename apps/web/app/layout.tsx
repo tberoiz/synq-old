@@ -14,9 +14,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <SynqProviders>
-          {children}
-        </SynqProviders>
+        <SynqProviders>{children}</SynqProviders>
         <Toaster />
       </body>
     </html>

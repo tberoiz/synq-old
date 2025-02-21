@@ -1,7 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { ChartLine, Package, WalletCards, Blocks, Settings } from "lucide-react";
+import {
+  ChartLine,
+  Package,
+  WalletCards,
+  Blocks,
+  Settings,
+} from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -22,7 +28,7 @@ import { usePathname } from "next/navigation";
 const navItems = [
   { title: "Overview", url: "/overview", icon: ChartLine },
   { title: "Inventory", url: "/inventory", icon: Package },
-  { title: "Sales", url: "/orders", icon: WalletCards },
+  { title: "Sales", url: "/sales", icon: WalletCards },
   { title: "Integrations", url: "/integrations", icon: Blocks },
   { title: "Settings", url: "/settings", icon: Settings },
 ];
@@ -62,7 +68,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                           "flex items-center justify-start gap-3 px-4 py-2 rounded-lg transition-colors h-12 w-full",
                           isActive
                             ? "bg-primary text-white dark:text-black"
-                            : "hover:bg-gray-100 dark:hover:bg-gray-800"
+                            : "hover:bg-gray-100 dark:hover:bg-gray-800",
                         )}
                       >
                         <Icon className="w-6 h-6 mr-2" />
@@ -81,7 +87,11 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
         <SidebarGroup>
           <SidebarGroupContent className="px-4 pb-4 text-sm">
             <div className="border-t border-gray-200 pt-4">
-              <Link href="https://docs.synqtcg.com" target="_blank" className="hover:text-gray-900">
+              <Link
+                href="https://docs.synqtcg.com"
+                target="_blank"
+                className="hover:text-gray-900"
+              >
                 Documentation
               </Link>
             </div>

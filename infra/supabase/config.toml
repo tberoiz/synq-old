@@ -48,16 +48,14 @@ enabled = true
 # Specifies an ordered list of seed files to load during db reset.
 # Supports glob patterns relative to supabase directory: './seeds/*.sql'
 sql_paths = [
-    './seed/seed_test_user.sql',
-    './seed/seed_subscription_plans.sql',
-    './seed/seed_subscriptions.sql',
-    './seed/seed_profiles.sql',
-    './seed/seed_inventory_groups.sql',
-    './seed/seed_items.sql',
-    './seed/seed_orders.sql',
-    './seed/seed_bulk_listings.sql',
-    './seed/seed_sync_logs.sql',
+    './seed/000_seed_test_user.sql',
+    './seed/001_seed_user_subscription.sql',
+    './seed/002_seed_user_integrations.sql',
+    './seed/003_seed_inventory_and_products.sql',
+    './seed/004_seed_sales_and_orders.sql',
+    './seed/005_seed_reports.sql',
 ]
+
 
 
 [realtime]

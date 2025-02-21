@@ -56,7 +56,6 @@ const NavUser: React.FC = () => {
     fetchUserInfo();
   }, []);
 
-
   return (
     <SidebarMenu>
       <SidebarMenuItem>
