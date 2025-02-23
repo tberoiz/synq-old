@@ -7,6 +7,7 @@ import { Label } from "@synq/ui/label";
 
 import { signInWithPassword } from "../actions";
 import { OAuthButton } from "../components/provider-button";
+import { SynqIcon } from "@ui/icons/icons";
 
 export function SignInForm({
   className,
@@ -22,7 +23,7 @@ export function SignInForm({
               className="flex flex-col items-center gap-2 font-medium"
             >
               <div className="flex h-8 w-8 items-center justify-center rounded-md">
-                <GalleryVerticalEnd className="size-6" />
+                <SynqIcon />
               </div>
               <span className="sr-only">synq.com</span>
             </a>

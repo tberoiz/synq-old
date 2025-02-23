@@ -24,7 +24,7 @@ export function CardLayout({
 }: CardLayoutProps) {
   return (
     <Card>
-      <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
+      <CardHeader className="flex flex-col items-start gap-4 border-b py-5 sm:flex-row sm:items-center sm:gap-2">
         <div className="flex flex-1 flex-col gap-1">
           <div className="flex items-center gap-2">
             {icon && <div className="flex-shrink-0">{icon}</div>}
@@ -34,7 +34,11 @@ export function CardLayout({
             {description}
           </CardDescription>
         </div>
-        {actions && <div className="flex items-center gap-2">{actions}</div>}
+        {actions && (
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            {actions}
+          </div>
+        )}
       </CardHeader>
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         {children}

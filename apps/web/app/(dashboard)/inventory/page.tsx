@@ -1,94 +1,84 @@
 "use client";
-import { useState } from "react";
+
+import { lazy, Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
-
-import { AcquisitionBatchesTable } from "@ui/tables/acquisition-batches-table";
-import { ItemsTable } from "@ui/tables/items-table";
-import { CollectionsTable } from "@ui/tables/collections-table";
-
+import { Package, List, Folder } from "lucide-react";
 import {
   fetchInventoryBatches,
   fetchAllItems,
   fetchCollections,
 } from "@synq/supabase/queries/inventory";
-import {
-  UserAcquisitionBatch,
-  UserCollection,
-} from "@synq/supabase/models/inventory";
-import { AddNewBatchDialog } from "@ui/dialogs/add-new-batch-dialog";
-import { CreateItemsDropdown } from "@ui/dropdowns/create-items-dropdown";
 import { CardLayout } from "@ui/layouts/content/card-layout";
-import { Package, List, Folder } from "lucide-react";
+import { AddNewBatchDialog } from "@ui/dialogs/add-new-batch-dialog";
 import { AddNewCollectionDialog } from "@ui/dialogs/add-new-collection-dialog";
+import { CreateItemsDropdown } from "@ui/dropdowns/create-items-dropdown";
+
+// Lazy load the data table components
+const CollectionsDataTable = lazy(
+  () => import("@ui/tables/inventory/collections-data-table"),
+);
+const BatchesDataTable = lazy(
+  () => import("@ui/tables/inventory/batches-data-table"),
+);
+const ItemsDataTable = lazy(
+  () => import("@ui/tables/inventory/items-data-table"),
+);
 
 const InventoryPage = () => {
-  const [selectedBatch, setSelectedBatch] =
-    useState<UserAcquisitionBatch | null>(null);
-  const [selectedCollection, setSelectedCollection] =
-    useState<UserCollection | null>(null);
-
-  // Fetch collections
   const { data: collections, isLoading: isFetchingCollections } = useQuery({
     queryKey: ["user_inventory_collections"],
     queryFn: fetchCollections,
   });
 
-  // Fetch batches
   const { data: batches, isLoading: isFetchingBatches } = useQuery({
     queryKey: ["user_inventory_batches"],
     queryFn: fetchInventoryBatches,
   });
 
-  // Fetch items
   const { data: items, isLoading: isFetchingItems } = useQuery({
     queryKey: ["user_inventory_items"],
     queryFn: fetchAllItems,
   });
 
-  const handleBatchClick = (batch: UserAcquisitionBatch) =>
-    setSelectedBatch(batch);
-
-  const handleCollectionClick = (collection: UserCollection) =>
-    setSelectedCollection(collection);
-
   return (
     <div className="space-y-4">
-      {/* Collections Table */}
+      {/* Collections Section */}
       <CardLayout
         title="Collections"
         description="Organize your inventory into collections"
         icon={<Folder className="h-4 w-4" />}
         actions={<AddNewCollectionDialog />}
       >
-        <CollectionsTable
-          collections={collections || []}
-          isFetching={isFetchingCollections}
-        />
+        <Suspense fallback={<div>Loading Collections...</div>}>
+          <CollectionsDataTable
+            data={collections || []}
+            loading={isFetchingCollections}
+          />
+        </Suspense>
       </CardLayout>
 
-      {/* Batches Table */}
+      {/* Batches Section */}
       <CardLayout
         title="Acquisition Batches"
         description="Track and manage your inventory acquisition batches"
         icon={<Package className="h-4 w-4" />}
         actions={<AddNewBatchDialog />}
       >
-        <AcquisitionBatchesTable
-          batches={batches || []}
-          isFetching={isFetchingBatches}
-          selectedBatch={selectedBatch}
-          onBatchClick={handleBatchClick}
-        />
+        <Suspense fallback={<div>Loading Batches...</div>}>
+          <BatchesDataTable data={batches || []} loading={isFetchingBatches} />
+        </Suspense>
       </CardLayout>
 
-      {/* Items Table */}
+      {/* Items Section */}
       <CardLayout
         title="Items"
         description="View and organize all items in your inventory"
         icon={<List className="h-4 w-4" />}
         actions={<CreateItemsDropdown />}
       >
-        <ItemsTable data={items || []} loading={isFetchingItems} />
+        <Suspense fallback={<div>Loading Items...</div>}>
+          <ItemsDataTable data={items || []} loading={isFetchingItems} />
+        </Suspense>
       </CardLayout>
     </div>
   );

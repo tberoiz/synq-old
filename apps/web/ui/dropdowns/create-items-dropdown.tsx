@@ -20,7 +20,7 @@ import {
   DropdownMenuItem,
   DropdownMenuGroup,
 } from "@synq/ui/dropdown-menu";
-import { UserAcquisitionBatch } from "@synq/supabase/models/inventory";
+import { ReactNode } from "react";
 
 const tcgCollections = [
   {
@@ -38,7 +38,6 @@ const tcgCollections = [
     title: "Dragon Ball Z",
     image: "/tcg/dbz.png",
   },
-  // Add more as needed...
 ];
 
 export const AddDatabaseInventoryDialog = () => (
@@ -112,7 +111,7 @@ export const AddManualInventoryDialog = () => (
     <DialogTrigger asChild>
       <Button variant="ghost" className="flex items-center">
         <CirclePlus className="h-3 w-3 mr-1" />
-        Add custom item
+        Create custom
       </Button>
     </DialogTrigger>
 
@@ -129,14 +128,20 @@ export const AddManualInventoryDialog = () => (
   </Dialog>
 );
 
-export const CreateItemsDropdown = () => {
+interface CreateItemsDropdownProps {
+  trigger?: ReactNode;
+}
+
+export const CreateItemsDropdown = ({ trigger }: CreateItemsDropdownProps) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="text-sm">
-          <Plus className="h-3 w-3 mr-1" />
-          Add Item
-        </Button>
+        {trigger || (
+          <Button variant="outline" size="sm" className="text-sm">
+            <Plus className="h-3 w-3 mr-1" />
+            Create an Item
+          </Button>
+        )}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="center">
         <DropdownMenuGroup>

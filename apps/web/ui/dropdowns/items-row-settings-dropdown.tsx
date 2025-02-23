@@ -21,7 +21,7 @@ export const ItemRowSettingsDropdown = ({
           variant="ghost"
           size="sm"
           onClick={(e) => {
-            e.stopPropagation(); // Stop propagation here
+            e.stopPropagation();
           }}
         >
           <MoreVertical className="h-4 w-4" />
@@ -30,12 +30,12 @@ export const ItemRowSettingsDropdown = ({
       <DropdownMenuContent
         className="dropdown-menu"
         onClick={(e) => {
-          e.stopPropagation(); // Stop propagation here
+          e.stopPropagation();
         }}
       >
         <DropdownMenuItem
           onClick={(e) => {
-            e.stopPropagation(); // Stop propagation here
+            e.stopPropagation();
             onDeleteClick();
           }}
         >

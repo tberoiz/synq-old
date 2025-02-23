@@ -1,9 +1,8 @@
 import { Card, CardContent, CardTitle } from "@synq/ui/card";
+import { Checkbox } from "@synq/ui/checkbox";
 import { Progress } from "@synq/ui/progress";
 import { cn } from "@synq/ui/utils";
 import { ItemRowSettingsButton } from "@ui/dialogs/items-row-settings-button";
-
-import { List } from "lucide-react";
 
 interface ItemCardProps {
   id: string;
@@ -11,7 +10,10 @@ interface ItemCardProps {
   quantity: number;
   cogs: number;
   listingPrice: number;
+  isActive?: boolean;
+  isSelected?: boolean;
   onClick?: () => void;
+  onSelect?: (e: React.MouseEvent) => void;
 }
 
 export function ItemCard({
@@ -20,14 +22,19 @@ export function ItemCard({
   quantity,
   cogs,
   listingPrice,
+  isActive = false,
+  isSelected = false,
   onClick,
+  onSelect,
 }: ItemCardProps) {
   const profit = listingPrice - cogs;
 
   return (
     <Card
       className={cn(
-        "relative hover:shadow-md transition-shadow group cursor-pointer"
+        "relative hover:shadow-md transition-shadow group cursor-pointer",
+        isActive ? "border-primary shadow-lg" : "border-muted",
+        isSelected && "bg-secondary/50 border-2 border-primary/50",
       )}
       onClick={onClick}
     >
@@ -35,12 +42,23 @@ export function ItemCard({
       <div className="absolute top-1 right-1">
         <ItemRowSettingsButton itemId={id} />
       </div>
+
       <CardContent className="p-3">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            {/* Item Name */}
-            <div className="flex items-center gap-2 mb-2">
-              <List className="h-4 w-4 text-primary" strokeWidth={1} />
+            {/* Item Name with Checkbox */}
+            <div
+              className="flex items-center gap-2 mb-2"
+              onClick={(e) => {
+                e.stopPropagation();
+                onSelect?.(e);
+              }}
+            >
+              <Checkbox
+                checked={isSelected}
+                aria-label={`Select ${name}`}
+                className="h-4 w-4"
+              />
               <CardTitle className="text-sm">{name}</CardTitle>
             </div>
 
@@ -81,7 +99,7 @@ export function ItemCard({
                 <span
                   className={cn(
                     "font-medium",
-                    profit >= 0 ? "text-green-500" : "text-red-500"
+                    profit >= 0 ? "text-green-500" : "text-red-500",
                   )}
                 >
                   {new Intl.NumberFormat("en-US", {

@@ -1,12 +1,13 @@
+//FIXME: rename camelcase values
 export interface UserCollection {
   id: string;
   user_id: string;
   name: string;
   code: string;
   created_at: string;
-  itemCount?: number;
-  totalValue?: number;
-  totalProfit?: number;
+  itemCount: number;
+  totalValue: number;
+  totalProfit: number;
 }
 
 export interface GlobalCard {

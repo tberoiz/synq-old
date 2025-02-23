@@ -1,7 +1,10 @@
+"use client";
+
 import { Card, CardContent, CardTitle } from "@synq/ui/card";
 import { cn } from "@synq/ui/utils";
 import { BatchRowSettingsButton } from "@ui/dialogs/batch-row-settings-button";
 import { Package } from "lucide-react";
+import { Checkbox } from "@synq/ui/checkbox";
 
 interface AcquisitionBatchCardProps {
   id: string;
@@ -11,7 +14,9 @@ interface AcquisitionBatchCardProps {
   totalListingPrice: number;
   totalProfit: number;
   isActive?: boolean;
+  isSelected?: boolean;
   onClick?: () => void;
+  onSelect?: (e: React.MouseEvent) => void;
 }
 
 export function AcquisitionBatchCard({
@@ -22,13 +27,16 @@ export function AcquisitionBatchCard({
   totalListingPrice,
   totalProfit,
   isActive = false,
+  isSelected = false,
   onClick,
+  onSelect,
 }: AcquisitionBatchCardProps) {
   return (
     <Card
       className={cn(
         "relative hover:shadow-md transition-shadow group cursor-pointer",
-        isActive ? "border-primary shadow-lg" : "border-muted"
+        isActive ? "border-primary shadow-lg" : "border-muted",
+        isSelected && "bg-secondary/50 border-2 border-primary/50",
       )}
       onClick={onClick}
     >
@@ -36,12 +44,23 @@ export function AcquisitionBatchCard({
       <div className="absolute top-1 right-1">
         <BatchRowSettingsButton batchId={id} />
       </div>
+
       <CardContent className="p-3">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            {/* Batch Name */}
-            <div className="flex items-center gap-2 mb-2">
-              <Package className="h-4 w-4 text-primary" strokeWidth={1} />
+            {/* Batch Name with Checkbox */}
+            <div
+              className="flex items-center gap-2 mb-2"
+              onClick={(e) => {
+                e.stopPropagation();
+                onSelect?.(e);
+              }}
+            >
+              <Checkbox
+                checked={isSelected}
+                aria-label={`Select ${name}`}
+                className="h-4 w-4"
+              />
               <CardTitle className="text-sm">{name}</CardTitle>
             </div>
 
@@ -80,7 +99,7 @@ export function AcquisitionBatchCard({
                 <span
                   className={cn(
                     "font-medium",
-                    totalProfit >= 0 ? "text-green-500" : "text-red-500"
+                    totalProfit >= 0 ? "text-green-500" : "text-red-500",
                   )}
                 >
                   {new Intl.NumberFormat("en-US", {

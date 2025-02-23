@@ -7,7 +7,6 @@
   "main": "main.js",
   "scripts": {
     "dev": "concurrently \"cd ../web && yarn dev\" \"wait-on http://localhost:3000 && electron .\"",
-    "build": "cd ../web && yarn build && yarn export && electron-builder",
     "start": "electron .",
     "package": "electron-builder --dir",
     "make": "electron-builder"

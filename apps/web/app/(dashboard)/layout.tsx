@@ -14,7 +14,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       }
     >
       <AppSidebar />
-      <SidebarInset>
+      <SidebarInset className="w-screen overflow-x-hidden">
         <AppHeader />
         <AppContent>{children}</AppContent>
       </SidebarInset>

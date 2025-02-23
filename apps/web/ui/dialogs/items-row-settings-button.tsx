@@ -69,7 +69,12 @@ export const ItemRowSettingsButton = ({ itemId }: ItemSettingsButtonProps) => {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={(e) => {e.stopPropagation(); handleDeleteItem()}}>
+          <AlertDialogAction
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDeleteItem();
+            }}
+          >
             Delete
           </AlertDialogAction>
         </AlertDialogFooter>

@@ -1,10 +1,9 @@
-// CollectionDetailsSheetContent.tsx
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
 import { SheetHeader, SheetTitle } from "@synq/ui/sheet";
 import { Folder } from "lucide-react";
-import { ItemsTable } from "@ui/tables/items-table";
+import ItemsDataTable from "@ui/tables/inventory/items-data-table";
 import { fetchItemsByCollection } from "@synq/supabase/queries/inventory";
 import { UserCollection } from "@synq/supabase/models/inventory";
 
@@ -35,7 +34,7 @@ export function CollectionDetailsSheetContent({
         </SheetTitle>
       </SheetHeader>
       <div className="py-4">
-        <ItemsTable data={items || []} loading={isFetchingItems} />
+        <ItemsDataTable data={items || []} loading={isFetchingItems} />
       </div>
     </>
   );

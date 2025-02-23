@@ -30,7 +30,9 @@ export const CollectionsRowSettingsButton = ({
   const handleDeleteCollection = async () => {
     try {
       await deleteInventoryCollection(collectionId);
-      queryClient.invalidateQueries({ queryKey: ["user_inventory_collections"] });
+      queryClient.invalidateQueries({
+        queryKey: ["user_inventory_collections"],
+      });
       toast({
         title: "Collection deleted",
         description: "The collection was successfully deleted.",
@@ -63,7 +65,12 @@ export const CollectionsRowSettingsButton = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={(e) => {e.stopPropagation(); handleDeleteCollection()}}>
+          <AlertDialogAction
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDeleteCollection();
+            }}
+          >
             Delete
           </AlertDialogAction>
         </AlertDialogFooter>
