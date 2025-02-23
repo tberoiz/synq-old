@@ -1,5 +1,6 @@
 import { Card, CardContent, CardTitle } from "@synq/ui/card";
 import { cn } from "@synq/ui/utils";
+import { BatchRowSettingsButton } from "@ui/dialogs/batch-row-settings-button";
 import { Package } from "lucide-react";
 
 interface AcquisitionBatchCardProps {
@@ -27,10 +28,14 @@ export function AcquisitionBatchCard({
     <Card
       className={cn(
         "relative hover:shadow-md transition-shadow group cursor-pointer",
-        isActive ? "border-primary shadow-lg" : "border-muted",
+        isActive ? "border-primary shadow-lg" : "border-muted"
       )}
       onClick={onClick}
     >
+      {/* Inventory Settings Button */}
+      <div className="absolute top-1 right-1">
+        <BatchRowSettingsButton batchId={id} />
+      </div>
       <CardContent className="p-3">
         <div className="flex items-start justify-between">
           <div className="flex-1">
@@ -75,7 +80,7 @@ export function AcquisitionBatchCard({
                 <span
                   className={cn(
                     "font-medium",
-                    totalProfit >= 0 ? "text-green-500" : "text-red-500",
+                    totalProfit >= 0 ? "text-green-500" : "text-red-500"
                   )}
                 >
                   {new Intl.NumberFormat("en-US", {

@@ -24,33 +24,29 @@ import {
   TableRow,
 } from "@synq/ui/table";
 import { Skeleton } from "@synq/ui/skeleton";
-import { cn } from "@synq/ui/utils";
 import { UserCollection } from "@synq/supabase/models/inventory";
 import { LayoutGrid, TableProperties } from "lucide-react";
 import { CollectionsGrid } from "@ui/grids/collections-grid";
-import { CollectionDetailsSheet } from "@ui/sheets/collection-details-sheet";
+import { Sheet, SheetTrigger, SheetContent } from "@synq/ui/sheet";
+import { CollectionDetailsSheetContent } from "@ui/sheets/collection-details-sheet";
+import { CollectionsRowSettingsButton } from "@ui/dialogs/collections-row-settings-button";
 
 interface CollectionsTableProps {
   collections: UserCollection[];
   isFetching: boolean;
-  selectedCollection: UserCollection | null;
-  onCollectionClick: (collection: UserCollection) => void;
 }
 
 export function CollectionsTable({
   collections,
   isFetching,
-  selectedCollection,
-  onCollectionClick,
 }: CollectionsTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
+    []
   );
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [layout, setLayout] = React.useState<"table" | "grid">("table");
-  const [isSheetOpen, setIsSheetOpen] = React.useState(false);
 
   const table = useReactTable({
     data: collections,
@@ -73,12 +69,6 @@ export function CollectionsTable({
       columnVisibility,
     },
   });
-
-  // Handle row click to open the sheet
-  const handleRowClick = (collection: UserCollection) => {
-    onCollectionClick(collection);
-    setIsSheetOpen(true);
-  };
 
   return (
     <div className="w-full">
@@ -113,7 +103,7 @@ export function CollectionsTable({
                     <TableHead key={header.id}>
                       {flexRender(
                         header.column.columnDef.header,
-                        header.getContext(),
+                        header.getContext()
                       )}
                     </TableHead>
                   ))}
@@ -135,25 +125,28 @@ export function CollectionsTable({
                 </TableRow>
               ) : table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    className={cn(
-                      "cursor-pointer transition",
-                      selectedCollection?.id === row.original.id
-                        ? "bg-primary/10"
-                        : "",
-                    )}
-                    onClick={() => handleRowClick(row.original)}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
+                  <Sheet key={row.id}>
+                    <SheetTrigger asChild>
+                      <TableRow className="cursor-pointer transition">
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell key={cell.id}>
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    </SheetTrigger>
+                    <SheetContent
+                      side="right"
+                      className="w-full max-w-2xl overflow-y-auto"
+                    >
+                      <CollectionDetailsSheetContent
+                        collection={row.original}
+                      />
+                    </SheetContent>
+                  </Sheet>
                 ))
               ) : (
                 <TableRow>
@@ -172,8 +165,6 @@ export function CollectionsTable({
         <CollectionsGrid
           collections={collections}
           isFetching={isFetching}
-          selectedCollection={selectedCollection}
-          onCollectionClick={handleRowClick}
         />
       )}
 
@@ -196,13 +187,6 @@ export function CollectionsTable({
           Next
         </Button>
       </div>
-
-      {/* Collection Details Sheet */}
-      <CollectionDetailsSheet
-        collection={selectedCollection}
-        open={isSheetOpen}
-        onOpenChange={setIsSheetOpen}
-      />
     </div>
   );
 }
@@ -245,5 +229,12 @@ const collectionColumns: ColumnDef<UserCollection>[] = [
         </span>
       );
     },
+  },
+  {
+    accessorKey: "Actions",
+    header: "",
+    cell: ({ row }) => (
+      <CollectionsRowSettingsButton collectionId={row.original.id} />
+    ),
   },
 ];

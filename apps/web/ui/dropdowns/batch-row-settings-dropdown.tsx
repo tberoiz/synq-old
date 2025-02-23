@@ -18,7 +18,12 @@ export const BatchRowSettingsDropdown = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 hover:bg-muted"
+          onClick={(e) => e.stopPropagation()}
+        >
           <MoreVertical className="h-4 w-4 text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>

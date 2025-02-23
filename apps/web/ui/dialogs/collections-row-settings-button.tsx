@@ -1,10 +1,8 @@
 "use client";
-
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@synq/ui/use-toast";
-import { deleteInventoryItem } from "@synq/supabase/queries/inventory";
-import { ItemRowSettingsDropdown } from "@ui/dropdowns/items-row-settings-dropdown";
+import { deleteInventoryCollection } from "@synq/supabase/queries/inventory";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,60 +14,56 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@synq/ui/alert-dialog";
+import { CollectionsRowSettingsDropdown } from "@ui/dropdowns/collections-row-settings-dropdown";
 
-interface ItemSettingsButtonProps {
-  itemId: string;
+interface BatchSettingsButtonProps {
+  collectionId: string;
 }
 
-export const ItemRowSettingsButton = ({ itemId }: ItemSettingsButtonProps) => {
+export const CollectionsRowSettingsButton = ({
+  collectionId,
+}: BatchSettingsButtonProps) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const handleDeleteItem = async () => {
+  const handleDeleteCollection = async () => {
     try {
-      await deleteInventoryItem(itemId);
-      queryClient.invalidateQueries({ queryKey: ["user_inventory_items"] });
+      await deleteInventoryCollection(collectionId);
+      queryClient.invalidateQueries({ queryKey: ["user_inventory_collections"] });
       toast({
-        title: "Item deleted",
-        description: "The item was successfully deleted.",
+        title: "Collection deleted",
+        description: "The collection was successfully deleted.",
         variant: "default",
       });
+      setIsDeleteDialogOpen(false);
     } catch {
       toast({
-        title: "Failed to delete item",
+        title: "Failed to delete collection",
         description: "An error occurred. Please try again.",
         variant: "destructive",
       });
-    } finally {
-      setIsDeleteDialogOpen(false);
     }
   };
 
   return (
     <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
       <AlertDialogTrigger asChild>
-        <div
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-          className="delete-button"
-        >
-          <ItemRowSettingsDropdown
-            onDeleteClick={() => setIsDeleteDialogOpen(true)}
-          />
-        </div>
+        <CollectionsRowSettingsDropdown
+          onDeleteClick={() => setIsDeleteDialogOpen(true)}
+        />
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the item.
+            This action cannot be undone. This will permanently delete the
+            batch.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={(e) => {e.stopPropagation(); handleDeleteItem()}}>
+          <AlertDialogAction onClick={(e) => {e.stopPropagation(); handleDeleteCollection()}}>
             Delete
           </AlertDialogAction>
         </AlertDialogFooter>

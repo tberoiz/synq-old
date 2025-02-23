@@ -63,8 +63,6 @@ const InventoryPage = () => {
         <CollectionsTable
           collections={collections || []}
           isFetching={isFetchingCollections}
-          selectedCollection={selectedCollection}
-          onCollectionClick={handleCollectionClick}
         />
       </CardLayout>
 

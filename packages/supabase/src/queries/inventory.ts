@@ -99,6 +99,18 @@ export const fetchItemsByCollection = async (
   return items as UserInventory[];
 };
 
+export const deleteInventoryCollection = async (id: string) => {
+  const userId = await getUserId();
+  const { error } = await supabase
+    .from("user_collections")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", userId)
+    .throwOnError();
+
+  if (error) throw error;
+};
+
 export const createInventoryCollection = async (name: string, code: string) => {
   const userId = await getUserId();
   const { data, error } = await supabase

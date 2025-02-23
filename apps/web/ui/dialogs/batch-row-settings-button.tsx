@@ -63,7 +63,7 @@ export const BatchRowSettingsButton = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDeleteBatch}>
+          <AlertDialogAction onClick={(e) => {e.stopPropagation(); handleDeleteBatch()}}>
             Delete
           </AlertDialogAction>
         </AlertDialogFooter>

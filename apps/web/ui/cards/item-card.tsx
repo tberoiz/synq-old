@@ -1,6 +1,7 @@
 import { Card, CardContent, CardTitle } from "@synq/ui/card";
 import { Progress } from "@synq/ui/progress";
 import { cn } from "@synq/ui/utils";
+import { ItemRowSettingsButton } from "@ui/dialogs/items-row-settings-button";
 
 import { List } from "lucide-react";
 
@@ -26,10 +27,14 @@ export function ItemCard({
   return (
     <Card
       className={cn(
-        "relative hover:shadow-md transition-shadow group cursor-pointer",
+        "relative hover:shadow-md transition-shadow group cursor-pointer"
       )}
       onClick={onClick}
     >
+      {/* Inventory Settings Button */}
+      <div className="absolute top-1 right-1">
+        <ItemRowSettingsButton itemId={id} />
+      </div>
       <CardContent className="p-3">
         <div className="flex items-start justify-between">
           <div className="flex-1">
@@ -76,7 +81,7 @@ export function ItemCard({
                 <span
                   className={cn(
                     "font-medium",
-                    profit >= 0 ? "text-green-500" : "text-red-500",
+                    profit >= 0 ? "text-green-500" : "text-red-500"
                   )}
                 >
                   {new Intl.NumberFormat("en-US", {

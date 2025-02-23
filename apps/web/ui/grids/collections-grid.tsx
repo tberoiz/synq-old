@@ -7,15 +7,11 @@ import { CollectionCard } from "@ui/cards/collection-card";
 interface CollectionsGridProps {
   collections: UserCollection[];
   isFetching: boolean;
-  selectedCollection: UserCollection | null;
-  onCollectionClick: (collection: UserCollection) => void;
 }
 
 export function CollectionsGrid({
   collections,
   isFetching,
-  selectedCollection,
-  onCollectionClick,
 }: CollectionsGridProps) {
   if (isFetching) {
     return (
@@ -39,8 +35,6 @@ export function CollectionsGrid({
           itemCount={collection.itemCount || 0}
           totalValue={collection.totalValue || 0}
           totalProfit={collection.totalProfit || 0}
-          isActive={selectedCollection?.id === collection.id}
-          onClick={() => onCollectionClick(collection)}
         />
       ))}
     </div>
