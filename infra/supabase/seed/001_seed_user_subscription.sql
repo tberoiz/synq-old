@@ -32,4 +32,10 @@ BEGIN
     VALUES (
         extensions.uuid_generate_v4(), user_uuid, plan_basic_uuid, plan_pro_uuid, 'upgrade', NOW() - INTERVAL '15 days'
     );
+
+    -- Insert default User Settings with inventory_layout defaulting to 'grid'
+    INSERT INTO public.user_settings (id, user_id, inventory_layout)
+    VALUES (
+        extensions.uuid_generate_v4(), user_uuid, DEFAULT
+    );
 END $$;

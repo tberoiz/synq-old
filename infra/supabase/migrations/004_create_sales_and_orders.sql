@@ -30,3 +30,48 @@ CREATE TABLE user_listings (
     sold_at timestamptz,
     created_at timestamptz DEFAULT now()
 );
+
+CREATE TYPE user_sales_batch_item_details AS (
+    inventory_id uuid,
+    listing_price numeric(10,2),
+    quantity_to_list integer,
+    ebay_category_id text
+);
+
+CREATE OR REPLACE FUNCTION create_sales_batch(
+    p_user_id uuid,
+    p_name text,
+    p_items user_sales_batch_item_details[]
+)
+RETURNS uuid AS $$
+DECLARE
+    v_sales_batch_id uuid;
+    item user_sales_batch_item_details;
+BEGIN
+    -- Insert the new sales batch and capture its id
+    INSERT INTO user_sales_batches(user_id, name)
+    VALUES (p_user_id, p_name)
+    RETURNING id INTO v_sales_batch_id;
+
+    -- Insert each item into the sales batch items table
+    FOREACH item IN ARRAY p_items
+    LOOP
+        INSERT INTO user_sales_batch_items(
+            sales_batch_id,
+            inventory_id,
+            listing_price,
+            quantity_to_list,
+            ebay_category_id
+        )
+        VALUES (
+            v_sales_batch_id,
+            item.inventory_id,
+            item.listing_price,
+            item.quantity_to_list,
+            item.ebay_category_id
+        );
+    END LOOP;
+
+    RETURN v_sales_batch_id;
+END;
+$$ LANGUAGE plpgsql;

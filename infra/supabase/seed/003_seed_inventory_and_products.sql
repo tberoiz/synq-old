@@ -1,67 +1,140 @@
 DO $$
 DECLARE
-  user_uuid uuid;
+    user_uuid uuid;
 BEGIN
-  -- Fetch the user ID for the test user
-  SELECT id INTO user_uuid
-  FROM auth.users
-  WHERE email = 'test@synq.com';
 
-  -- Seed global_collections
-  INSERT INTO global_collections (id, name, code, created_at)
-  VALUES
-    ('550e8400-e29b-41d4-a716-446655440001', 'Magic: The Gathering', 'MTG', now()),
-    ('550e8400-e29b-41d4-a716-446655440000', 'Pokémon', 'POK', now()),
-    ('550e8400-e29b-41d4-a716-446655440002', 'Yu-Gi-Oh!', 'YGO', now());
+    SELECT id INTO user_uuid FROM auth.users WHERE email = 'test@synq.com';
 
-  -- Seed global_cards
-  INSERT INTO global_cards (id, collection_id, name, image_url, rarity, created_at)
-  VALUES
-    ('660e8400-e29b-41d4-a716-446655440000', '550e8400-e29b-41d4-a716-446655440000', 'Charizard', 'https://example.com/charizard.jpg', 'Rare', now()),
-    ('660e8400-e29b-41d4-a716-446655440001', '550e8400-e29b-41d4-a716-446655440000', 'Pikachu', 'https://example.com/pikachu.jpg', 'Common', now()),
-    ('660e8400-e29b-41d4-a716-446655440002', '550e8400-e29b-41d4-a716-446655440001', 'Black Lotus', 'https://example.com/black-lotus.jpg', 'Mythic', now()),
-    ('660e8400-e29b-41d4-a716-446655440003', '550e8400-e29b-41d4-a716-446655440002', 'Blue-Eyes White Dragon', 'https://example.com/blue-eyes.jpg', 'Ultra Rare', now()),
-    ('660e8400-e29b-41d4-a716-446655440004', '550e8400-e29b-41d4-a716-446655440002', 'Dark Magician', 'https://example.com/dark-magician.jpg', 'Ultra Rare', now());
+    -- Seed user_categories table
+    INSERT INTO user_categories (user_id, name)
+    VALUES
+        (user_uuid, 'Electronics'),
+        (user_uuid, 'Clothing'),
+        (user_uuid, 'Books'),
+        (user_uuid, 'Home Decor');
 
-  -- Seed user_collections
-  INSERT INTO user_collections (id, name, code, created_at, user_id)
-  VALUES
-    ('550e8400-e29b-41d4-a716-446655440001', 'Magic: The Gathering', 'MTG', now(), user_uuid),
-    ('550e8400-e29b-41d4-a716-446655440000', 'Pokémon', 'POK', now(), user_uuid),
-    ('550e8400-e29b-41d4-a716-446655440002', 'Yu-Gi-Oh!', 'YGO', now(), user_uuid);
+    -- Seed user_suppliers table
+    INSERT INTO user_suppliers (user_id, name, contact_info)
+    VALUES
+        (user_uuid, 'Tech Gadgets Inc.', 'sales@techgadgets.com'),
+        (user_uuid, 'Fashion Trends Co.', 'info@fashiontrends.com'),
+        (user_uuid, 'Book Haven Ltd.', 'support@bookhaven.com'),
+        (user_uuid, 'Home Essentials LLC', 'contact@homeessentials.com');
 
-  -- Seed user_acquisition_batches
-  INSERT INTO user_acquisition_batches (id, user_id, name, created_at)
-  VALUES
-    ('770e8400-e29b-41d4-a716-446655440001', user_uuid, 'April 2024 MTG Purchase', now()),
-    ('770e8400-e29b-41d4-a716-446655440000', user_uuid, 'March 2024 Pokémon Purchase', now()),
-    ('770e8400-e29b-41d4-a716-446655440002', user_uuid, 'May 2024 Yu-Gi-Oh! Purchase', now());
+    -- Seed user_acquisition_batches table
+    INSERT INTO user_acquisition_batches (user_id, supplier_id, name)
+    VALUES
+        (
+            user_uuid,
+            (SELECT id FROM user_suppliers WHERE name = 'Tech Gadgets Inc.'),
+            'Q1 2024 Electronics Batch'
+        ),
+        (
+            user_uuid,
+            (SELECT id FROM user_suppliers WHERE name = 'Fashion Trends Co.'),
+            'Spring 2024 Clothing Collection'
+        ),
+        (
+            user_uuid,
+            (SELECT id FROM user_suppliers WHERE name = 'Book Haven Ltd.'),
+            '2024 Bestsellers Batch'
+        ),
+        (
+            user_uuid,
+            (SELECT id FROM user_suppliers WHERE name = 'Home Essentials LLC'),
+            'Q1 2024 Home Decor Batch'
+        );
 
-  -- Seed user_inventory
-  INSERT INTO user_inventory (id, user_id, acquisition_batch_id, global_card_id, collection_id, custom_name, quantity, cogs, listing_price, created_at)
-  VALUES
-    ('880e8400-e29b-41d4-a716-446655440000', user_uuid, '770e8400-e29b-41d4-a716-446655440000', '660e8400-e29b-41d4-a716-446655440000', '550e8400-e29b-41d4-a716-446655440000', 'Charizard', 10, 5.00, 10.00, now()),
-    ('880e8400-e29b-41d4-a716-446655440001', user_uuid, '770e8400-e29b-41d4-a716-446655440000', '660e8400-e29b-41d4-a716-446655440001', '550e8400-e29b-41d4-a716-446655440000', 'Pikachu', 20, 2.50, 5.00, now()),
-    ('880e8400-e29b-41d4-a716-446655440002', user_uuid, '770e8400-e29b-41d4-a716-446655440001', '660e8400-e29b-41d4-a716-446655440002', '550e8400-e29b-41d4-a716-446655440001', 'Black Lotus', 1, 1000.00, 1100.00, now()),
-    ('880e8400-e29b-41d4-a716-446655440003', user_uuid, '770e8400-e29b-41d4-a716-446655440002', '660e8400-e29b-41d4-a716-446655440003', '550e8400-e29b-41d4-a716-446655440002', 'Blue-Eyes White Dragon', 5, 50.00, 80.00, now()),
-    ('880e8400-e29b-41d4-a716-446655440004', user_uuid, '770e8400-e29b-41d4-a716-446655440002', '660e8400-e29b-41d4-a716-446655440004', '550e8400-e29b-41d4-a716-446655440002', 'Dark Magician', 3, 30.00, 60.00, now());
+    -- Seed user_inventory table
+    INSERT INTO user_inventory (
+        user_id,
+        acquisition_batch_id,
+        category_id,
+        name,
+        quantity,
+        cogs,
+        listing_price,
+        created_at
+    )
+    VALUES
+        (
+            user_uuid,
+            (SELECT id FROM user_acquisition_batches WHERE name = 'Q1 2024 Electronics Batch'),
+            (SELECT id FROM user_categories WHERE name = 'Electronics'),
+            'Wireless Noise-Canceling Headphones',
+            50,
+            75.00,
+            149.99,
+            NOW()
+        ),
+        (
+            user_uuid,
+            (SELECT id FROM user_acquisition_batches WHERE name = 'Q1 2024 Electronics Batch'),
+            (SELECT id FROM user_categories WHERE name = 'Electronics'),
+            'Smartwatch with Heart Rate Monitor',
+            30,
+            120.00,
+            199.99,
+            NOW()
+        ),
+        (
+            user_uuid,
+            (SELECT id FROM user_acquisition_batches WHERE name = 'Spring 2024 Clothing Collection'),
+            (SELECT id FROM user_categories WHERE name = 'Clothing'),
+            'Men’s Casual T-Shirt (Pack of 3)',
+            100,
+            15.00,
+            29.99,
+            NOW()
+        ),
+        (
+            user_uuid,
+            (SELECT id FROM user_acquisition_batches WHERE name = 'Spring 2024 Clothing Collection'),
+            (SELECT id FROM user_categories WHERE name = 'Clothing'),
+            'Women’s Summer Dress',
+            60,
+            25.00,
+            49.99,
+            NOW()
+        ),
+        (
+            user_uuid,
+            (SELECT id FROM user_acquisition_batches WHERE name = '2024 Bestsellers Batch'),
+            (SELECT id FROM user_categories WHERE name = 'Books'),
+            'The Midnight Library by Matt Haig',
+            200,
+            5.00,
+            12.99,
+            NOW()
+        ),
+        (
+            user_uuid,
+            (SELECT id FROM user_acquisition_batches WHERE name = '2024 Bestsellers Batch'),
+            (SELECT id FROM user_categories WHERE name = 'Books'),
+            'Atomic Habits by James Clear',
+            150,
+            6.00,
+            14.99,
+            NOW()
+        ),
+        (
+            user_uuid,
+            (SELECT id FROM user_acquisition_batches WHERE name = 'Q1 2024 Home Decor Batch'),
+            (SELECT id FROM user_categories WHERE name = 'Home Decor'),
+            'Ceramic Table Vase',
+            40,
+            10.00,
+            24.99,
+            NOW()
+        ),
+        (
+            user_uuid,
+            (SELECT id FROM user_acquisition_batches WHERE name = 'Q1 2024 Home Decor Batch'),
+            (SELECT id FROM user_categories WHERE name = 'Home Decor'),
+            'Modern Wall Clock',
+            25,
+            20.00,
+            39.99,
+            NOW()
+        );
 END $$;
-
--- Function to get batch statistics
-CREATE OR REPLACE FUNCTION get_batch_stats(user_id_param UUID)
-RETURNS TABLE (
-  acquisition_batch_id UUID,
-  item_count INT,
-  total_cogs NUMERIC
-) AS $$
-BEGIN
-  RETURN QUERY
-  SELECT
-    acquisition_batch_id,
-    COUNT(*) AS item_count,
-    COALESCE(SUM(cogs), 0) AS total_cogs
-  FROM user_inventory
-  WHERE user_id = user_id_param
-  GROUP BY acquisition_batch_id;
-END;
-$$ LANGUAGE plpgsql;
