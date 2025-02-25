@@ -22,17 +22,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@synq/ui/select";
-import { LayoutToggleDropdown } from "@ui/dropdowns/layout-toggle-dropdown";
 
 interface DataTableProps<TData> {
   columns: ColumnDef<TData>[];
   data: TData[];
+  actions: React.ReactNode;
   defaultPageSize?: number;
   searchPlaceholder?: string;
-  gridComponent?: (filteredData: TData[]) => React.ReactNode;
   tableComponent?: (filteredData: TData[]) => React.ReactNode;
-  layout?: "table" | "grid";
-  onLayoutChange?: (layout: "table" | "grid") => void;
   enableRowSelection?: boolean;
   selectedRows?: TData[];
   onRowSelectionChange?: (rows: TData[]) => void;
@@ -41,31 +38,32 @@ interface DataTableProps<TData> {
 export function DataTable<TData>({
   columns,
   data,
+  actions,
   defaultPageSize = 8,
   searchPlaceholder = "Search...",
-  gridComponent,
   tableComponent,
-  layout,
-  onLayoutChange,
+  enableRowSelection = false,
+  selectedRows = [],
+  onRowSelectionChange,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
+    []
   );
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState<
+    Record<string, boolean>
+  >({});
 
-  const [internalLayout, setInternalLayout] = React.useState<"table" | "grid">(
-    "table",
-  );
-  const currentLayout = layout ?? internalLayout;
-  const handleLayoutChange = (newLayout: "table" | "grid") => {
-    if (onLayoutChange) {
-      onLayoutChange(newLayout);
-    } else {
-      setInternalLayout(newLayout);
+  React.useEffect(() => {
+    if (onRowSelectionChange) {
+      const selectedData = table
+        .getSelectedRowModel()
+        .rows.map((row) => row.original);
+      onRowSelectionChange(selectedData);
     }
-  };
+  }, [rowSelection]);
 
   const table = useReactTable({
     data,
@@ -77,21 +75,26 @@ export function DataTable<TData>({
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: enableRowSelection ? setRowSelection : undefined,
     initialState: {
       pagination: {
         pageSize: defaultPageSize,
       },
+      rowSelection: enableRowSelection
+        ? Object.fromEntries(selectedRows.map((row) => [(row as any).id, true]))
+        : {},
     },
     state: {
       sorting,
       columnFilters,
       columnVisibility,
+      rowSelection: enableRowSelection ? rowSelection : {},
     },
+    enableRowSelection,
   });
 
   return (
     <div className="w-full">
-      {/* Search and Layout Toggle */}
       <div className="flex flex-row items-center justify-between gap-2 py-4">
         <Input
           placeholder={searchPlaceholder}
@@ -102,16 +105,11 @@ export function DataTable<TData>({
           }
         />
         <div className="flex gap-2">
-          <LayoutToggleDropdown
-            layout={currentLayout}
-            onLayoutChange={handleLayoutChange}
-          />
+          {actions}
         </div>
       </div>
 
-      {currentLayout === "table"
-        ? tableComponent?.(table.getRowModel().rows.map((row) => row.original))
-        : gridComponent?.(table.getRowModel().rows.map((row) => row.original))}
+      {tableComponent?.(table.getRowModel().rows.map((row) => row.original))}
 
       {/* Pagination Controls */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-2 py-4">

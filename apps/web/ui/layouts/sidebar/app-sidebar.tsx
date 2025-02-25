@@ -38,14 +38,14 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const { isMobile, setOpenMobile } = useSidebar();
 
   return (
-    <Sidebar variant="sidebar" className="border-r py-3 z-40" {...props}>
+    <Sidebar variant="sidebar" className="border-r py-3 z-40 bg-sidebar" {...props}>
       <SidebarHeader className="flex items-start justify-start">
         <SidebarMenu className="flex-wrap">
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild className="md:h-10 md:p-0">
               <Link href="/overview">
                 <SynqIcon />
-                <span className="text-xl font-bold md:inline ml-2">Synq</span>
+                {/* <span className="text-xl font-light md:inline ml-2">Synq</span> */}
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -61,7 +61,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                 return (
                   <SidebarMenuItem key={title}>
                     <Link href={url}>
-                      <SidebarMenuButton
+                      <SidebarMenuButton 
                         onClick={() => isMobile && setOpenMobile(false)}
                         isActive={isActive}
                         className={cn(

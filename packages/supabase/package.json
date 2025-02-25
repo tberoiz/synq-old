@@ -37,9 +37,21 @@
       "types": "./dist/models/inventory.d.ts",
       "default": "./dist/models/inventory.js"
     },
+    "./models/sales": {
+      "types": "./dist/models/sales.d.ts",
+      "default": "./dist/models/sales.js"
+    },
+    "./queries/user": {
+      "types": "./dist/queries/user.d.ts",
+      "default": "./dist/queries/user.js"
+    },
     "./queries/inventory": {
       "types": "./dist/queries/inventory.d.ts",
       "default": "./dist/queries/inventory.js"
+    },
+    "./queries/sales": {
+      "types": "./dist/queries/sales.d.ts",
+      "default": "./dist/queries/sales.js"
     }
   }
 }

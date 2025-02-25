@@ -2,7 +2,7 @@ DO $$
 DECLARE
     user_uuid uuid;
 BEGIN
-
+    -- Get the user UUID
     SELECT id INTO user_uuid FROM auth.users WHERE email = 'test@synq.com';
 
     -- Seed user_categories table
@@ -22,26 +22,29 @@ BEGIN
         (user_uuid, 'Home Essentials LLC', 'contact@homeessentials.com');
 
     -- Seed user_acquisition_batches table
-    INSERT INTO user_acquisition_batches (user_id, supplier_id, name)
+    INSERT INTO user_acquisition_batches (user_id, suppliers, name)
     VALUES
         (
             user_uuid,
-            (SELECT id FROM user_suppliers WHERE name = 'Tech Gadgets Inc.'),
+            ARRAY[(SELECT id FROM user_suppliers WHERE name = 'Tech Gadgets Inc.')],
             'Q1 2024 Electronics Batch'
         ),
         (
             user_uuid,
-            (SELECT id FROM user_suppliers WHERE name = 'Fashion Trends Co.'),
+            ARRAY[
+                (SELECT id FROM user_suppliers WHERE name = 'Fashion Trends Co.'),
+                (SELECT id FROM user_suppliers WHERE name = 'Tech Gadgets Inc.')
+            ],
             'Spring 2024 Clothing Collection'
         ),
         (
             user_uuid,
-            (SELECT id FROM user_suppliers WHERE name = 'Book Haven Ltd.'),
+            ARRAY[(SELECT id FROM user_suppliers WHERE name = 'Book Haven Ltd.')],
             '2024 Bestsellers Batch'
         ),
         (
             user_uuid,
-            (SELECT id FROM user_suppliers WHERE name = 'Home Essentials LLC'),
+            ARRAY[(SELECT id FROM user_suppliers WHERE name = 'Home Essentials LLC')],
             'Q1 2024 Home Decor Batch'
         );
 

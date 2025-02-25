@@ -1,10 +1,11 @@
 "use client";
+
 import Image from "next/image";
 
 export const SynqIcon = (props: React.ComponentProps<any>) => {
   return (
     <Image
-      src="/brand/logo.png"
+      src="/brand/synq-icon.png"
       alt="synq Icon"
       width={42}
       height={42}
@@ -21,39 +22,6 @@ export const EbayIcon = (props: React.ComponentProps<any>) => (
     height={16}
     className="w-4 h-4"
     sizes="(max-width: 768px) 16px, 16px"
-    {...props}
-  />
-);
-
-export const ShopifyIcon = (props: React.ComponentProps<any>) => (
-  <Image
-    src="/icons/shopify.svg"
-    alt="Shopify Icon"
-    width="16"
-    height="16"
-    className="w-4 h-4"
-    {...props}
-  />
-);
-
-export const TCGPlayerIcon = (props: React.ComponentProps<any>) => (
-  <Image
-    src="/icons/tcgplayer.svg"
-    alt="TCGPlayer Icon"
-    width={16}
-    height={16}
-    className="w-4 h-4"
-    {...props}
-  />
-);
-
-export const CardMarketIcon = (props: React.ComponentProps<any>) => (
-  <Image
-    src="/icons/cardmarket.svg"
-    alt="CardMarket Icon"
-    width={16}
-    height={16}
-    className="w-4 h-4"
     {...props}
   />
 );

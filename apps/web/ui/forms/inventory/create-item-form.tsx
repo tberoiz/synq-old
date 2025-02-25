@@ -8,9 +8,8 @@ import { Input } from "@synq/ui/input";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useToast } from "@synq/ui/use-toast";
 import {
-  fetchInventoryBatches,
   createCustomItem,
-  fetchCollections,
+  fetchCategories,
 } from "@synq/supabase/queries/inventory";
 import {
   Form,
@@ -29,14 +28,12 @@ import {
   SelectValue,
 } from "@synq/ui/select";
 
-// Define query keys as constants
 const QUERY_KEYS = {
   INVENTORY_BATCHES: "user_inventory_batches",
-  COLLECTIONS: "user_inventory_collections",
+  CATEGORIES: "user_categories",
   ITEMS: "user_inventory_items",
 };
 
-// Updated schema for manual items
 const itemSchema = z.object({
   customName: z
     .string()
@@ -50,10 +47,7 @@ const itemSchema = z.object({
     .string()
     .regex(/^\d+(\.\d{1,2})?$/, { message: "Invalid COGS format." })
     .min(1, { message: "COGS is required." }),
-  acquisitionBatchId: z
-    .string()
-    .min(1, { message: "Acquisition batch is required." }),
-  collectionId: z.string().min(1, { message: "Collection is required." }),
+  categoryId: z.string().min(1, { message: "Category is required." }),
   listingPrice: z
     .string()
     .regex(/^\d+(\.\d{1,2})?$/, { message: "Invalid listing price format." })
@@ -71,65 +65,35 @@ export const CreateItemForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       customName: "",
       stockQuantity: "",
       cogs: "",
-      acquisitionBatchId: "",
-      collectionId: "",
+      categoryId: "",
       listingPrice: "",
     },
   });
 
-  // Fetch acquisition batches
   const {
-    data: acquisitionBatches,
-    isLoading: isAcquisitionBatchesLoading,
-    error: acquisitionBatchesError,
+    data: categories,
+    isLoading: isCategoriesLoading,
   } = useQuery({
-    queryKey: [QUERY_KEYS.INVENTORY_BATCHES],
-    queryFn: fetchInventoryBatches,
+    queryKey: [QUERY_KEYS.CATEGORIES],
+    queryFn: fetchCategories,
   });
-
-  // Fetch collections
-  const {
-    data: collections,
-    isLoading: isCollectionsLoading,
-    error: collectionsError,
-  } = useQuery({
-    queryKey: [QUERY_KEYS.COLLECTIONS],
-    queryFn: fetchCollections,
-  });
-
-  // Handle query errors
-  if (acquisitionBatchesError) {
-    toast({
-      title: "Error",
-      description: "Failed to load acquisition batches.",
-      variant: "destructive",
-    });
-  }
-
-  if (collectionsError) {
-    toast({
-      title: "Error",
-      description: "Failed to load collections.",
-      variant: "destructive",
-    });
-  }
 
   const onSubmit = async (data: ItemFormValues) => {
     try {
       await createCustomItem(
-        data.acquisitionBatchId,
-        data.collectionId,
+        data.categoryId,
         data.customName,
         parseFloat(data.cogs),
         parseInt(data.stockQuantity, 10),
         parseFloat(data.listingPrice),
       );
 
+      // Invalidate relevant queries
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.INVENTORY_BATCHES],
       });
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.COLLECTIONS],
+        queryKey: [QUERY_KEYS.CATEGORIES],
       });
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.ITEMS],
@@ -236,60 +200,28 @@ export const CreateItemForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           )}
         />
 
-        {/* Acquisition Batch Selection */}
+        {/* Category Selection */}
         <FormField
           control={form.control}
-          name="acquisitionBatchId"
+          name="categoryId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Acquisition Batch</FormLabel>
+              <FormLabel>Category</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select an acquisition batch" />
+                    <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {isAcquisitionBatchesLoading ? (
+                  {isCategoriesLoading ? (
                     <SelectItem value="loading" disabled>
-                      Loading acquisition batches...
+                      Loading categories...
                     </SelectItem>
                   ) : (
-                    acquisitionBatches?.map((batch) => (
-                      <SelectItem key={batch.id} value={batch.id}>
-                        {batch.name}
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Collection Selection */}
-        <FormField
-          control={form.control}
-          name="collectionId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Collection</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a collection" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {isCollectionsLoading ? (
-                    <SelectItem value="loading" disabled>
-                      Loading collections...
-                    </SelectItem>
-                  ) : (
-                    collections?.map((collection) => (
-                      <SelectItem key={collection.id} value={collection.id}>
-                        {collection.name}
+                    categories?.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
                       </SelectItem>
                     ))
                   )}

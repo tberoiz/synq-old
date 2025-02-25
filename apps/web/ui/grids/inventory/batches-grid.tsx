@@ -1,7 +1,8 @@
+// NOTE: This File is not being used for now.
 "use client";
 
 import { UserAcquisitionBatch } from "@synq/supabase/models/inventory";
-import { AcquisitionBatchCard } from "@ui/cards/adquisition-batch-card";
+import { AcquisitionBatchCard } from "@ui/cards/batch-card";
 import { Sheet, SheetTrigger, SheetContent } from "@synq/ui/sheet";
 import { BatchDetailsSheet } from "@ui/sheets/batch-details-sheet";
 import { AddNewBatchDialog } from "@ui/dialogs/add-new-batch-dialog";
@@ -45,7 +46,7 @@ export function BatchesGrid({
             <SheetContent
               key={batch.id}
               side="right"
-              className="w-full max-w-2xl overflow-y-auto"
+              className="min-w-[800px] max-w-2xl overflow-y-auto"
             >
               <BatchDetailsSheet batch={batch} />
             </SheetContent>

@@ -17,7 +17,7 @@ CREATE TABLE user_suppliers (
 CREATE TABLE user_acquisition_batches (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-    supplier_id uuid REFERENCES user_suppliers(id) ON DELETE SET NULL,
+    suppliers uuid[] DEFAULT ARRAY[]::uuid[],
     name text NOT NULL,
     created_at timestamptz DEFAULT now()
 );

@@ -1,13 +1,11 @@
+// NOTE: This File is not being used for now.
 "use client";
 
 import { UserInventory } from "@synq/supabase/models/inventory";
 import { ItemCard } from "@ui/cards/item-card";
 import { Sheet, SheetContent, SheetTrigger } from "@synq/ui/sheet";
 import ItemDetailsSheetContent from "@ui/sheets/item-details-sheet";
-import { Button } from "@synq/ui/button";
-import { Plus } from "lucide-react";
-import { AddNewCollectionDialog } from "@ui/dialogs/add-new-collection-dialog";
-import { CreateItemsDropdown } from "@ui/dropdowns/create-items-dropdown";
+import { CreateItemDialog } from "@ui/dialogs/create-item-dialog";
 
 interface ItemsGridProps {
   data: UserInventory[];
@@ -22,7 +20,6 @@ export function ItemsGrid({
 }: ItemsGridProps) {
   return (
     <div>
-      {/* Grid Items */}
       <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
         {data.map((item) => (
           <Sheet key={item.id}>
@@ -31,7 +28,7 @@ export function ItemsGrid({
                 key={item.id}
                 id={item.id}
                 name={
-                  item.custom_name || item.global_card?.name || "Unnamed Item"
+                  item.name
                 }
                 quantity={item.quantity}
                 cogs={item.cogs}
@@ -52,14 +49,7 @@ export function ItemsGrid({
             </SheetContent>
           </Sheet>
         ))}
-        {/* Add New Collection Button */}
-        <CreateItemsDropdown
-          trigger={
-            <Button variant="outline" className="border-dashed h-full w-full">
-              <Plus className="h-6 w-6 text-muted-foreground" />
-            </Button>
-          }
-        />
+        <CreateItemDialog />
       </div>
     </div>
   );

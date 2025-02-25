@@ -2,16 +2,16 @@
 
 import * as React from "react";
 import { UserInventory } from "@synq/supabase/models/inventory";
-import ItemDetailsSheetContent from "@ui/sheets/item-details-sheet";
 import { DataTable } from "../data-table";
 import { Checkbox } from "@synq/ui/checkbox";
 import { ItemRowSettingsButton } from "@ui/dialogs/items-row-settings-button";
-import { ItemsGrid } from "@ui/grids/inventory/items-grid";
-import { ItemsTable } from "./item-table";
+import { ItemsTable } from "./items-table";
 
 interface ItemsDataTableProps {
   data: UserInventory[];
   loading: boolean;
+  actions?: React.ReactNode;
+  onSelectionChange?: (selectedItems: UserInventory[]) => void;
 }
 
 interface Row {
@@ -19,8 +19,20 @@ interface Row {
   original: UserInventory;
 }
 
-function ItemsDataTable({ data, loading }: ItemsDataTableProps) {
+function ItemsDataTable({
+  data,
+  loading,
+  actions,
+  onSelectionChange,
+}: ItemsDataTableProps) {
   const [selectedItems, setSelectedItems] = React.useState<UserInventory[]>([]);
+
+  const handleRowSelectionChange = (rows: UserInventory[]) => {
+    setSelectedItems(rows);
+    if (onSelectionChange) {
+      onSelectionChange(rows);
+    }
+  };
 
   const itemColumns = [
     {
@@ -32,12 +44,12 @@ function ItemsDataTable({ data, loading }: ItemsDataTableProps) {
             table.getRowModel().rows.length > 0
           }
           onCheckedChange={(value: boolean) => {
-            if (value) {
-              setSelectedItems(
-                table.getRowModel().rows.map((row: Row) => row.original),
-              );
-            } else {
-              setSelectedItems([]);
+            const newSelectedItems = value
+              ? table.getRowModel().rows.map((row: Row) => row.original)
+              : [];
+            setSelectedItems(newSelectedItems);
+            if (onSelectionChange) {
+              onSelectionChange(newSelectedItems);
             }
           }}
           aria-label="Select all"
@@ -47,7 +59,17 @@ function ItemsDataTable({ data, loading }: ItemsDataTableProps) {
         <div onClick={(e) => e.stopPropagation()}>
           <Checkbox
             checked={selectedItems.some((i) => i.id === row.original.id)}
-            onCheckedChange={() => handleSelectItem(row.original)}
+            onCheckedChange={() => {
+              const newSelectedItems = selectedItems.some(
+                (i) => i.id === row.original.id
+              )
+                ? selectedItems.filter((i) => i.id !== row.original.id)
+                : [...selectedItems, row.original];
+              setSelectedItems(newSelectedItems);
+              if (onSelectionChange) {
+                onSelectionChange(newSelectedItems);
+              }
+            }}
             aria-label="Select row"
           />
         </div>
@@ -59,10 +81,7 @@ function ItemsDataTable({ data, loading }: ItemsDataTableProps) {
       accessorKey: "name",
       header: "Item Name",
       cell: ({ row }: { row: Row }) => {
-        const customName = row.original.custom_name;
-        const globalCardName = row.original.global_card?.name;
-        const name = customName || globalCardName || "Unnamed Item";
-        return <span className="font-medium">{name}</span>;
+        return <span className="font-medium">{row.original.name}</span>;
       },
     },
     {
@@ -120,38 +139,24 @@ function ItemsDataTable({ data, loading }: ItemsDataTableProps) {
     },
   ];
 
-  const handleSelectItem = (item: UserInventory) => {
-    setSelectedItems((prev) =>
-      prev.some((i) => i.id === item.id)
-        ? prev.filter((i) => i.id !== item.id)
-        : [...prev, item],
-    );
-  };
-
   return (
     <DataTable
       columns={itemColumns}
       data={data}
+      actions={actions}
       searchPlaceholder="Search items..."
-      gridComponent={(filteredData) => (
-        <ItemsGrid
-          data={filteredData}
-          selectedItems={selectedItems}
-          onSelectItem={handleSelectItem}
-        />
-      )}
       tableComponent={(filteredData) => (
         <ItemsTable
           data={filteredData}
-          onRowClick={(row: UserInventory) => (
-            <ItemDetailsSheetContent item={row} />
-          )}
+          selectedItems={selectedItems}
+          onRowSelectionChange={handleRowSelectionChange}
         />
       )}
       enableRowSelection={true}
       selectedRows={selectedItems}
-      onRowSelectionChange={setSelectedItems}
+      onRowSelectionChange={handleRowSelectionChange}
     />
   );
 }
+
 export default ItemsDataTable;

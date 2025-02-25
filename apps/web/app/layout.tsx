@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { SynqProviders } from "./providers";
 import "@synq/ui/globals.css";
 import { Toaster } from "@synq/ui/toaster";
+import { ErrorBoundary } from "react-error-boundary";
+import { ErrorFallback } from "./error-fallback";
 
 export const metadata: Metadata = {
   title: "synq",
@@ -14,7 +16,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <SynqProviders>{children}</SynqProviders>
+        <SynqProviders>
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
+            {children}
+          </ErrorBoundary>
+        </SynqProviders>
         <Toaster />
       </body>
     </html>

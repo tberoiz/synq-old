@@ -1,13 +1,16 @@
-import { Card, CardContent, CardTitle } from "@synq/ui/card";
-import { Checkbox } from "@synq/ui/checkbox";
-import { cn } from "@synq/ui/utils";
-import { CollectionsRowSettingsButton } from "@ui/dialogs/collections-row-settings-button";
+"use client";
 
-interface CollectionCardProps {
+import { Card, CardContent, CardTitle } from "@synq/ui/card";
+import { cn } from "@synq/ui/utils";
+import { BatchRowSettingsButton } from "@ui/dialogs/batch-row-settings-button";
+import { Checkbox } from "@synq/ui/checkbox";
+
+interface BatchCardProps {
   id: string;
   name: string;
   itemCount: number;
-  totalValue: number;
+  totalCogs: number;
+  totalListingPrice: number;
   totalProfit: number;
   isActive?: boolean;
   isSelected?: boolean;
@@ -15,35 +18,36 @@ interface CollectionCardProps {
   onSelect?: (e: React.MouseEvent) => void;
 }
 
-export function CollectionCard({
+export function AcquisitionBatchCard({
   id,
   name,
   itemCount,
-  totalValue,
+  totalCogs,
+  totalListingPrice,
   totalProfit,
   isActive = false,
   isSelected = false,
   onClick,
   onSelect,
-}: CollectionCardProps) {
+}: BatchCardProps) {
   return (
     <Card
       className={cn(
-        "relative hover:shadow-md transition-shadow group cursor-pointer",
+        "relative hover:shadow-md transition-shadow group cursor-pointer bg-secondary/25 hover:primary/50",
         isActive ? "border-primary shadow-lg" : "border-muted",
         isSelected && "bg-secondary/50 border-2 border-primary/50",
       )}
       onClick={onClick}
     >
-      {/* Collection Settings Button */}
+      {/* Inventory Settings Button */}
       <div className="absolute top-1 right-1">
-        <CollectionsRowSettingsButton collectionId={id} />
+        <BatchRowSettingsButton batchId={id} />
       </div>
 
       <CardContent className="p-3">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            {/* Collection Name with Checkbox */}
+            {/* Batch Name with Checkbox */}
             <div
               className="flex items-center gap-2 mb-2"
               onClick={(e) => {
@@ -70,12 +74,23 @@ export function CollectionCard({
             {/* Financial Information */}
             <div className="space-y-1 text-xs">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Total Value</span>
+                <span className="text-muted-foreground">Total COGS</span>
                 <span className="font-medium">
                   {new Intl.NumberFormat("en-US", {
                     style: "currency",
                     currency: "USD",
-                  }).format(totalValue)}
+                  }).format(totalCogs)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">
+                  Total Listing Price
+                </span>
+                <span className="font-medium">
+                  {new Intl.NumberFormat("en-US", {
+                    style: "currency",
+                    currency: "USD",
+                  }).format(totalListingPrice)}
                 </span>
               </div>
               <div className="flex justify-between">
