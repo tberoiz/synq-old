@@ -8,7 +8,7 @@ BEGIN
         confirmation_token, email_change, email_change_token_new, recovery_token
     ) VALUES (
         '00000000-0000-0000-0000-000000000000',
-        extensions.uuid_generate_v4(), -- Generate unique ID
+        extensions.uuid_generate_v4(),
         'authenticated',
         'authenticated',
         'test@synq.com', -- Test email
