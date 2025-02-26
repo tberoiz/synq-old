@@ -5,7 +5,7 @@ export class AppError extends Error {
   constructor(
     public readonly code: string, // Error code (e.g., "VALIDATION_ERROR", "FETCH_FAILED")
     public readonly message: string, // Human-readable error message
-    public readonly context?: Record<string, unknown> // Additional context for debugging
+    public readonly context?: Record<string, unknown>, // Additional context for debugging
   ) {
     super(message);
     this.name = "AppError";
@@ -43,7 +43,7 @@ export const handleSupabaseError = (error: any, context: string): never => {
     throw new AppError(
       supabaseError.code || "SUPABASE_ERROR",
       supabaseError.message || "An unexpected Supabase error occurred",
-      { context, supabaseError }
+      { context, supabaseError },
     );
   }
 

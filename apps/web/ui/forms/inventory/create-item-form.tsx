@@ -72,10 +72,7 @@ export const CreateItemForm = ({ onSuccess }: { onSuccess?: () => void }) => {
     },
   });
 
-  const {
-    data: categories,
-    isLoading: isCategoriesLoading,
-  } = useQuery({
+  const { data: categories, isLoading: isCategoriesLoading } = useQuery({
     queryKey: [QUERY_KEYS.CATEGORIES],
     queryFn: fetchCategories,
   });
@@ -88,11 +85,13 @@ export const CreateItemForm = ({ onSuccess }: { onSuccess?: () => void }) => {
         data.sku,
         parseFloat(data.cogs),
         parseInt(data.stockQuantity, 10),
-        parseFloat(data.listingPrice)
+        parseFloat(data.listingPrice),
       );
 
       // Invalidate relevant queries
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.INVENTORY_BATCHES] });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.INVENTORY_BATCHES],
+      });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CATEGORIES] });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ITEMS] });
 
@@ -141,7 +140,12 @@ export const CreateItemForm = ({ onSuccess }: { onSuccess?: () => void }) => {
             <FormItem>
               <FormLabel>Stock Quantity</FormLabel>
               <FormControl>
-                <Input placeholder="Stock Quantity" {...field} type="number" min="1" />
+                <Input
+                  placeholder="Stock Quantity"
+                  {...field}
+                  type="number"
+                  min="1"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -155,7 +159,13 @@ export const CreateItemForm = ({ onSuccess }: { onSuccess?: () => void }) => {
             <FormItem>
               <FormLabel>COGS</FormLabel>
               <FormControl>
-                <Input placeholder="Cost of Goods Sold" {...field} type="number" step="0.01" min="0" />
+                <Input
+                  placeholder="Cost of Goods Sold"
+                  {...field}
+                  type="number"
+                  step="0.01"
+                  min="0"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -169,7 +179,13 @@ export const CreateItemForm = ({ onSuccess }: { onSuccess?: () => void }) => {
             <FormItem>
               <FormLabel>Listing Price</FormLabel>
               <FormControl>
-                <Input placeholder="Listing Price" {...field} type="number" step="0.01" min="0" />
+                <Input
+                  placeholder="Listing Price"
+                  {...field}
+                  type="number"
+                  step="0.01"
+                  min="0"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -209,7 +225,11 @@ export const CreateItemForm = ({ onSuccess }: { onSuccess?: () => void }) => {
 
         <DialogFooter>
           <DialogClose asChild>
-            <Button type="button" variant="outline" onClick={() => form.reset()}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => form.reset()}
+            >
               Cancel
             </Button>
           </DialogClose>

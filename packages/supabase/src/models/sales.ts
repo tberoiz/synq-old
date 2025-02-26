@@ -1,6 +1,6 @@
 // Define union types for status fields to match the SQL constraints
-export type SalesBatchStatus = 'draft' | 'listed' | 'completed';
-export type SalesBatchItemStatus = 'pending' | 'listed' | 'sold';
+export type SalesBatchStatus = "draft" | "listed" | "completed";
+export type SalesBatchItemStatus = "pending" | "listed" | "sold";
 
 interface SalesBatch {
   id: string;

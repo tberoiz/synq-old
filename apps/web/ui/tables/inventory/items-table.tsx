@@ -25,7 +25,12 @@ interface ItemsTableProps {
   onRowSelectionChange?: (rows: UserItem[]) => void;
 }
 
-export function ItemsTable({ data, loading, selectedItems = [], onRowSelectionChange }: ItemsTableProps) {
+export function ItemsTable({
+  data,
+  loading,
+  selectedItems = [],
+  onRowSelectionChange,
+}: ItemsTableProps) {
   const { data: categories, isLoading: isCategoriesLoading } = useQuery({
     queryKey: ["user_inv_categories"],
     queryFn: fetchCategories,
@@ -93,11 +98,13 @@ export function ItemsTable({ data, loading, selectedItems = [], onRowSelectionCh
         <TableBody>
           {data.length > 0 ? (
             data.map((item) => {
-              const profit = (Number(item.listing_price) - Number(item.cogs)) * Number(item.quantity);
+              const profit =
+                (Number(item.listing_price) - Number(item.cogs)) *
+                Number(item.quantity);
               const isSelected = selectedItems.some((i) => i.id === item.id);
-              const categoryName = categories?.find(
-                (category) => category.id === item.category_id
-              )?.name || "Uncategorized";
+              const categoryName =
+                categories?.find((category) => category.id === item.category_id)
+                  ?.name || "Uncategorized";
 
               return (
                 <Sheet key={item.id}>
@@ -116,9 +123,7 @@ export function ItemsTable({ data, loading, selectedItems = [], onRowSelectionCh
                           aria-label="Select item"
                         />
                       </TableCell>
-                      <TableCell>
-                        {item.name || "Unnamed Item"}
-                      </TableCell>
+                      <TableCell>{item.name || "Unnamed Item"}</TableCell>
                       <TableCell>{item.sku}</TableCell>
                       <TableCell>{item.quantity}</TableCell>
                       <TableCell>

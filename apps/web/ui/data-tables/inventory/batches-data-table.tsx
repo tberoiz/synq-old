@@ -17,12 +17,8 @@ interface Row {
   original: UserAcquisitionBatch;
 }
 
-function BatchesDataTable({
-  data,
-  loading,
-  actions,
-}: BatchesDataTableProps) {
-  console.log(data)
+function BatchesDataTable({ data, loading, actions }: BatchesDataTableProps) {
+  console.log(data);
   const [selectedBatches, setSelectedBatches] = React.useState<
     UserAcquisitionBatch[]
   >([]);
@@ -87,7 +83,7 @@ function BatchesDataTable({
     setSelectedBatches((prev) =>
       prev.some((b) => b.id === batch.id)
         ? prev.filter((b) => b.id !== batch.id)
-        : [...prev, batch]
+        : [...prev, batch],
     );
   };
 

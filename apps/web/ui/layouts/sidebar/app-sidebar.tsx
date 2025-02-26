@@ -38,7 +38,11 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const { isMobile, setOpenMobile } = useSidebar();
 
   return (
-    <Sidebar variant="sidebar" className="border-r py-3 z-40 bg-sidebar" {...props}>
+    <Sidebar
+      variant="sidebar"
+      className="border-r py-3 z-40 bg-sidebar"
+      {...props}
+    >
       <SidebarHeader className="flex items-start justify-start">
         <SidebarMenu className="flex-wrap">
           <SidebarMenuItem>
@@ -61,7 +65,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                 return (
                   <SidebarMenuItem key={title}>
                     <Link href={url}>
-                      <SidebarMenuButton 
+                      <SidebarMenuButton
                         onClick={() => isMobile && setOpenMobile(false)}
                         isActive={isActive}
                         className={cn(

@@ -78,7 +78,7 @@ export const fetchInventoryBatches = cache(
             quantity,
             listing_price
           )
-          `
+          `,
         )
         .eq("user_id", userId)
         .throwOnError();
@@ -89,11 +89,11 @@ export const fetchInventoryBatches = cache(
         const items = batch.items || [];
         const total_cogs = items.reduce(
           (sum, item) => sum + item.cogs * item.quantity,
-          0
+          0,
         );
         const total_listing_price = items.reduce(
           (sum, item) => sum + item.listing_price * item.quantity,
-          0
+          0,
         );
 
         return {
@@ -107,12 +107,12 @@ export const fetchInventoryBatches = cache(
     } catch (error) {
       throw handleSupabaseError(error, "fetchInventoryBatches");
     }
-  }
+  },
 );
 
 export const createInventoryBatch = async (
   name: string,
-  supplierIds?: string[]
+  supplierIds?: string[],
 ): Promise<UserAcquisitionBatch> => {
   try {
     const userId = await getUserId();
@@ -166,7 +166,7 @@ export const fetchAllItems = cache(async (): Promise<UserItem[]> => {
         image_urls,
         created_at,
         updated_at
-        `
+        `,
       )
       .eq("user_id", userId)
       .order("updated_at", { ascending: false })
@@ -190,7 +190,7 @@ export const createCustomItem = async (
   cogs: number,
   quantity: number,
   listingPrice: number,
-  imageUrls?: string[]
+  imageUrls?: string[],
 ): Promise<UserItem> => {
   try {
     const userId = await getUserId();
@@ -252,7 +252,7 @@ export const fetchItemsByBatch = cache(
           image_urls,
           created_at,
           updated_at
-          `
+          `,
         )
         .eq("user_id", userId)
         .eq("acquisition_batch_id", batchId)
@@ -262,7 +262,7 @@ export const fetchItemsByBatch = cache(
     } catch (error) {
       throw handleSupabaseError(error, "fetchItemsByBatch");
     }
-  }
+  },
 );
 
 export const fetchUnimportedBatchItems = cache(
@@ -285,22 +285,22 @@ export const fetchUnimportedBatchItems = cache(
           image_urls,
           created_at,
           updated_at
-          `
+          `,
         )
         .eq("user_id", userId)
         .neq("acquisition_batch_id", batchId)
         .throwOnError();
 
-      return data || [] as UserItem[];
+      return data || ([] as UserItem[]);
     } catch (error) {
       throw handleSupabaseError(error, "fetchUnimportedBatchItems");
     }
-  }
+  },
 );
 
 export const importItemsToBatch = async (
   batchId: string,
-  itemIds: string[]
+  itemIds: string[],
 ): Promise<void> => {
   try {
     const userId = await getUserId();
@@ -325,7 +325,7 @@ export const updateItem = async (
     listingPrice?: number;
     categoryId?: string;
     imageUrls?: string[];
-  }
+  },
 ): Promise<void> => {
   try {
     await supabase
@@ -352,7 +352,7 @@ export const updateItem = async (
 
 export const uploadImages = async (
   itemId: string,
-  files: File[]
+  files: File[],
 ): Promise<string[]> => {
   try {
     const userId = await getUserId();
@@ -404,7 +404,7 @@ export const uploadImages = async (
 
 export const deleteItemImage = async (
   itemId: string,
-  imageUrl: string
+  imageUrl: string,
 ): Promise<void> => {
   try {
     const userId = await getUserId();
@@ -415,7 +415,9 @@ export const deleteItemImage = async (
     } else if (imageUrl.includes("/storage/v1/object/public/item-images/")) {
       bucketSegment = "/storage/v1/object/public/item-images/";
     } else {
-      throw new Error("Invalid image URL format. Expected Supabase Storage URL.");
+      throw new Error(
+        "Invalid image URL format. Expected Supabase Storage URL.",
+      );
     }
 
     // Extract the file path and remove any query parameters

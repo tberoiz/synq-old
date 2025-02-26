@@ -10,16 +10,19 @@ import { Skeleton } from "@synq/ui/skeleton";
 
 import { CreateItemDialog } from "@ui/dialogs/inventory/create-item-dialog";
 
-import { fetchAllItems, fetchInventoryBatches } from "@synq/supabase/queries/inventory";
+import {
+  fetchAllItems,
+  fetchInventoryBatches,
+} from "@synq/supabase/queries/inventory";
 import { DialogTrigger } from "@synq/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@synq/ui/tabs";
 import { AddNewBatchDialog } from "@ui/dialogs/inventory/add-new-batch-dialog";
 
 const BatchesDataTable = lazy(
-  () => import("@ui/data-tables/inventory/batches-data-table")
+  () => import("@ui/data-tables/inventory/batches-data-table"),
 );
 const ItemsDataTable = lazy(
-  () => import("@ui/data-tables/inventory/items-data-table")
+  () => import("@ui/data-tables/inventory/items-data-table"),
 );
 
 const InventoryPage = () => {
@@ -67,7 +70,7 @@ const InventoryPage = () => {
       </TabsContent>
 
       {/* Batches Tab */}
-       <TabsContent value="batches">
+      <TabsContent value="batches">
         <Suspense
           fallback={
             <div className="space-y-4">

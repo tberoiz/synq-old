@@ -27,9 +27,7 @@ export function ItemsGrid({
               <ItemCard
                 key={item.id}
                 id={item.id}
-                name={
-                  item.name
-                }
+                name={item.name}
                 quantity={item.quantity}
                 cogs={item.cogs}
                 listingPrice={item.listing_price}

@@ -8,7 +8,10 @@ import {
   importItemsToBatch,
   fetchUnimportedBatchItems, // Now imported correctly
 } from "@synq/supabase/queries/inventory";
-import { UserAcquisitionBatch, UserItem } from "@synq/supabase/models/inventory";
+import {
+  UserAcquisitionBatch,
+  UserItem,
+} from "@synq/supabase/models/inventory";
 import ItemsDataTable from "@ui/data-tables/inventory/items-data-table";
 import { ImportItemsDialog } from "@ui/dialogs/import-items-dialog";
 import { CreateItemDialog } from "@ui/dialogs/inventory/create-item-dialog";
@@ -47,9 +50,13 @@ export function BatchDetailsSheet({ batch }: BatchDetailsSheetProps) {
       await importItemsToBatch(batch.id, itemIds);
 
       queryClient.invalidateQueries({ queryKey: ["user_inventory", batch.id] });
-      queryClient.invalidateQueries({ queryKey: ["unimported_items", batch.id] });
+      queryClient.invalidateQueries({
+        queryKey: ["unimported_items", batch.id],
+      });
 
-      await queryClient.refetchQueries({ queryKey: ["user_inventory", batch.id] });
+      await queryClient.refetchQueries({
+        queryKey: ["user_inventory", batch.id],
+      });
     } catch (error) {
       console.error("Failed to import items:", error);
     }

@@ -1,8 +1,27 @@
 "use client";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { SheetDescription, SheetHeader, SheetTitle, SheetTrigger, SheetContent } from "@synq/ui/sheet";
-import { Package, TrendingUp, DollarSign, Tag, User, RefreshCw, ExternalLink, AlertCircle, CheckCircle, Clock, Edit, XCircle } from "lucide-react";
+import {
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetContent,
+} from "@synq/ui/sheet";
+import {
+  Package,
+  TrendingUp,
+  DollarSign,
+  Tag,
+  User,
+  RefreshCw,
+  ExternalLink,
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  Edit,
+  XCircle,
+} from "lucide-react";
 import {
   Table,
   TableBody,
@@ -37,7 +56,9 @@ interface BulkListingDetailsSheetProps {
   batch: BulkListingBatch;
 }
 
-export function BulkListingDetailsSheet({ batch }: BulkListingDetailsSheetProps) {
+export function BulkListingDetailsSheet({
+  batch,
+}: BulkListingDetailsSheetProps) {
   const queryClient = useQueryClient();
 
   // Mock function to simulate retrying failed listings
@@ -120,8 +141,8 @@ export function BulkListingDetailsSheet({ batch }: BulkListingDetailsSheetProps)
                       listing.status === "listed"
                         ? "default"
                         : listing.status === "failed"
-                        ? "destructive"
-                        : "secondary"
+                          ? "destructive"
+                          : "secondary"
                     }
                   >
                     {listing.status}

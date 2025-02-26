@@ -61,7 +61,7 @@ function ItemsDataTable({
             checked={selectedItems.some((i) => i.id === row.original.id)}
             onCheckedChange={() => {
               const newSelectedItems = selectedItems.some(
-                (i) => i.id === row.original.id
+                (i) => i.id === row.original.id,
               )
                 ? selectedItems.filter((i) => i.id !== row.original.id)
                 : [...selectedItems, row.original];
