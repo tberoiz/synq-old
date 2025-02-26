@@ -1,35 +1,35 @@
 "use client";
 
-import { lazy, Suspense } from "react";
+import React, { lazy, Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Package, List, Plus } from "lucide-react";
-import {
-  fetchInventoryBatches,
-  fetchAllItems,
-} from "@synq/supabase/queries/inventory";
-import { CreateItemDialog } from "@ui/dialogs/create-item-dialog";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@synq/ui/tabs";
-import React from "react";
+
+import { List, Package, Plus } from "lucide-react";
+
 import { Button } from "@synq/ui/button";
-import { DialogTrigger } from "@synq/ui/dialog";
 import { Skeleton } from "@synq/ui/skeleton";
-import { AddNewBatchDialog } from "@ui/dialogs/add-new-batch-dialog";
+
+import { CreateItemDialog } from "@ui/dialogs/inventory/create-item-dialog";
+
+import { fetchAllItems, fetchInventoryBatches } from "@synq/supabase/queries/inventory";
+import { DialogTrigger } from "@synq/ui/dialog";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@synq/ui/tabs";
+import { AddNewBatchDialog } from "@ui/dialogs/inventory/add-new-batch-dialog";
 
 const BatchesDataTable = lazy(
-  () => import("@ui/tables/inventory/batches-data-table")
+  () => import("@ui/data-tables/inventory/batches-data-table")
 );
 const ItemsDataTable = lazy(
-  () => import("@ui/tables/inventory/items-data-table")
+  () => import("@ui/data-tables/inventory/items-data-table")
 );
 
-export const InventoryPage = () => {
+const InventoryPage = () => {
   const { data: batches, isLoading: isFetchingBatches } = useQuery({
     queryKey: ["user_inventory_batches"],
     queryFn: fetchInventoryBatches,
   });
 
   const { data: items, isLoading: isFetchingItems } = useQuery({
-    queryKey: ["user_inventory_items"],
+    queryKey: ["user_inv_items"],
     queryFn: fetchAllItems,
   });
 
@@ -67,7 +67,7 @@ export const InventoryPage = () => {
       </TabsContent>
 
       {/* Batches Tab */}
-      <TabsContent value="batches">
+       <TabsContent value="batches">
         <Suspense
           fallback={
             <div className="space-y-4">

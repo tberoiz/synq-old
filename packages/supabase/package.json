@@ -8,13 +8,14 @@
     "dev": "tsc --watch"
   },
   "devDependencies": {
-    "typescript": "^5.5.4",
-    "next": "15.0.3"
+    "next": "15.0.3",
+    "typescript": "^5.5.4"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.1",
     "@supabase/supabase-js": "^2.46.1",
-    "supabase": "^1.219.2"
+    "supabase": "^1.219.2",
+    "uuid": "^11.1.0"
   },
   "exports": {
     "./client": {
@@ -33,7 +34,7 @@
       "types": "./dist/types/index.d.ts",
       "default": "./dist/types/index.js"
     },
-     "./models/inventory": {
+    "./models/inventory": {
       "types": "./dist/models/inventory.d.ts",
       "default": "./dist/models/inventory.js"
     },

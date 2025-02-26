@@ -57,6 +57,15 @@ FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
 -- Enable RLS on the user_inv_items table
 alter table user_inv_items enable row level security;
 
+-- Policy: Users can insert their own items
+create policy "Users can insert their own items"
+on user_inv_items
+for insert
+to authenticated
+with check (
+  user_id = auth.uid()
+);
+
 
 -- Policy: Users can read their own items
 create policy "Users can read their own items"

@@ -6,15 +6,12 @@ import { Package, TrendingUp, DollarSign, Tag, User } from "lucide-react";
 import {
   fetchItemsByBatch,
   importItemsToBatch,
-  fetchUnimportedBatchItems,
+  fetchUnimportedBatchItems, // Now imported correctly
 } from "@synq/supabase/queries/inventory";
-import {
-  UserAcquisitionBatch,
-  UserInventory,
-} from "@synq/supabase/models/inventory";
-import ItemsDataTable from "@ui/tables/inventory/items-data-table";
+import { UserAcquisitionBatch, UserItem } from "@synq/supabase/models/inventory";
+import ItemsDataTable from "@ui/data-tables/inventory/items-data-table";
 import { ImportItemsDialog } from "@ui/dialogs/import-items-dialog";
-import { CreateItemDialog } from "@ui/dialogs/create-item-dialog";
+import { CreateItemDialog } from "@ui/dialogs/inventory/create-item-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 
 interface BatchDetailsSheetProps {
@@ -39,7 +36,7 @@ export function BatchDetailsSheet({ batch }: BatchDetailsSheetProps) {
   });
 
   // Handle importing items
-  const handleImportItems = async (selectedItems: UserInventory[]) => {
+  const handleImportItems = async (selectedItems: UserItem[]) => {
     if (!batch) {
       console.error("No batch selected.");
       return;
@@ -47,17 +44,12 @@ export function BatchDetailsSheet({ batch }: BatchDetailsSheetProps) {
 
     try {
       const itemIds = selectedItems.map((item) => item.id);
-
       await importItemsToBatch(batch.id, itemIds);
 
       queryClient.invalidateQueries({ queryKey: ["user_inventory", batch.id] });
-      queryClient.invalidateQueries({
-        queryKey: ["unimported_items", batch.id],
-      });
+      queryClient.invalidateQueries({ queryKey: ["unimported_items", batch.id] });
 
-      await queryClient.refetchQueries({
-        queryKey: ["user_inventory", batch.id],
-      });
+      await queryClient.refetchQueries({ queryKey: ["user_inventory", batch.id] });
     } catch (error) {
       console.error("Failed to import items:", error);
     }
@@ -117,7 +109,7 @@ export function BatchDetailsSheet({ batch }: BatchDetailsSheetProps) {
       <div className="py-4">
         <h3 className="text-lg font-semibold mb-4">Suppliers</h3>
         <div className="space-y-4">
-          {batch.suppliers?.map((supplier) => (
+          {/* {batch.suppliers?.map((supplier) => (
             <div
               key={supplier.id}
               className="flex items-center gap-4 p-4 border rounded-lg"
@@ -140,7 +132,7 @@ export function BatchDetailsSheet({ batch }: BatchDetailsSheetProps) {
                 )}
               </div>
             </div>
-          ))}
+          ))} */}
         </div>
       </div>
 

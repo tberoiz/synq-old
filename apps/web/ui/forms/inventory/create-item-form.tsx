@@ -52,6 +52,7 @@ const itemSchema = z.object({
     .string()
     .regex(/^\d+(\.\d{1,2})?$/, { message: "Invalid listing price format." })
     .min(1, { message: "Listing price is required." }),
+  sku: z.string().optional(), // Making SKU optional
 });
 
 type ItemFormValues = z.infer<typeof itemSchema>;
@@ -67,6 +68,7 @@ export const CreateItemForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       cogs: "",
       categoryId: "",
       listingPrice: "",
+      sku: "",
     },
   });
 
@@ -83,21 +85,16 @@ export const CreateItemForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       await createCustomItem(
         data.categoryId,
         data.customName,
+        data.sku,
         parseFloat(data.cogs),
         parseInt(data.stockQuantity, 10),
-        parseFloat(data.listingPrice),
+        parseFloat(data.listingPrice)
       );
 
       // Invalidate relevant queries
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.INVENTORY_BATCHES],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.CATEGORIES],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.ITEMS],
-      });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.INVENTORY_BATCHES] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CATEGORIES] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ITEMS] });
 
       form.reset();
 
@@ -123,7 +120,6 @@ export const CreateItemForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        {/* Custom Name */}
         <FormField
           control={form.control}
           name="customName"
@@ -138,7 +134,6 @@ export const CreateItemForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           )}
         />
 
-        {/* Stock Quantity */}
         <FormField
           control={form.control}
           name="stockQuantity"
@@ -146,19 +141,13 @@ export const CreateItemForm = ({ onSuccess }: { onSuccess?: () => void }) => {
             <FormItem>
               <FormLabel>Stock Quantity</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="Stock Quantity"
-                  {...field}
-                  type="number"
-                  min="1"
-                />
+                <Input placeholder="Stock Quantity" {...field} type="number" min="1" />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        {/* COGS */}
         <FormField
           control={form.control}
           name="cogs"
@@ -166,20 +155,13 @@ export const CreateItemForm = ({ onSuccess }: { onSuccess?: () => void }) => {
             <FormItem>
               <FormLabel>COGS</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="Cost of Goods Sold"
-                  {...field}
-                  type="number"
-                  step="0.01"
-                  min="0"
-                />
+                <Input placeholder="Cost of Goods Sold" {...field} type="number" step="0.01" min="0" />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        {/* Listing Price */}
         <FormField
           control={form.control}
           name="listingPrice"
@@ -187,20 +169,13 @@ export const CreateItemForm = ({ onSuccess }: { onSuccess?: () => void }) => {
             <FormItem>
               <FormLabel>Listing Price</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="Listing Price"
-                  {...field}
-                  type="number"
-                  step="0.01"
-                  min="0"
-                />
+                <Input placeholder="Listing Price" {...field} type="number" step="0.01" min="0" />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        {/* Category Selection */}
         <FormField
           control={form.control}
           name="categoryId"
@@ -232,14 +207,9 @@ export const CreateItemForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           )}
         />
 
-        {/* Form Actions */}
         <DialogFooter>
           <DialogClose asChild>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => form.reset()}
-            >
+            <Button type="button" variant="outline" onClick={() => form.reset()}>
               Cancel
             </Button>
           </DialogClose>

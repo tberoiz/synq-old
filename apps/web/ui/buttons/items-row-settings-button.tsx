@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@synq/ui/use-toast";
 import { deleteInventoryItem } from "@synq/supabase/queries/inventory";
-import { ItemRowSettingsDropdown } from "@ui/dropdowns/items-row-settings-dropdown";
+import { ItemRowSettingsDropdown } from "@ui/dropdowns/inventory/items-row-settings-dropdown";
 import {
   AlertDialog,
   AlertDialogAction,

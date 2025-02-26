@@ -1,6 +1,6 @@
 "use client";
 
-import { UserInventory } from "@synq/supabase/models/inventory";
+import { UserItem } from "@synq/supabase/models/inventory";
 import {
   Table,
   TableBody,
@@ -11,22 +11,23 @@ import {
 } from "@synq/ui/table";
 import { Skeleton } from "@synq/ui/skeleton";
 import { Checkbox } from "@synq/ui/checkbox";
-import { ItemRowSettingsButton } from "@ui/dialogs/items-row-settings-button";
+import { ItemRowSettingsButton } from "@ui/buttons/items-row-settings-button";
 import { Sheet, SheetTrigger, SheetContent } from "@synq/ui/sheet";
-import ItemDetailsSheetContent from "@ui/sheets/item-details-sheet";
+import ItemDetailsSheetContent from "@ui/sheets/inventory/item-details-sheet";
 import { useQuery } from "@tanstack/react-query";
 import { fetchCategories } from "@synq/supabase/queries/inventory";
+import Image from "next/image";
 
 interface ItemsTableProps {
-  data: UserInventory[];
+  data: UserItem[];
   loading?: boolean;
-  selectedItems?: UserInventory[];
-  onRowSelectionChange?: (rows: UserInventory[]) => void;
+  selectedItems?: UserItem[];
+  onRowSelectionChange?: (rows: UserItem[]) => void;
 }
 
 export function ItemsTable({ data, loading, selectedItems = [], onRowSelectionChange }: ItemsTableProps) {
   const { data: categories, isLoading: isCategoriesLoading } = useQuery({
-    queryKey: ["user_categories"],
+    queryKey: ["user_inv_categories"],
     queryFn: fetchCategories,
   });
 
@@ -41,23 +42,25 @@ export function ItemsTable({ data, loading, selectedItems = [], onRowSelectionCh
 
   if (loading || isCategoriesLoading) {
     return (
-      <div className="border overflow-x-auto max-h-[400px] overflow-y-auto">
+      <div className="border overflow-x-auto lg:max-h-[800px] overflow-y-auto">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Select</TableHead>
               <TableHead>Item Name</TableHead>
+              <TableHead>SKU</TableHead>
               <TableHead>Quantity</TableHead>
               <TableHead>COGS</TableHead>
               <TableHead>Selling Price</TableHead>
               <TableHead>Profit</TableHead>
               <TableHead>Category</TableHead>
+              <TableHead>Images</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             <TableRow>
-              <TableCell colSpan={8} className="h-24 text-center">
+              <TableCell colSpan={10} className="h-24 text-center">
                 <div className="flex items-center justify-center space-x-2">
                   <Skeleton className="h-4 w-4" />
                   <span>Loading...</span>
@@ -71,17 +74,19 @@ export function ItemsTable({ data, loading, selectedItems = [], onRowSelectionCh
   }
 
   return (
-    <div className="border overflow-x-auto max-h-[400px] overflow-y-auto">
+    <div className="border overflow-x-auto lg:max-h-[500px] overflow-y-auto">
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Select</TableHead>
             <TableHead>Item Name</TableHead>
+            <TableHead>SKU</TableHead>
             <TableHead>Quantity</TableHead>
             <TableHead>COGS</TableHead>
             <TableHead>Selling Price</TableHead>
             <TableHead>Profit</TableHead>
             <TableHead>Category</TableHead>
+            <TableHead>Images</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -114,6 +119,7 @@ export function ItemsTable({ data, loading, selectedItems = [], onRowSelectionCh
                       <TableCell>
                         {item.name || "Unnamed Item"}
                       </TableCell>
+                      <TableCell>{item.sku}</TableCell>
                       <TableCell>{item.quantity}</TableCell>
                       <TableCell>
                         {new Intl.NumberFormat("en-US", {
@@ -139,6 +145,25 @@ export function ItemsTable({ data, loading, selectedItems = [], onRowSelectionCh
                       </TableCell>
                       <TableCell>{categoryName}</TableCell>
                       <TableCell>
+                        <div className="flex space-x-2">
+                          {item.image_urls?.slice(0, 3).map((url, index) => (
+                            <div key={index} className="w-10 h-10 relative">
+                              <Image
+                                src={url}
+                                alt={`Item Image ${index + 1}`}
+                                fill
+                                className="rounded-md object-cover"
+                              />
+                            </div>
+                          ))}
+                          {item.image_urls?.length > 3 && (
+                            <div className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-md">
+                              +{item.image_urls.length - 3}
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
                         <ItemRowSettingsButton itemId={item.id} />
                       </TableCell>
                     </TableRow>
@@ -154,7 +179,7 @@ export function ItemsTable({ data, loading, selectedItems = [], onRowSelectionCh
             })
           ) : (
             <TableRow className="bg-secondary/50 hover:bg-primary/10">
-              <TableCell colSpan={8} className="text-center">
+              <TableCell colSpan={10} className="text-center">
                 No items found.
               </TableCell>
             </TableRow>

@@ -2,7 +2,7 @@ import { Card, CardContent, CardTitle } from "@synq/ui/card";
 import { Checkbox } from "@synq/ui/checkbox";
 import { Progress } from "@synq/ui/progress";
 import { cn } from "@synq/ui/utils";
-import { ItemRowSettingsButton } from "@ui/dialogs/items-row-settings-button";
+import { ItemRowSettingsButton } from "@ui/buttons/items-row-settings-button";
 
 interface ItemCardProps {
   id: string;

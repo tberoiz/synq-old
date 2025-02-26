@@ -11,15 +11,15 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@synq/ui/dialog";
-import { UserInventory } from "@synq/supabase/models/inventory";
-import ItemsDataTable from "@ui/tables/inventory/items-data-table";
+import { UserItem } from "@synq/supabase/models/inventory";
+import ItemsDataTable from "@ui/data-tables/inventory/items-data-table";
 import { Plus } from "lucide-react";
 
 interface ImportItemsDialogProps {
-  items: UserInventory[];
+  items: UserItem[];
   title: string;
   actions?: React.ReactNode;
-  onImport: (selectedItems: UserInventory[]) => void;
+  onImport: (selectedItems: UserItem[]) => void;
 }
 
 export function ImportItemsDialog({
@@ -28,7 +28,7 @@ export function ImportItemsDialog({
   actions,
   onImport,
 }: ImportItemsDialogProps) {
-  const [selectedItems, setSelectedItems] = useState<UserInventory[]>([]);
+  const [selectedItems, setSelectedItems] = useState<UserItem[]>([]);
 
   const handleImport = () => {
     onImport(selectedItems);

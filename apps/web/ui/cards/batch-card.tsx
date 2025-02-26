@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardTitle } from "@synq/ui/card";
 import { cn } from "@synq/ui/utils";
-import { BatchRowSettingsButton } from "@ui/dialogs/batch-row-settings-button";
+import { BatchRowSettingsButton } from "@ui/buttons/batch-row-settings-button";
 import { Checkbox } from "@synq/ui/checkbox";
 
 interface BatchCardProps {

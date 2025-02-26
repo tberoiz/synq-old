@@ -3,8 +3,8 @@
 import * as React from "react";
 import { UserAcquisitionBatch } from "@synq/supabase/models/inventory";
 import { DataTable } from "../data-table";
-import { BatchRowSettingsButton } from "@ui/dialogs/batch-row-settings-button";
-import { BatchesTable } from "./batches-table";
+import { BatchRowSettingsButton } from "@ui/buttons/batch-row-settings-button";
+import { BatchesTable } from "../../tables/inventory/batches-table";
 
 interface BatchesDataTableProps {
   data: UserAcquisitionBatch[];
@@ -27,7 +27,6 @@ function BatchesDataTable({
     UserAcquisitionBatch[]
   >([]);
 
-  /** Columns Definition for Batches */
   const batchColumns = [
     {
       accessorKey: "name",

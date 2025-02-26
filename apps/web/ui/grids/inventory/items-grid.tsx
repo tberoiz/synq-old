@@ -1,16 +1,16 @@
 // NOTE: This File is not being used for now.
 "use client";
 
-import { UserInventory } from "@synq/supabase/models/inventory";
+import { UserItem } from "@synq/supabase/models/inventory";
 import { ItemCard } from "@ui/cards/item-card";
 import { Sheet, SheetContent, SheetTrigger } from "@synq/ui/sheet";
-import ItemDetailsSheetContent from "@ui/sheets/item-details-sheet";
-import { CreateItemDialog } from "@ui/dialogs/create-item-dialog";
+import ItemDetailsSheetContent from "@ui/sheets/inventory/item-details-sheet";
+import { CreateItemDialog } from "@ui/dialogs/inventory/create-item-dialog";
 
 interface ItemsGridProps {
-  data: UserInventory[];
-  selectedItems: UserInventory[];
-  onSelectItem: (item: UserInventory) => void;
+  data: UserItem[];
+  selectedItems: UserItem[];
+  onSelectItem: (item: UserItem) => void;
 }
 
 export function ItemsGrid({

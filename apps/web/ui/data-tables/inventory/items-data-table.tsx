@@ -1,22 +1,22 @@
 "use client";
 
 import * as React from "react";
-import { UserInventory } from "@synq/supabase/models/inventory";
+import { UserItem } from "@synq/supabase/models/inventory";
 import { DataTable } from "../data-table";
 import { Checkbox } from "@synq/ui/checkbox";
-import { ItemRowSettingsButton } from "@ui/dialogs/items-row-settings-button";
-import { ItemsTable } from "./items-table";
+import { ItemRowSettingsButton } from "@ui/buttons/items-row-settings-button";
+import { ItemsTable } from "../../tables/inventory/items-table";
 
 interface ItemsDataTableProps {
-  data: UserInventory[];
+  data: UserItem[];
   loading: boolean;
   actions?: React.ReactNode;
-  onSelectionChange?: (selectedItems: UserInventory[]) => void;
+  onSelectionChange?: (selectedItems: UserItem[]) => void;
 }
 
 interface Row {
   getValue: (key: string) => any;
-  original: UserInventory;
+  original: UserItem;
 }
 
 function ItemsDataTable({
@@ -25,9 +25,9 @@ function ItemsDataTable({
   actions,
   onSelectionChange,
 }: ItemsDataTableProps) {
-  const [selectedItems, setSelectedItems] = React.useState<UserInventory[]>([]);
+  const [selectedItems, setSelectedItems] = React.useState<UserItem[]>([]);
 
-  const handleRowSelectionChange = (rows: UserInventory[]) => {
+  const handleRowSelectionChange = (rows: UserItem[]) => {
     setSelectedItems(rows);
     if (onSelectionChange) {
       onSelectionChange(rows);

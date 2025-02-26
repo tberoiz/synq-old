@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@synq/ui/use-toast";
 import { deleteInventoryBatch } from "@synq/supabase/queries/inventory";
-import { BatchRowSettingsDropdown } from "@ui/dropdowns/batch-row-settings-dropdown";
+import { BatchRowSettingsDropdown } from "@ui/dropdowns/inventory/batch-row-settings-dropdown";
 import {
   AlertDialog,
   AlertDialogAction,

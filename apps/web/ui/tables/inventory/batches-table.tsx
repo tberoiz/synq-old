@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { UserAcquisitionBatch } from "@synq/supabase/models/inventory";
-import { BatchRowSettingsButton } from "@ui/dialogs/batch-row-settings-button";
+import { BatchRowSettingsButton } from "@ui/buttons/batch-row-settings-button";
 import {
   Table,
   TableBody,
@@ -14,7 +14,7 @@ import {
 import { Checkbox } from "@synq/ui/checkbox";
 import { Skeleton } from "@synq/ui/skeleton";
 import { Sheet, SheetTrigger, SheetContent } from "@synq/ui/sheet";
-import { BatchDetailsSheet } from "@ui/sheets/batch-details-sheet";
+import { BatchDetailsSheet } from "@ui/sheets/inventory/batch-details-sheet";
 
 interface BatchesTableProps {
   data: UserAcquisitionBatch[];
@@ -94,7 +94,7 @@ export function BatchesTable({ data, loading }: BatchesTableProps) {
                   </SheetTrigger>
                   <SheetContent
                     side="right"
-                    className="min-w-[700px] max-w-2xl overflow-y-auto"
+                    className="min-w-[800px] max-w-2xl overflow-y-auto"
                   >
                     <BatchDetailsSheet batch={batch} />
                   </SheetContent>

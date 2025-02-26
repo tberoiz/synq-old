@@ -4,8 +4,8 @@
 import { UserAcquisitionBatch } from "@synq/supabase/models/inventory";
 import { AcquisitionBatchCard } from "@ui/cards/batch-card";
 import { Sheet, SheetTrigger, SheetContent } from "@synq/ui/sheet";
-import { BatchDetailsSheet } from "@ui/sheets/batch-details-sheet";
-import { AddNewBatchDialog } from "@ui/dialogs/add-new-batch-dialog";
+import { BatchDetailsSheet } from "@ui/sheets/inventory/batch-details-sheet";
+import { AddNewBatchDialog } from "@ui/dialogs/inventory/add-new-batch-dialog";
 import { DialogTrigger } from "@synq/ui/dialog";
 import { Button } from "@synq/ui/button";
 import { Plus } from "lucide-react";

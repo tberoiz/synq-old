@@ -1,7 +1,7 @@
 export interface UserCategory {
   id: string;
-  user_id: string;
   name: string;
+  user_id: string;
 }
 
 export interface UserSupplier {
@@ -15,23 +15,27 @@ export interface UserSupplier {
 export interface UserAcquisitionBatch {
   id: string;
   user_id: string;
-  suppliers: UserSupplier[];
+  suppliers: string[];
   name: string;
   created_at: string;
   item_count: number;
   total_listing_price: number;
   total_profit: number;
   total_cogs: number;
+  updated_at: string;
 }
 
-export interface UserInventory {
+export interface UserItem {
   id: string;
   user_id: string;
   acquisition_batch_id: string | null;
   category_id: string;
+  sku: string;
   name: string;
   quantity: number;
   cogs: number;
   listing_price: number;
+  image_urls: string[];
   created_at: string;
+  updated_at: string;
 }

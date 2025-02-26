@@ -3,432 +3,454 @@ import { getUserId } from "./user";
 import {
   UserAcquisitionBatch,
   UserCategory,
-  UserInventory,
+  UserItem,
   UserSupplier,
 } from "../models/inventory";
+import { TABLES } from "../config/tables";
+import { handleSupabaseError } from "../utils/error";
+import { cache } from "react";
+import { BUCKETS } from "../config/buckets";
+import { v4 as uuidv4 } from "uuid";
 
 const supabase = createClient();
-/**
- * Fetch all categories for the current user.
- */
-export const fetchCategories = async (): Promise<UserCategory[]> => {
-  const userId = await getUserId();
+const CACHE_TTL = 60 * 5; // 5 minutes cache TTL
 
-  const { data, error } = await supabase
-    .from("user_categories")
-    .select("id, name")
-    .eq("user_id", userId);
+// ==================================================================
+//                             Categories
+// ==================================================================
 
-  if (error) {
-    console.error("Error fetching categories:", error);
-    throw error;
+export const fetchCategories = cache(async (): Promise<UserCategory[]> => {
+  try {
+    const userId = await getUserId();
+    const { data } = await supabase
+      .from(TABLES.CATEGORIES)
+      .select("id, name, user_id")
+      .eq("user_id", userId)
+      .throwOnError();
+
+    return data || [];
+  } catch (error) {
+    throw handleSupabaseError(error, "fetchCategories");
   }
+});
 
-  return data as UserCategory[];
-};
+// ==================================================================
+//                             Suppliers
+// ==================================================================
 
-/**
- * Fetch all suppliers for the current user.
- */
-export const fetchSuppliers = async (): Promise<UserSupplier[]> => {
-  const userId = await getUserId();
+export const fetchSuppliers = cache(async (): Promise<UserSupplier[]> => {
+  try {
+    const userId = await getUserId();
+    const { data } = await supabase
+      .from(TABLES.SUPPLIERS)
+      .select("id, name, contact_info, created_at, user_id")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .throwOnError();
 
-  const { data, error } = await supabase
-    .from("user_suppliers")
-    .select("id, name, contact_info, created_at")
-    .eq("user_id", userId)
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    console.error("Error fetching suppliers:", error);
-    throw error;
+    return data || [];
+  } catch (error) {
+    throw handleSupabaseError(error, "fetchSuppliers");
   }
+});
 
-  return data as UserSupplier[];
-};
+// ==================================================================
+//                             Batches
+// ==================================================================
 
-/**
- * Fetch all batches for the current user.
- */
-export const fetchInventoryBatches = async (): Promise<UserAcquisitionBatch[]> => {
-  const userId = await getUserId();
+export const fetchInventoryBatches = cache(
+  async (): Promise<UserAcquisitionBatch[]> => {
+    try {
+      const userId = await getUserId();
+      const { data: batches } = await supabase
+        .from(TABLES.ACQUISITION_BATCHES)
+        .select(
+          `
+          id,
+          user_id,
+          suppliers,
+          name,
+          created_at,
+          updated_at,
+          items:${TABLES.INVENTORY_ITEMS}!acquisition_batch_id(
+            id,
+            cogs,
+            quantity,
+            listing_price
+          )
+          `
+        )
+        .eq("user_id", userId)
+        .throwOnError();
 
-  // Fetch batches with their items
-  const { data: batches, error: batchesError } = await supabase
-    .from("user_acquisition_batches")
-    .select(
-      `
-      id,
-      user_id,
-      suppliers,
-      name,
-      created_at,
-      user_inventory:user_inventory!acquisition_batch_id (
-        id,
-        cogs,
-        quantity,
-        listing_price
-      )
-      `,
-    )
-    .eq("user_id", userId)
-    .throwOnError();
+      if (!batches) return [];
 
-  if (batchesError) throw batchesError;
+      return batches.map((batch) => {
+        const items = batch.items || [];
+        const total_cogs = items.reduce(
+          (sum, item) => sum + item.cogs * item.quantity,
+          0
+        );
+        const total_listing_price = items.reduce(
+          (sum, item) => sum + item.listing_price * item.quantity,
+          0
+        );
 
-  // Fetch all suppliers for the current user
-  const { data: suppliers, error: suppliersError } = await supabase
-    .from("user_suppliers")
-    .select("id, name, contact_info")
-    .eq("user_id", userId)
-    .throwOnError();
+        return {
+          ...batch,
+          item_count: items.length,
+          total_cogs,
+          total_listing_price,
+          total_profit: total_listing_price - total_cogs,
+        };
+      });
+    } catch (error) {
+      throw handleSupabaseError(error, "fetchInventoryBatches");
+    }
+  }
+);
 
-  if (suppliersError) throw suppliersError;
-
-  // Create a map of supplier IDs to supplier details for quick lookup
-  const supplierMap = new Map(
-    suppliers.map((supplier) => [supplier.id, supplier]),
-  );
-
-  // Map batches to include supplier details
-  const batchesWithSuppliers = (batches ?? []).map((batch) => {
-    const items = batch.user_inventory || [];
-    const item_count = items.length;
-    const total_cogs = items.reduce(
-      (sum, item) => sum + item.cogs * item.quantity,
-      0,
-    );
-    const total_listing_price = items.reduce(
-      (sum, item) => sum + (item.listing_price || 0) * item.quantity,
-      0,
-    );
-    const total_profit = total_listing_price - total_cogs;
-
-    // Map supplier IDs to supplier details
-    const supplierDetails = batch.suppliers
-      .map((supplierId: string) => supplierMap.get(supplierId))
-      .filter(Boolean); // Filter out undefined values
-
-    return {
-      ...batch,
-      item_count,
-      total_cogs,
-      total_listing_price,
-      total_profit,
-      suppliers: supplierDetails,
-    };
-  });
-
-  return batchesWithSuppliers as UserAcquisitionBatch[];
-};
-
-/**
- * Fetch all items for the current user.
- */
-export const fetchAllItems = async (): Promise<UserInventory[]> => {
-  const userId = await getUserId();
-
-  const { data, error } = await supabase
-    .from("user_inventory")
-    .select(
-      `
-      id,
-      user_id,
-      acquisition_batch_id,
-      category_id,
-      name,
-      quantity,
-      cogs,
-      listing_price,
-      created_at
-      `,
-    )
-    .eq("user_id", userId)
-    .throwOnError();
-
-  if (error) throw error;
-
-  return data as UserInventory[];
-};
-
-/**
- * Create a new category.
- */
-export const createCategory = async (name: string): Promise<UserCategory> => {
-  const userId = await getUserId();
-
-  const { data, error } = await supabase
-    .from("user_categories")
-    .insert([{ name, user_id: userId }])
-    .select("*")
-    .throwOnError();
-
-  if (error) throw error;
-  return data[0] as UserCategory;
-};
-
-/**
- * Create a new supplier.
- */
-export const createSupplier = async (
+export const createInventoryBatch = async (
   name: string,
-  contact_info?: string,
-): Promise<UserSupplier> => {
-  const userId = await getUserId();
+  supplierIds?: string[]
+): Promise<UserAcquisitionBatch> => {
+  try {
+    const userId = await getUserId();
+    const { data } = await supabase
+      .from(TABLES.ACQUISITION_BATCHES)
+      .insert([{ name, user_id: userId, suppliers: supplierIds || [] }])
+      .select("*")
+      .single()
+      .throwOnError();
 
-  const { data, error } = await supabase
-    .from("user_suppliers")
-    .insert([{ name, contact_info, user_id: userId }])
-    .select("*")
-    .throwOnError();
-
-  if (error) throw error;
-  return data[0] as UserSupplier;
+    return data;
+  } catch (error) {
+    throw handleSupabaseError(error, "createInventoryBatch");
+  }
 };
 
-/**
- * Create a custom item.
- */
+export const deleteInventoryBatch = async (id: string): Promise<void> => {
+  try {
+    const userId = await getUserId();
+    await supabase
+      .from(TABLES.ACQUISITION_BATCHES)
+      .delete()
+      .eq("id", id)
+      .eq("user_id", userId)
+      .throwOnError();
+  } catch (error) {
+    throw handleSupabaseError(error, "deleteInventoryBatch");
+  }
+};
+
+// ==================================================================
+//                          Inventory Items
+// ==================================================================
+
+export const fetchAllItems = cache(async (): Promise<UserItem[]> => {
+  try {
+    const userId = await getUserId();
+    const { data } = await supabase
+      .from(TABLES.INVENTORY_ITEMS)
+      .select(
+        `
+        id,
+        user_id,
+        acquisition_batch_id,
+        category_id,
+        name,
+        sku,
+        quantity,
+        cogs,
+        listing_price,
+        image_urls,
+        created_at,
+        updated_at
+        `
+      )
+      .eq("user_id", userId)
+      .order("updated_at", { ascending: false })
+      .throwOnError();
+
+    return (data || []).map((item) => ({
+      ...item,
+      name: item.name || "Unnamed Item",
+      // Provide a fallback for updated_at if missing
+      updated_at: item.updated_at || item.created_at,
+    }));
+  } catch (error) {
+    throw handleSupabaseError(error, "fetchAllItems");
+  }
+});
+
 export const createCustomItem = async (
   categoryId: string,
   name: string,
+  sku: string = "",
   cogs: number,
   quantity: number,
   listingPrice: number,
-): Promise<UserInventory> => {
-  const userId = await getUserId();
+  imageUrls?: string[]
+): Promise<UserItem> => {
+  try {
+    const userId = await getUserId();
+    const { data } = await supabase
+      .from(TABLES.INVENTORY_ITEMS)
+      .insert([
+        {
+          user_id: userId,
+          category_id: categoryId,
+          name,
+          sku,
+          cogs,
+          quantity,
+          listing_price: listingPrice,
+          image_urls: imageUrls || [],
+        },
+      ])
+      .select("*")
+      .single()
+      .throwOnError();
 
-  if (
-    !categoryId ||
-    !name ||
-    cogs < 0 ||
-    quantity < 0 ||
-    listingPrice < 0
-  ) {
-    throw new Error(
-      "Invalid input: Missing required fields or invalid values.",
-    );
+    return data;
+  } catch (error) {
+    throw handleSupabaseError(error, "createCustomItem");
   }
-
-  const { data, error } = await supabase
-    .from("user_inventory")
-    .insert([
-      {
-        user_id: userId,
-        category_id: categoryId,
-        name: name,
-        cogs: cogs,
-        quantity: quantity,
-        listing_price: listingPrice,
-      },
-    ])
-    .select("*")
-    .throwOnError();
-
-  if (error) throw error;
-
-  return data[0] as UserInventory;
 };
 
-/**
- * Create an inventory batch.
- */
-export const createInventoryBatch = async (
-  name: string,
-  supplierId?: string,
-) => {
-  const userId = await getUserId();
-
-  const { data, error } = await supabase
-    .from("user_acquisition_batches")
-    .insert([{ name, user_id: userId, supplier_id: supplierId }])
-    .select("*")
-    .throwOnError();
-
-  if (error) throw error;
-  return data;
+export const deleteInventoryItem = async (itemId: string): Promise<void> => {
+  try {
+    const userId = await getUserId();
+    await supabase
+      .from(TABLES.INVENTORY_ITEMS)
+      .delete()
+      .eq("id", itemId)
+      .eq("user_id", userId)
+      .throwOnError();
+  } catch (error) {
+    throw handleSupabaseError(error, "deleteInventoryItem");
+  }
 };
 
-export const deleteInventoryBatch = async (id: string) => {
-  const userId = await getUserId();
-  const { error } = await supabase
-    .from("user_acquisition_batches")
-    .delete()
-    .eq("id", id)
-    .eq("user_id", userId)
-    .throwOnError();
+export const fetchItemsByBatch = cache(
+  async (batchId: string): Promise<UserItem[]> => {
+    try {
+      const userId = await getUserId();
+      const { data } = await supabase
+        .from(TABLES.INVENTORY_ITEMS)
+        .select(
+          `
+          id,
+          user_id,
+          acquisition_batch_id,
+          category_id,
+          name,
+          sku,
+          quantity,
+          cogs,
+          listing_price,
+          image_urls,
+          created_at,
+          updated_at
+          `
+        )
+        .eq("user_id", userId)
+        .eq("acquisition_batch_id", batchId)
+        .throwOnError();
 
-  if (error) throw error;
-};
+      return (data || []) as UserItem[];
+    } catch (error) {
+      throw handleSupabaseError(error, "fetchItemsByBatch");
+    }
+  }
+);
 
-export const deleteInventoryItem = async (itemId: string) => {
-  const userId = await getUserId();
-  const { error } = await supabase
-    .from("user_inventory")
-    .delete()
-    .eq("id", itemId)
-    .eq("user_id", userId)
-    .throwOnError();
+export const fetchUnimportedBatchItems = cache(
+  async (batchId: string): Promise<UserItem[]> => {
+    try {
+      const userId = await getUserId();
+      const { data } = await supabase
+        .from(TABLES.INVENTORY_ITEMS)
+        .select(
+          `
+          id,
+          user_id,
+          acquisition_batch_id,
+          category_id,
+          name,
+          sku,
+          quantity,
+          cogs,
+          listing_price,
+          image_urls,
+          created_at,
+          updated_at
+          `
+        )
+        .eq("user_id", userId)
+        .neq("acquisition_batch_id", batchId)
+        .throwOnError();
 
-  if (error) throw error;
-};
+      return data || [] as UserItem[];
+    } catch (error) {
+      throw handleSupabaseError(error, "fetchUnimportedBatchItems");
+    }
+  }
+);
 
-
-export const fetchItemsByBatch = async (
-  batchId: string,
-): Promise<UserInventory[]> => {
-  const userId = await getUserId();
-
-  const { data, error } = await supabase
-    .from("user_inventory")
-    .select(
-      `
-      id,
-      user_id,
-      acquisition_batch_id,
-      category_id,
-      name,
-      quantity,
-      cogs,
-      listing_price,
-      created_at
-      `,
-    )
-    .eq("user_id", userId)
-    .eq("acquisition_batch_id", batchId)
-    .throwOnError();
-
-  if (error) throw error;
-
-  const items = (data ?? []).map((item: any) => ({
-    ...item,
-    name: item.name || "Unnamed Item", // Fallback to "Unnamed Item" if name is null or undefined
-  }));
-
-  return items as UserInventory[];
-};
-
-/**
- * Import selected items into a batch by updating their acquisition_batch_id.
- * @param batchId - The ID of the target batch.
- * @param itemIds - An array of item IDs to import into the batch.
- */
 export const importItemsToBatch = async (
   batchId: string,
-  itemIds: string[],
+  itemIds: string[]
 ): Promise<void> => {
-  const userId = await getUserId();
-
-  // Validate input
-  if (!batchId || !itemIds || itemIds.length === 0) {
-    throw new Error("Invalid input: Missing batch ID or item IDs.");
+  try {
+    const userId = await getUserId();
+    await supabase
+      .from(TABLES.INVENTORY_ITEMS)
+      .update({ acquisition_batch_id: batchId })
+      .in("id", itemIds)
+      .eq("user_id", userId)
+      .throwOnError();
+  } catch (error) {
+    throw handleSupabaseError(error, "importItemsToBatch");
   }
-
-  // Update the acquisition_batch_id for each item
-  const { error } = await supabase
-    .from("user_inventory")
-    .update({ acquisition_batch_id: batchId })
-    .in("id", itemIds)
-    .eq("user_id", userId)
-    .throwOnError();
-
-  if (error) {
-    console.error("Error importing items to batch:", error);
-    throw error;
-  }
-
-  console.log(`Successfully imported ${itemIds.length} items into batch ${batchId}.`);
-};
-
-export const fetchUnimportedCollectionItems = async (
-  collectionId: string,
-): Promise<UserInventory[]> => {
-  const userId = await getUserId();
-
-  const { data, error } = await supabase
-    .from("user_inventory")
-    .select(
-      `
-      id,
-      user_id,
-      acquisition_batch_id,
-      category_id,
-      name,
-      cogs,
-      quantity,
-      listing_price,
-      created_at
-      `,
-    )
-    .eq("user_id", userId)
-    .neq("collection_id", collectionId) // Exclude items already in the collection
-    .throwOnError();
-
-  if (error) throw error;
-
-  const items = (data ?? []).map((item: any) => ({
-    ...item,
-    name: item.name || "Unnamed Item", // Fallback to "Unnamed Item" if name is null or undefined
-  }));
-
-  return items as UserInventory[];
-};
-
-export const fetchUnimportedBatchItems = async (
-  batchId: string,
-): Promise<UserInventory[]> => {
-  const userId = await getUserId();
-
-  const { data, error } = await supabase
-    .from("user_inventory")
-    .select(
-      `
-      id,
-      user_id,
-      acquisition_batch_id,
-      category_id,
-      name,
-      cogs,
-      quantity,
-      listing_price,
-      created_at
-      `,
-    )
-    .eq("user_id", userId)
-    .neq("acquisition_batch_id", batchId)
-    .throwOnError();
-
-  if (error) throw error;
-
-  const items = (data ?? []).map((item: any) => ({
-    ...item,
-    name: item.name || "Unnamed Item",
-  }));
-
-  return items as UserInventory[];
 };
 
 export const updateItem = async (
   itemId: string,
   data: {
     name?: string;
+    sku?: string;
     quantity?: number;
     cogs?: number;
     listingPrice?: number;
     categoryId?: string;
-  },
-) => {
-  const { error } = await supabase
-    .from("user_inventory")
-    .update({
-      name: data.name,
-      quantity: data.quantity,
-      cogs: data.cogs,
-      listing_price: data.listingPrice,
-      category_id: data.categoryId,
-    })
-    .eq("id", itemId)
-    .throwOnError();
+    imageUrls?: string[];
+  }
+): Promise<void> => {
+  try {
+    await supabase
+      .from(TABLES.INVENTORY_ITEMS)
+      .update({
+        name: data.name,
+        sku: data.sku,
+        quantity: data.quantity,
+        cogs: data.cogs,
+        listing_price: data.listingPrice,
+        category_id: data.categoryId,
+        image_urls: data.imageUrls,
+      })
+      .eq("id", itemId)
+      .throwOnError();
+  } catch (error) {
+    throw handleSupabaseError(error, "updateItem");
+  }
+};
 
-  if (error) throw error;
+// ==================================================================
+//                             Images
+// ==================================================================
+
+export const uploadImages = async (
+  itemId: string,
+  files: File[]
+): Promise<string[]> => {
+  try {
+    const userId = await getUserId();
+    const newImageUrls: string[] = [];
+
+    for (const file of files) {
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${userId}/${uuidv4()}.${fileExt}`;
+      const { data: uploadData } = await supabase.storage
+        .from(BUCKETS.ITEMS_IMAGES)
+        .upload(fileName, file);
+      if (!uploadData) {
+        throw new Error("Failed to upload image");
+      }
+      const { data: signedUrlData } = await supabase.storage
+        .from(BUCKETS.ITEMS_IMAGES)
+        .createSignedUrl(uploadData.path, 3600);
+      if (signedUrlData) {
+        newImageUrls.push(signedUrlData.signedUrl);
+      } else {
+        throw new Error("Failed to create signed URL");
+      }
+    }
+
+    // Append new images to current image_urls
+    const { data: currentItem } = await supabase
+      .from(TABLES.INVENTORY_ITEMS)
+      .select("image_urls")
+      .eq("id", itemId)
+      .eq("user_id", userId)
+      .single();
+
+    const updatedImageUrls = [
+      ...(currentItem?.image_urls || []),
+      ...newImageUrls,
+    ];
+
+    await supabase
+      .from(TABLES.INVENTORY_ITEMS)
+      .update({ image_urls: updatedImageUrls })
+      .eq("id", itemId)
+      .eq("user_id", userId);
+
+    return newImageUrls;
+  } catch (error) {
+    throw handleSupabaseError(error, "uploadImages");
+  }
+};
+
+export const deleteItemImage = async (
+  itemId: string,
+  imageUrl: string
+): Promise<void> => {
+  try {
+    const userId = await getUserId();
+
+    let bucketSegment = "";
+    if (imageUrl.includes("/storage/v1/object/sign/item-images/")) {
+      bucketSegment = "/storage/v1/object/sign/item-images/";
+    } else if (imageUrl.includes("/storage/v1/object/public/item-images/")) {
+      bucketSegment = "/storage/v1/object/public/item-images/";
+    } else {
+      throw new Error("Invalid image URL format. Expected Supabase Storage URL.");
+    }
+
+    // Extract the file path and remove any query parameters
+    const filePathWithQuery = imageUrl.split(bucketSegment)[1];
+    if (!filePathWithQuery) {
+      throw new Error("Unable to extract file path from the image URL.");
+    }
+    // Assert that the first element exists (non-null)
+    const filePath = filePathWithQuery.split("?")[0]!;
+
+    const { error: deleteError } = await supabase.storage
+      .from(BUCKETS.ITEMS_IMAGES)
+      .remove([filePath]);
+    if (deleteError) {
+      throw deleteError;
+    }
+
+    const { data: itemData } = await supabase
+      .from(TABLES.INVENTORY_ITEMS)
+      .select("image_urls")
+      .eq("id", itemId)
+      .eq("user_id", userId)
+      .single();
+    if (!itemData) throw new Error("Item not found");
+
+    const updatedImageUrls =
+      itemData.image_urls?.filter((url: string) => url !== imageUrl) || [];
+
+    await supabase
+      .from(TABLES.INVENTORY_ITEMS)
+      .update({ image_urls: updatedImageUrls })
+      .eq("id", itemId)
+      .eq("user_id", userId)
+      .throwOnError();
+  } catch (error) {
+    throw handleSupabaseError(error, "deleteItemImage");
+  }
 };
