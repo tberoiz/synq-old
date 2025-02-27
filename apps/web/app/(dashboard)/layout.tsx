@@ -9,7 +9,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <SidebarProvider
       style={
         {
-          "--sidebar-width": "12rem",
+          "--sidebar-width": "4rem",
         } as React.CSSProperties
       }
     >

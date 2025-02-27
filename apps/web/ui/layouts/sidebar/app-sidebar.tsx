@@ -8,10 +8,10 @@ import {
   Blocks,
   Settings,
 } from "lucide-react";
+
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarHeader,
@@ -25,58 +25,66 @@ import { cn } from "@synq/ui/utils";
 import { SynqIcon } from "@ui/icons/icons";
 import { usePathname } from "next/navigation";
 
-const navItems = [
-  { title: "Overview", url: "/overview", icon: ChartLine },
-  { title: "Inventory", url: "/inventory", icon: Package },
-  { title: "Sales", url: "/sales", icon: WalletCards },
-  { title: "Integrations", url: "/integrations", icon: Blocks },
-  { title: "Settings", url: "/settings", icon: Settings },
-];
+const data = {
+  navMain: [
+    { title: "Overview", url: "/overview", icon: ChartLine },
+    { title: "Inventory", url: "/inventory", icon: Package },
+    { title: "Orders", url: "/sales", icon: WalletCards },
+    { title: "Integrations", url: "/integrations", icon: Blocks },
+    { title: "Settings", url: "/settings", icon: Settings },
+  ],
+};
 
-export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
   const { isMobile, setOpenMobile } = useSidebar();
 
   return (
-    <Sidebar
-      variant="sidebar"
-      className="border-r py-3 z-40 bg-sidebar"
-      {...props}
-    >
-      <SidebarHeader className="flex items-start justify-start">
-        <SidebarMenu className="flex-wrap">
+    <Sidebar variant="sidebar" className="border-r py-4 z-40" {...props}>
+      <SidebarHeader>
+        <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild className="md:h-10 md:p-0">
+            <SidebarMenuButton
+              size="lg"
+              asChild
+              className="md:h-10 md:p-0 flex justify-center"
+            >
               <Link href="/overview">
-                <SynqIcon />
-                {/* <span className="text-xl font-light md:inline ml-2">Synq</span> */}
+                <div className="flex aspect-square size-10 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                  <SynqIcon />
+                </div>
+                {isMobile && (
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-semibold">synq</span>
+                  </div>
+                )}
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-
-      <SidebarContent className="flex flex-col h-full">
+      <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupContent className="flex flex-col items-center justify-center flex-1">
-            <SidebarMenu className="flex flex-col gap-2 w-full">
-              {navItems.map(({ title, url, icon: Icon }) => {
-                const isActive = pathname === url;
+          <SidebarGroupContent className="px-1.5 md:px-0">
+            <SidebarMenu className="flex flex-col gap-4">
+              {data.navMain.map((item) => {
+                const isActive = pathname === item.url;
                 return (
-                  <SidebarMenuItem key={title}>
-                    <Link href={url}>
+                  <SidebarMenuItem key={item.title}>
+                    <Link href={item.url} passHref>
                       <SidebarMenuButton
+                        tooltip={{ children: item.title, hidden: false }}
                         onClick={() => isMobile && setOpenMobile(false)}
                         isActive={isActive}
                         className={cn(
-                          "flex items-center justify-start gap-3 px-4 py-2 rounded-lg transition-colors h-12 w-full",
+                          "p-4 md:p-2 flex items-center gap-3 rounded-lg transition-colors",
                           isActive
-                            ? "bg-primary text-white dark:text-black"
+                            ? "bg-primary text-white dark:text-black "
                             : "hover:bg-gray-100 dark:hover:bg-gray-800",
                         )}
                       >
-                        <Icon className="w-6 h-6 mr-2" />
-                        <span className="flex-1 min-w-[100px]">{title}</span>
+                        <item.icon strokeWidth={1} className="w-6 h-6" />
+                        {isMobile && <span>{item.title}</span>}
                       </SidebarMenuButton>
                     </Link>
                   </SidebarMenuItem>
@@ -86,23 +94,6 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-
-      <SidebarFooter>
-        <SidebarGroup>
-          <SidebarGroupContent className="px-4 pb-4 text-sm">
-            <div className="border-t border-gray-200 pt-4">
-              <Link
-                href="https://docs.synqtcg.com"
-                target="_blank"
-                className="hover:text-gray-900"
-              >
-                Documentation
-              </Link>
-            </div>
-            <div className="mt-2">App Version: 0.0.1</div>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarFooter>
     </Sidebar>
   );
 }
