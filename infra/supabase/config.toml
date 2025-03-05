@@ -52,9 +52,8 @@ sql_paths = [
     './seed/001_seed_user_subscription.sql',
     './seed/002_seed_user_integrations.sql',
     './seed/004_seed_inventory_and_products.sql',
-    './seed/005_seed_sales_and_orders.sql',
-    './seed/006_seed_reports.sql',
-]
+    './seed/005_seed_purchases_and_suppliers.sql',
+    './seed/006_seed_sales_and_orders.sql',]
 
 
 
