@@ -1,6 +1,6 @@
 // TODO: This is a mockup page
-// - backend needs to be created
-// - ui components has to be created
+// # backend needs to be created
+// # ui components has to be created
 import { Button } from "@synq/ui/button";
 import { Input } from "@synq/ui/input";
 import {
@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@synq/ui/select";
-import { Download, FileText, Calendar, PieChart } from "lucide-react";
+import { Download, FileText } from "lucide-react";
 
 export default function PnLReportsPage() {
   return (
@@ -21,53 +21,6 @@ export default function PnLReportsPage() {
         <Button variant="default" size="sm">
           <Download className="mr-2 h-4 w-4" /> Export All Reports
         </Button>
-      </div>
-
-      {/* Key Features Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {/* One-Click Reports Card */}
-        <div className="p-6 border rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center gap-2 mb-4">
-            <FileText className="h-5 w-5 text-blue-600" />
-            <p className="text-sm text-blue-600">One-Click Reports</p>
-          </div>
-          <p className="text-gray-600">
-            Simplify tax season with one-click P&L statements.
-          </p>
-        </div>
-
-        {/* Date Range Reports Card */}
-        <div className="p-6 border rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center gap-2 mb-4">
-            <Calendar className="h-5 w-5 text-purple-600" />
-            <p className="text-sm text-purple-600">Custom Date Range</p>
-          </div>
-          <p className="text-gray-600">
-            Generate P&L statements for any date range in Excel.
-          </p>
-        </div>
-
-        {/* 1099-Ready Reports Card */}
-        <div className="p-6 border rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center gap-2 mb-4">
-            <FileText className="h-5 w-5 text-green-600" />
-            <p className="text-sm text-green-600">1099-Ready Reports</p>
-          </div>
-          <p className="text-gray-600">
-            Export 1099-ready reports for your accountant.
-          </p>
-        </div>
-
-        {/* Track Income & Expenses Card */}
-        <div className="p-6 border rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center gap-2 mb-4">
-            <PieChart className="h-5 w-5 text-orange-600" />
-            <p className="text-sm text-orange-600">Track Finances</p>
-          </div>
-          <p className="text-gray-600">
-            Track income, expenses, and profits effortlessly.
-          </p>
-        </div>
       </div>
 
       {/* Report Generator Section */}
