@@ -1,5 +1,3 @@
-import { GalleryVerticalEnd } from "lucide-react";
-
 import { cn } from "@synq/ui/utils";
 import { Button } from "@synq/ui/button";
 import { Input } from "@synq/ui/input";
@@ -29,7 +27,7 @@ export function SignInForm({
             </a>
             <h1 className="text-xl font-bold">Welcome to synq.com</h1>
             <div className="text-center text-sm">
-              Don&apos;t have an account?{" "}
+              Don&apos;t have an account?
               <a href="/auth/signup" className="underline underline-offset-4">
                 Sign up
               </a>

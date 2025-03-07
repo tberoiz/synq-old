@@ -1,13 +1,14 @@
-import { Button } from "@synq/ui/button";
+"use client";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@synq/ui/dialog";
-import { CreateItemForm } from "@ui/forms/inventory/create-item-form";
+import { Button } from "@synq/ui/button";
 import { Plus } from "lucide-react";
+import { CreateItemForm } from "@ui/forms/inventory/create-item-form";
 
 export const CreateItemDialog = () => (
   <Dialog>

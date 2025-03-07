@@ -1,23 +1,23 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { format } from "date-fns";
+import { useEffect } from "react";
+import React from "react";
+
 import { Button } from "@synq/ui/button";
 import { Input } from "@synq/ui/input";
-import { SheetHeader, SheetTitle, SheetFooter } from "@synq/ui/sheet";
-import { Tag, Plus, Trash2 } from "lucide-react";
-import { format } from "date-fns";
-import { useToast } from "@synq/ui/use-toast";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
-import { UserItem } from "@synq/supabase/models/inventory";
 import {
-  updateItem,
-  fetchCategories,
-  uploadImages,
-  deleteItemImage,
-} from "@synq/supabase/queries/inventory";
+  Sheet,
+  SheetHeader,
+  SheetTitle,
+  SheetFooter,
+  SheetContent,
+} from "@synq/ui/sheet";
+import { Tag, DollarSign, Truck, Warehouse } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -25,321 +25,333 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@synq/ui/select";
-import Image from "next/image";
+import { Card, CardContent, CardHeader, CardTitle } from "@synq/ui/card";
+
+import {
+  updateItemDetails,
+  type ItemViewWithPurchaseBatches,
+  type Purchase,
+} from "@synq/supabase/queries";
+import { createClient } from "@synq/supabase/client";
+import { useToast } from "@synq/ui/use-toast";
+import { Label } from "@synq/ui/label";
+import { Badge } from "@synq/ui/badge";
+import PurchaseDetailsSheet from "./purchase-details-sheet";
 
 const itemSchema = z.object({
-  name: z
+  name: z.string().min(2),
+  sku: z
     .string()
-    .min(2, { message: "Item name must be at least 2 characters." }),
-  sku: z.string().min(1, { message: "SKU is required." }),
-  quantity: z.number().min(0, { message: "Quantity must be at least 0." }),
-  cogs: z.number().min(0, { message: "COGS must be at least 0." }),
-  listingPrice: z
-    .number()
-    .min(0, { message: "Listing price must be at least 0." }),
-  categoryId: z.string().min(1, { message: "Category is required." }),
+    .optional()
+    .transform((val) => val || null),
+  listing_price: z.number().min(0),
+  default_cogs: z.number().min(0),
+  inventory_group_id: z.string().min(1),
 });
 
-export default function ItemDetailsSheetContent({
+type PurchaseBatch = {
+  id: string;
+  name: string;
+  quantity: number;
+  unit_cost: number;
+  created_at: string;
+};
+
+interface ItemDetailsSheetProps {
+  item: ItemViewWithPurchaseBatches | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export default function ItemDetailsSheet({
   item,
+  open,
+  onOpenChange,
+}: ItemDetailsSheetProps) {
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="right" className="w-1/4">
+        <ItemDetailsSheetContent item={item} onOpenChange={onOpenChange} />
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+function ItemDetailsSheetContent({
+  item,
+  onOpenChange,
 }: {
-  item: UserItem | null;
+  item: ItemViewWithPurchaseBatches | null;
+  onOpenChange?: (open: boolean) => void;
 }) {
-  const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [images, setImages] = useState<string[]>(item?.image_urls || []);
-  useEffect(() => {
-    setImages(item?.image_urls || []);
-  }, [item]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const {
-    data: categories,
-    isLoading: isCategoriesLoading,
-    error: categoriesError,
-  } = useQuery({
-    queryKey: ["user_inv_categories"],
-    queryFn: fetchCategories,
+  const supabase = createClient();
+  const { toast } = useToast();
+  const [selectedPurchase, setSelectedPurchase] =
+    React.useState<Purchase | null>(null);
+
+  const { data: categories } = useQuery({
+    queryKey: ["inventory_groups"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("user_inventory_groups")
+        .select("*");
+      if (error) throw error;
+      return data;
+    },
   });
+
+  const { mutate: updateItemMutation, isPending } = useMutation({
+    mutationFn: async (data: z.infer<typeof itemSchema>) => {
+      if (!item?.item_id) throw new Error("Item ID is required");
+      return updateItemDetails(supabase, item.item_id, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user_inv_items"] });
+      toast({ title: "Success", description: "Item updated!" });
+    },
+    onError: (error) => {
+      toast({ title: "Error", description: error.message });
+    },
+  });
+
+  const handleRestore = async () => {
+    try {
+      await updateItemDetails(supabase, item!.item_id!, {
+        name: item!.item_name!,
+        sku: item!.sku,
+        listing_price: item!.listing_price!,
+        default_cogs: item!.default_cogs!,
+        inventory_group_id: item!.inventory_group_id!,
+        is_archived: false,
+      });
+      await queryClient.invalidateQueries({ queryKey: ["user_inv_items"] });
+      toast({ title: "Success", description: "Item restored!" });
+      onOpenChange?.(false);
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message });
+    }
+  };
+
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors, isDirty },
     setValue,
+    watch,
   } = useForm({
     resolver: zodResolver(itemSchema),
-    defaultValues: {
-      name: item?.name || "",
-      sku: item?.sku || "",
-      quantity: item?.quantity || 0,
-      cogs: item?.cogs || 0,
-      listingPrice: item?.listing_price || 0,
-      categoryId: item?.category_id || "",
-    },
+    defaultValues: item
+      ? {
+          name: item.item_name || "",
+          sku: item.sku || "",
+          listing_price: item.listing_price || 0,
+          default_cogs: item.default_cogs || 0,
+          inventory_group_id:
+            categories?.find((cat) => cat.name === item.category)?.id || "",
+        }
+      : undefined,
   });
-  const onSubmit = useCallback(
-    async (data: any) => {
-      if (!item) return;
-      try {
-        await updateItem(item.id, {
-          name: data.name,
-          sku: data.sku,
-          quantity: data.quantity,
-          cogs: data.cogs,
-          listingPrice: data.listingPrice,
-          categoryId: data.categoryId,
-        });
-        queryClient.invalidateQueries({ queryKey: ["user_inventory_items"] });
-        toast({
-          title: "Success",
-          description: "Item updated successfully!",
-          variant: "default",
-        });
-      } catch (error) {
-        console.error("Error updating item:", error);
-        toast({
-          title: "Error",
-          description: "Failed to update item. Please try again.",
-          variant: "destructive",
-        });
+
+  const inventoryGroupId = watch("inventory_group_id");
+
+  useEffect(() => {
+    if (categories && item?.category) {
+      const categoryId = categories.find(
+        (cat) => cat.name === item.category,
+      )?.id;
+      if (categoryId && categoryId !== inventoryGroupId) {
+        setValue("inventory_group_id", categoryId);
       }
-    },
-    [item, queryClient, toast],
-  );
-  const handleImageUpload = useCallback(
-    async (files: File[]) => {
-      if (!item) return;
-      try {
-        const newImageUrls = await uploadImages(item.id, files);
-        setImages((prev) => [...prev, ...newImageUrls]);
-        toast({
-          title: "Success",
-          description: "Images uploaded successfully!",
-          variant: "default",
-        });
-        queryClient.invalidateQueries({ queryKey: ["user_inventory_items"] });
-        queryClient.invalidateQueries({ queryKey: ["user_inv_items"] });
-      } catch (error) {
-        console.error("Error uploading images:", error);
-        toast({
-          title: "Error",
-          description: "Failed to upload images. Please try again.",
-          variant: "destructive",
-        });
-      }
-    },
-    [item, queryClient, toast],
-  );
-  const handleDeleteImage = useCallback(
-    async (imageIndex: number) => {
-      if (!item) return;
-      const imageUrl = images[imageIndex];
-      if (!imageUrl) return;
-      try {
-        await deleteItemImage(item.id, imageUrl);
-        setImages((prev) => prev.filter((_, idx) => idx !== imageIndex));
-        toast({
-          title: "Success",
-          description: "Image deleted successfully!",
-          variant: "default",
-        });
-        queryClient.invalidateQueries({ queryKey: ["user_inventory_items"] });
-      } catch (error) {
-        console.error("Error deleting image:", error);
-        toast({
-          title: "Error",
-          description:
-            error instanceof Error
-              ? error.message
-              : "Failed to delete image. Please try again.",
-          variant: "destructive",
-        });
-      }
-    },
-    [item, images, queryClient, toast],
-  );
-  const handleFileInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const files = e.target.files;
-      if (files && files.length > 0) {
-        handleImageUpload(Array.from(files));
-      }
-    },
-    [handleImageUpload],
-  );
-  const openFileDialog = useCallback(() => {
-    fileInputRef.current?.click();
-  }, []);
-  const imageGrid = useMemo(
-    () => (
-      <div className="grid grid-cols-2 gap-2 p-4">
-        {images.map((image, index) => (
-          <div
-            key={index}
-            className="aspect-square overflow-hidden rounded-lg relative group"
-          >
-            <Image
-              src={image}
-              alt={`Item Image ${index + 1}`}
-              fill
-              className="object-cover"
-            />
-            <Button
-              size="icon"
-              className="absolute top-1 right-1 p-1 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-              onClick={() => handleDeleteImage(index)}
-            >
-              <Trash2 className="h-4 w-4 text-white" />
-            </Button>
-          </div>
-        ))}
-        <div
-          className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-gray-400"
-          onClick={openFileDialog}
-        >
-          <Plus className="h-6 w-6 text-gray-400" />
-        </div>
-      </div>
-    ),
-    [images, handleDeleteImage, openFileDialog],
-  );
-  if (!item) return <div className="p-4 text-center">Item not found</div>;
+    }
+  }, [categories, item?.category, setValue, inventoryGroupId]);
+
+  if (!item)
+    return (
+      <div className="p-4 text-center">Select an item to view details</div>
+    );
+
   return (
     <div className="flex flex-col h-full">
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        multiple
-        className="hidden"
-        onChange={handleFileInputChange}
-      />
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="flex-1 overflow-y-auto"
-      >
-        {imageGrid}
-        <SheetHeader className="p-4">
-          <SheetTitle className="flex items-center gap-2">
-            <Tag className="h-6 w-6" />
-            <div>
-              <div className="text-lg font-medium">{item.name}</div>
-              <div className="text-sm text-muted-foreground">
-                Created: {format(new Date(item.created_at), "MMM dd, yyyy")}
-              </div>
+      {item.is_archived && (
+        <div className="bg-muted/50 border-b p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">
+                This item is archived
+              </span>
             </div>
-          </SheetTitle>
-        </SheetHeader>
-        <div className="grid grid-cols-2 gap-4 p-4">
-          <div className="col-span-2">
-            <label className="block text-sm font-medium mb-1">Item Name</label>
-            <Input
-              {...register("name")}
-              placeholder="Item Name"
-              autoComplete="off"
-              className="w-full"
-            />
-            {errors.name && (
-              <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
-            )}
-          </div>
-          <div className="col-span-2">
-            <label className="block text-sm font-medium mb-1">SKU</label>
-            <Input
-              {...register("sku")}
-              placeholder="SKU"
-              autoComplete="off"
-              className="w-full"
-            />
-            {errors.sku && (
-              <p className="text-red-500 text-xs mt-1">{errors.sku.message}</p>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Quantity</label>
-            <Input
-              {...register("quantity", { valueAsNumber: true })}
-              type="number"
-              min="0"
-              className="w-full"
-            />
-            {errors.quantity && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.quantity.message}
-              </p>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              COGS (Cost)
-            </label>
-            <Input
-              {...register("cogs", { valueAsNumber: true })}
-              type="number"
-              step="0.01"
-              min="0"
-              className="w-full"
-            />
-            {errors.cogs && (
-              <p className="text-red-500 text-xs mt-1">{errors.cogs.message}</p>
-            )}
-          </div>
-          <div className="col-span-2">
-            <label className="block text-sm font-medium mb-1">
-              Listing Price
-            </label>
-            <Input
-              {...register("listingPrice", { valueAsNumber: true })}
-              type="number"
-              step="0.01"
-              min="0"
-              className="w-full"
-            />
-            {errors.listingPrice && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.listingPrice.message}
-              </p>
-            )}
-          </div>
-          <div className="col-span-2">
-            <label className="block text-sm font-medium mb-1">Category</label>
-            <Select
-              onValueChange={(value) => setValue("categoryId", value)}
-              defaultValue={item.category_id || ""}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select a category" />
-              </SelectTrigger>
-              <SelectContent>
-                {isCategoriesLoading ? (
-                  <SelectItem value="loading" disabled>
-                    Loading categories...
-                  </SelectItem>
-                ) : categoriesError ? (
-                  <SelectItem value="error" disabled>
-                    Failed to load categories.
-                  </SelectItem>
-                ) : (
-                  categories?.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
-            {errors.categoryId && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.categoryId.message}
-              </p>
-            )}
+            <Button variant="outline" size="sm" onClick={handleRestore}>
+              Restore Item
+            </Button>
           </div>
         </div>
-        <SheetFooter className="sticky bottom-0 bg-background border-t p-4">
-          <Button type="submit" disabled={isSubmitting} className="w-full">
-            {isSubmitting ? "Updating..." : "Update Item"}
-          </Button>
+      )}
+      <form
+        onSubmit={handleSubmit((data) => updateItemMutation(data))}
+        className="flex flex-col h-full"
+      >
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">
+              <Tag className="h-6 w-6" />
+              <div>
+                <div className="text-lg font-medium truncate max-w-[300px]">
+                  {item.item_name}
+                </div>
+              </div>
+            </SheetTitle>
+          </SheetHeader>
+
+          <div className="space-y-4">
+            <div>
+              <Label>Item Name</Label>
+              <Input {...register("name")} className="truncate" />
+              {errors.name && <FormError error={errors.name} />}
+            </div>
+
+            <div>
+              <Label>SKU (optional)</Label>
+              <Input {...register("sku")} className="truncate" />
+              {errors.sku && <FormError error={errors.sku} />}
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Listing Price</Label>
+                <Input
+                  {...register("listing_price", { valueAsNumber: true })}
+                  type="number"
+                  step="0.01"
+                />
+                {errors.listing_price && (
+                  <FormError error={errors.listing_price} />
+                )}
+              </div>
+
+              <div>
+                <Label>Default COGS</Label>
+                <Input
+                  {...register("default_cogs", { valueAsNumber: true })}
+                  type="number"
+                  step="0.01"
+                />
+                {errors.default_cogs && (
+                  <FormError error={errors.default_cogs} />
+                )}
+              </div>
+            </div>
+
+            <div>
+              <Label>Category</Label>
+              <Select
+                onValueChange={(value) => setValue("inventory_group_id", value)}
+                value={inventoryGroupId}
+              >
+                <SelectTrigger className="truncate">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories?.map((category) => (
+                    <SelectItem
+                      key={category.id}
+                      value={category.id}
+                      className="truncate"
+                    >
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.inventory_group_id && (
+                <FormError error={errors.inventory_group_id} />
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Total Stock</Label>
+                <Input
+                  value={item.total_quantity || 0}
+                  disabled
+                  type="number"
+                />
+              </div>
+
+              <div>
+                <Label>Total Sold</Label>
+                <Input value={item.total_sold || 0} disabled type="number" />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Truck />
+                <h3 className="text-lg font-semibold">Purchase History</h3>
+              </div>
+              <div className="grid gap-4 overflow-y-auto max-h-60">
+                {item.purchase_batches?.map((batch) => (
+                  <Card key={batch.id}>
+                    <CardHeader className="flex flex-row items-center justify-between px-4 py-3 space-y-0">
+                      <CardTitle className="text-base font-semibold truncate max-w-[70%]">
+                        {batch.name}
+                      </CardTitle>
+                    </CardHeader>
+
+                    <CardContent className="px-4 pt-0 pb-3">
+                      <div className="flex gap-4">
+                        <div className="flex items-center space-x-1">
+                          <DollarSign className="h-5 w-5 text-gray-500 flex-shrink-0" />
+                          <div>
+                            <p className="">${batch.unit_cost}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <Warehouse className="h-5 w-5 text-gray-500" />
+                          <div>
+                            <p>{batch.quantity}</p>
+                          </div>
+                        </div>
+                        <Badge
+                          variant="outline"
+                          className="px-2 py-1 text-xs text-center bg-blue-100 text-blue-600"
+                        >
+                          <time
+                            dateTime={batch.created_at}
+                            title={batch.created_at}
+                          >
+                            {format(new Date(batch.created_at), "MMM dd, yyyy")}
+                          </time>
+                        </Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <SheetFooter className="border-t bg-background p-4">
+          <div className="w-full">
+            {isDirty ? (
+              <Button type="submit" disabled={isPending} className="w-full">
+                {isPending ? "Saving..." : "Save Changes"}
+              </Button>
+            ) : (
+              <div className="flex items-center justify-center h-10">
+                <p className="text-sm text-muted-foreground">
+                  No changes to save
+                </p>
+              </div>
+            )}
+          </div>
         </SheetFooter>
       </form>
     </div>
   );
 }
+
+const FormError = ({ error }: { error: { message?: string } }) => (
+  <p className="text-red-500 text-xs mt-1">{error.message || ""}</p>
+);

@@ -7,10 +7,7 @@ import { Button } from "@synq/ui/button";
 import { Input } from "@synq/ui/input";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useToast } from "@synq/ui/use-toast";
-import {
-  createCustomItem,
-  fetchCategories,
-} from "@synq/supabase/queries/inventory";
+import { createCustomItem, fetchCategories } from "@synq/supabase/queries";
 import {
   Form,
   FormControl,
@@ -19,7 +16,15 @@ import {
   FormLabel,
   FormMessage,
 } from "@synq/ui/form";
-import { DialogClose, DialogFooter } from "@synq/ui/dialog";
+import {
+  DialogClose,
+  DialogFooter,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@synq/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -27,32 +32,34 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@synq/ui/select";
+import { getUserId } from "@synq/supabase/queries";
+import { createClient } from "@synq/supabase/client";
+import { Plus } from "lucide-react";
+import { useState } from "react";
 
 const QUERY_KEYS = {
-  INVENTORY_BATCHES: "user_inventory_batches",
   CATEGORIES: "user_categories",
   ITEMS: "user_inventory_items",
-};
+  ITEMS_VIEW: "vw_items_ui_table",
+  PURCHASES: "user_purchases",
+  PURCHASE_ITEMS: "user_purchase_items",
+} as const;
 
 const itemSchema = z.object({
-  customName: z
+  name: z
     .string()
     .min(2, { message: "Item name must be at least 2 characters." })
     .max(255, { message: "Item name cannot exceed 255 characters." }),
-  stockQuantity: z
+  default_cogs: z
     .string()
-    .regex(/^\d+$/, { message: "Stock quantity must be a valid number." })
-    .min(1, { message: "Stock quantity is required." }),
-  cogs: z
-    .string()
-    .regex(/^\d+(\.\d{1,2})?$/, { message: "Invalid COGS format." })
-    .min(1, { message: "COGS is required." }),
+    .regex(/^\d+(\.\d{1,2})?$/, { message: "Invalid default COGS format." })
+    .min(1, { message: "Default COGS is required." }),
   categoryId: z.string().min(1, { message: "Category is required." }),
   listingPrice: z
     .string()
     .regex(/^\d+(\.\d{1,2})?$/, { message: "Invalid listing price format." })
     .min(1, { message: "Listing price is required." }),
-  sku: z.string().optional(), // Making SKU optional
+  sku: z.string().optional(),
 });
 
 type ItemFormValues = z.infer<typeof itemSchema>;
@@ -60,51 +67,71 @@ type ItemFormValues = z.infer<typeof itemSchema>;
 export const CreateItemForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const supabase = createClient();
+  const [isCreateCategoryOpen, setIsCreateCategoryOpen] = useState(false);
+  const { data: userId } = useQuery({
+    queryKey: ["user_id"],
+    queryFn: getUserId,
+  });
+
   const form = useForm<ItemFormValues>({
     resolver: zodResolver(itemSchema),
     defaultValues: {
-      customName: "",
-      stockQuantity: "",
-      cogs: "",
+      name: "",
+      default_cogs: "0",
       categoryId: "",
-      listingPrice: "",
+      listingPrice: "0",
       sku: "",
     },
   });
 
   const { data: categories, isLoading: isCategoriesLoading } = useQuery({
     queryKey: [QUERY_KEYS.CATEGORIES],
-    queryFn: fetchCategories,
+    queryFn: () => fetchCategories(supabase),
   });
 
   const onSubmit = async (data: ItemFormValues) => {
-    try {
-      await createCustomItem(
-        data.categoryId,
-        data.customName,
-        data.sku,
-        parseFloat(data.cogs),
-        parseInt(data.stockQuantity, 10),
-        parseFloat(data.listingPrice),
-      );
-
-      // Invalidate relevant queries
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.INVENTORY_BATCHES],
+    if (!userId) {
+      toast({
+        title: "Error",
+        description: "User ID not found. Please try again.",
+        variant: "destructive",
       });
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CATEGORIES] });
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ITEMS] });
+      return;
+    }
+
+    try {
+      await createCustomItem(supabase, {
+        categoryId: data.categoryId,
+        name: data.name,
+        sku: data.sku,
+        cogs: parseFloat(data.default_cogs),
+        listingPrice: parseFloat(data.listingPrice),
+        userId,
+      });
+
+      await queryClient.invalidateQueries({
+        predicate: (query) => {
+          const queryKey = query.queryKey[0];
+          return [
+            QUERY_KEYS.ITEMS,
+            QUERY_KEYS.ITEMS_VIEW,
+            QUERY_KEYS.CATEGORIES,
+            QUERY_KEYS.PURCHASES,
+            QUERY_KEYS.PURCHASE_ITEMS,
+          ].includes(queryKey as (typeof QUERY_KEYS)[keyof typeof QUERY_KEYS]);
+        },
+      });
 
       form.reset();
 
-      // Show success toast
       toast({
         title: "Success",
-        description: "Item created successfully!",
+        description:
+          "Item created successfully! You can now add stock to this item.",
         variant: "default",
       });
 
-      // Trigger onSuccess callback if provided
       if (onSuccess) onSuccess();
     } catch (error) {
       console.error("Error creating item:", error);
@@ -121,7 +148,7 @@ export const CreateItemForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
-          name="customName"
+          name="name"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Item Name</FormLabel>
@@ -135,32 +162,13 @@ export const CreateItemForm = ({ onSuccess }: { onSuccess?: () => void }) => {
 
         <FormField
           control={form.control}
-          name="stockQuantity"
+          name="default_cogs"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Stock Quantity</FormLabel>
+              <FormLabel>Default Cost of Goods Sold (COGS)</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="Stock Quantity"
-                  {...field}
-                  type="number"
-                  min="1"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="cogs"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>COGS</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Cost of Goods Sold"
+                  placeholder="Default Cost of Goods Sold"
                   {...field}
                   type="number"
                   step="0.01"
@@ -198,26 +206,66 @@ export const CreateItemForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Category</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a category" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {isCategoriesLoading ? (
-                    <SelectItem value="loading" disabled>
-                      Loading categories...
-                    </SelectItem>
-                  ) : (
-                    categories?.map((category) => (
-                      <SelectItem key={category.id} value={category.id}>
-                        {category.name}
+              <div className="flex gap-2">
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {isCategoriesLoading ? (
+                      <SelectItem value="loading" disabled>
+                        Loading categories...
                       </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
+                    ) : (
+                      categories?.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+                <Dialog
+                  open={isCreateCategoryOpen}
+                  onOpenChange={setIsCreateCategoryOpen}
+                >
+                  <DialogTrigger asChild>
+                    <Button type="button" variant="outline" size="icon">
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Create New Category</DialogTitle>
+                    </DialogHeader>
+                    <CreateCategoryForm
+                      onSuccess={() => {
+                        setIsCreateCategoryOpen(false);
+                        queryClient.invalidateQueries({
+                          queryKey: [QUERY_KEYS.CATEGORIES],
+                          exact: true,
+                        });
+                      }}
+                    />
+                  </DialogContent>
+                </Dialog>
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="sku"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>SKU (Optional)</FormLabel>
+              <FormControl>
+                <Input placeholder="Stock Keeping Unit" {...field} />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
@@ -233,7 +281,100 @@ export const CreateItemForm = ({ onSuccess }: { onSuccess?: () => void }) => {
               Cancel
             </Button>
           </DialogClose>
-          <Button type="submit">Create Item</Button>
+          <Button type="submit" disabled={!userId}>
+            Create Item
+          </Button>
+        </DialogFooter>
+      </form>
+    </Form>
+  );
+};
+
+// Create Category Form Component
+const categorySchema = z.object({
+  name: z
+    .string()
+    .min(2, { message: "Category name must be at least 2 characters." }),
+});
+
+type CategoryFormValues = z.infer<typeof categorySchema>;
+
+const CreateCategoryForm = ({ onSuccess }: { onSuccess?: () => void }) => {
+  const { toast } = useToast();
+  const supabase = createClient();
+  const { data: userId } = useQuery({
+    queryKey: ["user_id"],
+    queryFn: getUserId,
+  });
+
+  const form = useForm<CategoryFormValues>({
+    resolver: zodResolver(categorySchema),
+    defaultValues: {
+      name: "",
+    },
+  });
+
+  const onSubmit = async (data: CategoryFormValues) => {
+    if (!userId) {
+      toast({
+        title: "Error",
+        description: "User ID not found. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase.from("user_inventory_groups").insert({
+        name: data.name,
+        user_id: userId,
+      });
+
+      if (error) throw error;
+
+      form.reset();
+      toast({
+        title: "Success",
+        description: "Category created successfully!",
+        variant: "default",
+      });
+
+      if (onSuccess) onSuccess();
+    } catch (error) {
+      console.error("Error creating category:", error);
+      toast({
+        title: "Error",
+        description: "Failed to create category. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Category Name</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter category name" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button type="button" variant="outline">
+              Cancel
+            </Button>
+          </DialogClose>
+          <Button type="submit" disabled={!userId}>
+            Create Category
+          </Button>
         </DialogFooter>
       </form>
     </Form>
