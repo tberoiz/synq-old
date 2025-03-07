@@ -5,11 +5,18 @@
   "scripts": {
     "clean": "rm -rf node_modules",
     "build": "tsc",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "generate-types": "tsx src/scripts/generate-types.ts",
+    "lint": "tsc --noEmit",
+    "test": "vitest"
   },
   "devDependencies": {
     "next": "15.0.3",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "tsx": "^4.7.0",
+    "vitest": "^1.0.0",
+    "@types/node": "^20.0.0",
+    "zod": "^3.22.0"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.1",
@@ -19,40 +26,36 @@
   },
   "exports": {
     "./client": {
-      "types": "./dist/utils/client.d.ts",
-      "default": "./dist/utils/client.js"
-    },
-    "./middleware": {
-      "types": "./dist/auth/middleware.d.ts",
-      "default": "./dist/auth/middleware.js"
+      "types": "./dist/lib/client/client.d.ts",
+      "default": "./dist/lib/client/client.js"
     },
     "./server": {
-      "types": "./dist/utils/server.d.ts",
-      "default": "./dist/utils/server.js"
+      "types": "./dist/lib/client/server.d.ts",
+      "default": "./dist/lib/client/server.js"
+    },
+    "./middleware": {
+      "types": "./dist/lib/client/middleware.d.ts",
+      "default": "./dist/lib/client/middleware.js"
     },
     "./types": {
-      "types": "./dist/types/index.d.ts",
-      "default": "./dist/types/index.js"
+      "types": "./dist/lib/types/index.d.ts",
+      "default": "./dist/lib/types/index.js"
     },
-    "./models/inventory": {
-      "types": "./dist/models/inventory.d.ts",
-      "default": "./dist/models/inventory.js"
+    "./schemas": {
+      "types": "./dist/lib/schemas/index.d.ts",
+      "default": "./dist/lib/schemas/index.js"
     },
-    "./models/sales": {
-      "types": "./dist/models/sales.d.ts",
-      "default": "./dist/models/sales.js"
+    "./queries": {
+      "types": "./dist/lib/queries/index.d.ts",
+      "default": "./dist/lib/queries/index.js"
     },
-    "./queries/user": {
-      "types": "./dist/queries/user.d.ts",
-      "default": "./dist/queries/user.js"
+    "./utils": {
+      "types": "./dist/lib/utils/index.d.ts",
+      "default": "./dist/lib/utils/index.js"
     },
-    "./queries/inventory": {
-      "types": "./dist/queries/inventory.d.ts",
-      "default": "./dist/queries/inventory.js"
-    },
-    "./queries/sales": {
-      "types": "./dist/queries/sales.d.ts",
-      "default": "./dist/queries/sales.js"
+    "./config": {
+      "types": "./dist/lib/config.d.ts",
+      "default": "./dist/lib/config.js"
     }
   }
 }

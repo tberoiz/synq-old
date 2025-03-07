@@ -5,7 +5,8 @@
     "noEmit": false,
     "baseUrl": "src",
     "outDir": "dist",
+    "rootDir": "src",
   },
-  "include": ["src"],
+  "include": ["src/lib", "src/scripts/generate-types.ts"],
   "exclude": ["node_modules", "dist"]
 }
