@@ -51,7 +51,7 @@ export default function ImportItemsTable({
       (item) =>
         item.name.toLowerCase().includes(query) ||
         (item.sku?.toLowerCase() || "").includes(query) ||
-        (item.category?.toLowerCase() || "").includes(query),
+        (item.category.name.toLowerCase() || "").includes(query),
     );
   }, [data, searchQuery]);
 
@@ -158,7 +158,7 @@ export default function ImportItemsTable({
                         <div className="font-medium">{item.name}</div>
                         <div className="sm:hidden text-sm text-muted-foreground">
                           <div>SKU: {item.sku || "N/A"}</div>
-                          <div>Category: {item.category || "N/A"}</div>
+                          <div>Category: {item.category.name || "N/A"}</div>
                           <div>
                             Price: ${item.listing_price?.toFixed(2) || "0.00"}
                           </div>
@@ -169,7 +169,7 @@ export default function ImportItemsTable({
                       {item.sku}
                     </TableCell>
                     <TableCell className="hidden sm:table-cell max-w-[120px] truncate">
-                      {item.category}
+                      {item.category.name}
                     </TableCell>
                     <TableCell className="hidden sm:table-cell">
                       ${item.listing_price?.toFixed(2) || "0.00"}

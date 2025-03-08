@@ -32,7 +32,7 @@ export const CreatePurchaseDialog = ({
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <Plus className="h-4 w-4 mr-2" />
-          New Purchase
+          New
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px]">

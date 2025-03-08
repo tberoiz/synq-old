@@ -1,10 +1,18 @@
 "use client";
 
-import { Package, DollarSign, Box, TrendingUp } from "lucide-react";
+import {
+  DollarSign,
+  Box,
+  TrendingUp,
+  ShoppingCart,
+  BarChart,
+  PieChart,
+  Archive,
+  RefreshCcw,
+} from "lucide-react";
 import {
   SheetHeader,
   SheetTitle,
-  SheetDescription,
   SheetFooter,
   SheetContent,
 } from "@synq/ui/sheet";
@@ -17,9 +25,10 @@ import {
   addItemToPurchase,
   updatePurchaseItem,
   deletePurchase,
+  archivePurchase,
+  restorePurchase,
   type InventoryItemWithDetails,
   type Purchase,
-  type PurchaseItem,
 } from "@synq/supabase/queries";
 import { ImportItemsDialog } from "@ui/dialogs/inventory/import-items-dialog";
 import { CreateItemDialog } from "@ui/dialogs/inventory/create-item-dialog";
@@ -29,7 +38,8 @@ import PurchaseItemsTable, {
 import { Button } from "@synq/ui/button";
 import React, { useState, useRef } from "react";
 import { cn } from "@synq/ui/utils";
-import { format } from "date-fns";
+import { Badge } from "@synq/ui/badge";
+import { Card, CardHeader, CardTitle, CardContent } from "@synq/ui/card";
 
 interface PurchaseDetailsSheetProps {
   purchase: Purchase | null;
@@ -66,24 +76,8 @@ export default function PurchaseDetailsSheet({
     queryFn: async () => {
       if (!purchase?.id) return null;
       const { data, error } = await supabase
-        .from("user_purchase_batches")
-        .select(
-          `
-          *,
-          items:user_purchase_items (
-            id,
-            quantity,
-            unit_cost,
-            remaining_quantity,
-            item:user_inventory_items (
-              id,
-              name,
-              sku,
-              is_archived
-            )
-          )
-        `,
-        )
+        .from("vw_purchases_ui_table")
+        .select("*")
         .eq("id", purchase.id)
         .single();
 
@@ -192,32 +186,60 @@ export default function PurchaseDetailsSheet({
     },
   });
 
+  const { mutate: archivePurchaseMutation } = useMutation({
+    mutationFn: async () => {
+      if (!purchase) throw new Error("Purchase is required");
+      return archivePurchase(supabase, purchase.id);
+    },
+    onSuccess: () => {
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["user_purchases"] }),
+        queryClient.invalidateQueries({ queryKey: ["purchase_details"] }),
+        queryClient.invalidateQueries({ queryKey: ["inventory_items"] }),
+        queryClient.invalidateQueries({ queryKey: ["items_view"] }),
+      ]);
+      toast({ title: "Success", description: "Purchase archived!" });
+      const closeButton = document.querySelector(
+        '[role="dialog"]',
+      ) as HTMLButtonElement;
+      closeButton?.click();
+    },
+    onError: (error) => {
+      toast({ title: "Error", description: error.message });
+    },
+  });
+
+  const { mutate: restorePurchaseMutation } = useMutation({
+    mutationFn: async () => {
+      if (!purchase) throw new Error("Purchase is required");
+      return restorePurchase(supabase, purchase.id);
+    },
+    onSuccess: () => {
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["user_purchases"] }),
+        queryClient.invalidateQueries({ queryKey: ["purchase_details"] }),
+        queryClient.invalidateQueries({ queryKey: ["inventory_items"] }),
+        queryClient.invalidateQueries({ queryKey: ["items_view"] }),
+      ]);
+      toast({ title: "Success", description: "Purchase restored!" });
+      const closeButton = document.querySelector(
+        '[role="dialog"]',
+      ) as HTMLButtonElement;
+      closeButton?.click();
+    },
+    onError: (error) => {
+      toast({ title: "Error", description: error.message });
+    },
+  });
+
   // Early return if no purchase
   if (!purchaseDetails) {
     return null;
   }
 
-  const totalQuantity = (purchaseDetails.items || []).reduce(
-    (sum: number, item: PurchaseItem) =>
-      !item.item.is_archived ? sum + item.quantity : sum,
-    0,
-  );
-  const totalCost = (purchaseDetails.items || []).reduce(
-    (sum: number, item: PurchaseItem) =>
-      !item.item.is_archived ? sum + item.quantity * item.unit_cost : sum,
-    0,
-  );
-  const totalRemaining = (purchaseDetails.items || []).reduce(
-    (sum: number, item: PurchaseItem) =>
-      !item.item.is_archived ? sum + (item.remaining_quantity || 0) : sum,
-    0,
-  );
-
-  const archivedItemsCount = (purchaseDetails.items || []).reduce(
-    (sum: number, item: PurchaseItem) =>
-      item.item.is_archived ? sum + 1 : sum,
-    0,
-  );
+  const archivedItemsCount = (purchaseDetails.items || []).filter(
+    (item: Purchase["items"][number]) => item.is_archived,
+  ).length;
 
   const handleImportItems = async (
     selectedItems: InventoryItemWithDetails[],
@@ -341,113 +363,219 @@ export default function PurchaseDetailsSheet({
   return (
     <SheetContent
       side={isMobile ? "bottom" : "right"}
-      className={cn(isMobile ? "h-1/2 overflow-y-scroll" : "w-1/2")}
+      className={cn("w-full sm:max-w-xl lg:max-w-2xl", isMobile && "h-[90vh]")}
     >
-      <div className="flex h-full flex-col">
-        <div className="flex-1 overflow-y-auto space-y-6 p-4">
-          <SheetHeader>
+      <div className="flex flex-col h-full">
+        {purchaseDetails.status === "archived" && (
+          <div className="bg-muted/50 border-b p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">
+                  This purchase is archived
+                </span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => restorePurchaseMutation()}
+              >
+                <RefreshCcw className="h-4 w-4 mr-2" />
+                Restore Purchase
+              </Button>
+            </div>
+          </div>
+        )}
+
+        <div className="flex-1 overflow-y-auto">
+          <SheetHeader className="px-6 pt-6">
             <SheetTitle className="flex items-center gap-2">
-              <Package className="h-6 w-6" />
+              <Box className="h-6 w-6" />
               <div>
-                <div className="text-lg font-medium">
+                <div className="text-lg font-medium truncate max-w-[300px]">
                   {purchaseDetails.name}
                 </div>
-                <SheetDescription className="text-sm text-muted-foreground">
-                  Created on{" "}
-                  {format(new Date(purchaseDetails.created_at), "MMM dd, yyyy")}
-                </SheetDescription>
+                <Badge
+                  variant="secondary"
+                  className={cn(
+                    purchaseDetails.status === "active" &&
+                      "bg-emerald-50 text-emerald-700 hover:bg-emerald-50 dark:bg-emerald-950/20 dark:text-emerald-300",
+                    purchaseDetails.status === "archived" &&
+                      "bg-slate-100 text-slate-700 hover:bg-slate-100 dark:bg-slate-950/20 dark:text-slate-300",
+                  )}
+                >
+                  {purchaseDetails.status}
+                </Badge>
               </div>
+              {purchaseDetails.status !== "archived" && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="ml-auto"
+                  onClick={() => archivePurchaseMutation()}
+                >
+                  <Archive className="h-4 w-4 mr-2" />
+                  Archive
+                </Button>
+              )}
             </SheetTitle>
           </SheetHeader>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 py-4">
-            <div className="p-4 border rounded-lg bg-blue-50">
-              <div className="flex items-center gap-2">
-                <Box className="h-5 w-5 text-blue-600" />
-                <p className="text-sm text-blue-600">Total Items</p>
-              </div>
-              <p className="text-lg font-semibold text-blue-900">
-                {totalQuantity}
-              </p>
+          <div className="p-6 space-y-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <Card>
+                <CardHeader className="p-4 pb-2">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <Box className="h-4 w-4 text-blue-600" />
+                    Total Items
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 pt-1">
+                  <div className="text-lg">
+                    {purchaseDetails.total_quantity}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="p-4 pb-2">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <DollarSign className="h-4 w-4 text-purple-600" />
+                    Total Cost
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 pt-1">
+                  <div className="text-lg">
+                    ${purchaseDetails.total_cost.toFixed(2)}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="p-4 pb-2">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4 text-green-600" />
+                    Remaining
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 pt-1">
+                  <div className="text-lg">
+                    {purchaseDetails.remaining_quantity}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="p-4 pb-2">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <ShoppingCart className="h-4 w-4 text-amber-600" />
+                    Sold
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 pt-1">
+                  <div className="text-lg">{purchaseDetails.sold_quantity}</div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="p-4 pb-2">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <BarChart className="h-4 w-4 text-indigo-600" />
+                    Sell Through
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 pt-1">
+                  <div className="text-lg">
+                    {purchaseDetails.sell_through_rate}%
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="p-4 pb-2">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <PieChart className="h-4 w-4 text-rose-600" />
+                    Margin
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 pt-1">
+                  <div className="text-lg">
+                    {purchaseDetails.profit_margin}%
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
-            <div className="p-4 border rounded-lg bg-purple-50">
-              <div className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5 text-purple-600" />
-                <p className="text-sm text-purple-600">Total Cost</p>
-              </div>
-              <p className="text-lg font-semibold text-purple-900">
-                ${totalCost.toFixed(2)}
-              </p>
-            </div>
-
-            <div className="p-4 border rounded-lg bg-green-50">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-green-600" />
-                <p className="text-sm text-green-600">Remaining Items</p>
-              </div>
-              <p className="text-lg font-semibold text-green-900">
-                {totalRemaining}
-              </p>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <h3 className="text-lg font-semibold">Purchase Items</h3>
-                {archivedItemsCount > 0 && (
-                  <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                    {archivedItemsCount} archived
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                <ImportItemsDialog
-                  items={inventoryItems || []}
-                  title="Add Items to Purchase"
-                  onImport={handleImportItems}
-                  loading={isItemsLoading}
-                />
-                <CreateItemDialog />
-              </div>
-            </div>
-            <div className="border rounded-md">
-              <div className="relative">
-                <div className="max-h-[300px] overflow-y-auto">
-                  <PurchaseItemsTable
-                    ref={tableRef}
-                    data={purchaseDetails.items}
-                    onRemoveItem={handleRemoveItem}
-                    onSaveBatch={handleSaveBatch}
-                    onDirtyChange={setIsTableDirty}
-                    showHeader={false}
-                  />
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-semibold">Purchase Items</h3>
+                  {archivedItemsCount > 0 && (
+                    <Badge variant="outline" className="text-xs">
+                      {archivedItemsCount} archived
+                    </Badge>
+                  )}
                 </div>
+                <div className="flex items-center gap-2">
+                  <ImportItemsDialog
+                    items={inventoryItems || []}
+                    title="Add Items to Purchase"
+                    onImport={handleImportItems}
+                    loading={isItemsLoading}
+                  />
+                  <CreateItemDialog />
+                </div>
+              </div>
+
+              <div className="border rounded-lg overflow-hidden">
+                <PurchaseItemsTable
+                  ref={tableRef}
+                  data={purchaseDetails.items}
+                  onRemoveItem={handleRemoveItem}
+                  onSaveBatch={handleSaveBatch}
+                  onDirtyChange={setIsTableDirty}
+                  showHeader={false}
+                />
               </div>
             </div>
           </div>
         </div>
 
-        <SheetFooter className="border-t bg-background p-4">
-          <div className="w-full">
-            {isTableDirty ? (
-              <Button
-                onClick={() => tableRef.current?.saveChanges()}
-                disabled={isSaving}
-                className="w-full"
-              >
-                {isSaving ? "Saving..." : "Save Changes"}
-              </Button>
-            ) : (
-              <div className="flex items-center justify-center h-10">
-                <p className="text-sm text-muted-foreground">
-                  No changes to save
-                </p>
-              </div>
-            )}
-          </div>
-        </SheetFooter>
+        {isTableDirty && (
+          <SheetFooter className="flex justify-end gap-2 p-6 border-t">
+            <Button
+              variant="outline"
+              onClick={() => {
+                queryClient.invalidateQueries({
+                  queryKey: ["purchase_details", purchaseDetails.id],
+                });
+                setIsTableDirty(false);
+              }}
+              disabled={isSaving}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={async () => {
+                if (tableRef.current) {
+                  const updates = tableRef.current.getUpdates();
+                  if (updates.length > 0) {
+                    await handleSaveBatch(updates);
+                  }
+                }
+              }}
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <div className="flex items-center gap-2">
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  <span>Saving...</span>
+                </div>
+              ) : (
+                "Save Changes"
+              )}
+            </Button>
+          </SheetFooter>
+        )}
       </div>
     </SheetContent>
   );

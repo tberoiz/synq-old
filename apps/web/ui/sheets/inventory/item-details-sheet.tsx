@@ -43,7 +43,7 @@ const itemSchema = z.object({
   sku: z
     .string()
     .optional()
-    .transform((val) => val || null),
+    .transform((val) => val || undefined),
   listing_price: z.number().min(0),
   default_cogs: z.number().min(0),
   inventory_group_id: z.string().min(1),

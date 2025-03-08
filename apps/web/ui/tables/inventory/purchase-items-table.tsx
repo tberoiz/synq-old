@@ -24,18 +24,21 @@ import {
   DropdownMenuTrigger,
 } from "@synq/ui/dropdown-menu";
 import { cn } from "@synq/ui/utils";
+import { Badge } from "@synq/ui/badge";
+import { type ItemViewWithPurchaseBatches } from "@synq/supabase/queries";
 
 type PurchaseItem = {
   id: string;
+  item_id: string;
+  name: string;
+  sku: string;
   quantity: number;
-  unit_cost: number;
   remaining_quantity: number;
-  item: {
-    id: string;
-    name: string;
-    sku: string;
-    is_archived: boolean;
-  };
+  unit_cost: number;
+  total_cost: number;
+  listing_price: number;
+  potential_revenue: number;
+  is_archived: boolean;
 };
 
 type PurchaseBatch = {
@@ -46,23 +49,11 @@ type PurchaseBatch = {
   created_at: string;
 };
 
-type ItemDetailsSheetItem = {
-  item_id: string | null;
-  item_name: string | null;
-  sku: string | null;
-  category: string | null;
-  listing_price: number | null;
-  default_cogs: number | null;
-  total_quantity: number | null;
-  total_sold: number | null;
-  user_id: string | null;
-  inventory_group_id: string | null;
-  is_archived: boolean | null;
-  purchase_batches: PurchaseBatch[];
-};
+type ItemDetailsSheetItem = ItemViewWithPurchaseBatches;
 
 export interface PurchaseItemsTableRef {
   saveChanges: () => Promise<void>;
+  getUpdates: () => { id: string; quantity: number; unit_cost: number }[];
 }
 
 const PurchaseItemsTable = forwardRef<
@@ -160,6 +151,12 @@ const PurchaseItemsTable = forwardRef<
 
     useImperativeHandle(ref, () => ({
       saveChanges: handleSaveChanges,
+      getUpdates: () =>
+        Object.entries(updates).map(([id, values]) => ({
+          id,
+          quantity: values.quantity || 0,
+          unit_cost: values.unit_cost || 0,
+        })),
     }));
 
     const hasChanges = Object.keys(updates).length > 0;
@@ -211,15 +208,15 @@ const PurchaseItemsTable = forwardRef<
     }
 
     return (
-      <div className="space-y-4">
-        <div className="border rounded-md">
+      <div className="flex flex-col h-full">
+        <div className="flex-1 overflow-y-auto">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Item</TableHead>
                 <TableHead>Quantity</TableHead>
                 <TableHead>Unit Cost</TableHead>
-                <TableHead className="w-[100px]">Actions</TableHead>
+                <TableHead className="w-[50px]"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -240,18 +237,18 @@ const PurchaseItemsTable = forwardRef<
                   return (
                     <TableRow
                       key={purchaseItem.id}
-                      className={cn(
-                        "bg-secondary/80",
-                        purchaseItem.item.is_archived && "opacity-50",
-                      )}
+                      className={cn(purchaseItem.is_archived && "opacity-50")}
                     >
-                      <TableCell className="max-w-[200px] truncate">
+                      <TableCell>
                         <div className="flex items-center gap-2">
-                          {purchaseItem.item.name}
-                          {purchaseItem.item.is_archived && (
-                            <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+                          <span className="truncate">{purchaseItem.name}</span>
+                          {purchaseItem.is_archived && (
+                            <Badge
+                              variant="secondary"
+                              className="text-xs bg-slate-100 text-slate-700 hover:bg-slate-100 dark:bg-slate-950/20 dark:text-slate-300"
+                            >
                               Archived
-                            </span>
+                            </Badge>
                           )}
                         </div>
                       </TableCell>
@@ -266,6 +263,7 @@ const PurchaseItemsTable = forwardRef<
                               e.target.value,
                             )
                           }
+                          className="w-24"
                         />
                       </TableCell>
                       <TableCell>
@@ -279,6 +277,7 @@ const PurchaseItemsTable = forwardRef<
                               e.target.value,
                             )
                           }
+                          className="w-24"
                         />
                       </TableCell>
                       <TableCell>
@@ -293,28 +292,21 @@ const PurchaseItemsTable = forwardRef<
                               variant="ghost"
                               size="icon"
                               className="h-8 w-8"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                              }}
                             >
                               <ChevronDown className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleOpenSheet(purchaseItem.item.id);
-                              }}
+                              onClick={() =>
+                                handleOpenSheet(purchaseItem.item_id)
+                              }
                             >
                               <SquarePen className="mr-2 h-4 w-4" />
                               View Details
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleRemoveItem(purchaseItem.id);
-                              }}
+                              onClick={() => handleRemoveItem(purchaseItem.id)}
                               className="text-destructive"
                             >
                               <Trash className="mr-2 h-4 w-4" />
@@ -328,7 +320,10 @@ const PurchaseItemsTable = forwardRef<
                 })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={4} className="h-24 text-center">
+                  <TableCell
+                    colSpan={4}
+                    className="h-24 text-center text-muted-foreground"
+                  >
                     No items found.
                   </TableCell>
                 </TableRow>
@@ -338,8 +333,8 @@ const PurchaseItemsTable = forwardRef<
         </div>
 
         {isItemLoading ? (
-          <div className="flex items-center justify-center h-full">
-            <Skeleton className="h-4 w-full" />
+          <div className="flex items-center justify-center p-4">
+            <Skeleton className="h-4 w-32" />
           </div>
         ) : selectedItem ? (
           <ItemDetailsSheet

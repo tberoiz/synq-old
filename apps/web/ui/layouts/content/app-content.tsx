@@ -4,8 +4,8 @@ export default function AppContent({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4 w-full">
-      <div className="flex flex-1 flex-col gap-4 z-10 w-full">{children}</div>
+    <div className="flex flex-1 flex-col overflow-auto">
+      <div className="flex flex-1 flex-col p-4">{children}</div>
     </div>
   );
 }

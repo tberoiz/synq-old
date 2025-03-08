@@ -13,7 +13,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ChevronDown, MoreVertical, Trash2 } from "lucide-react";
+import { ChevronDown, MoreVertical, Archive, RefreshCcw } from "lucide-react";
 
 import { Button } from "@synq/ui/button";
 import {
@@ -49,7 +49,13 @@ import { CreatePurchaseDialog } from "@ui/dialogs/inventory/create-purchase-dial
 import { type Purchase } from "@synq/supabase/queries";
 import { cn } from "@synq/ui/utils";
 import { Checkbox } from "@synq/ui/checkbox";
-import { deletePurchase, updatePurchaseItem } from "@synq/supabase/queries";
+import {
+  deletePurchase,
+  updatePurchaseItem,
+  archivePurchase,
+  restorePurchase,
+} from "@synq/supabase/queries";
+import { Badge } from "@synq/ui/badge";
 
 export const columns: ColumnDef<Purchase>[] = [
   {
@@ -74,23 +80,21 @@ export const columns: ColumnDef<Purchase>[] = [
   {
     accessorKey: "name",
     header: "Name",
-  },
-  {
-    accessorKey: "items",
-    header: "Items",
     cell: ({ row }) => {
-      const items = row.getValue("items") as Purchase["items"];
-      const archivedCount = items.filter(
-        (item) => item.item.is_archived,
-      ).length;
       return (
         <div className="flex items-center gap-2">
-          <span>{items.length}</span>
-          {archivedCount > 0 && (
-            <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-              {archivedCount} archived
-            </span>
-          )}
+          <span className="font-medium">{row.getValue("name")}</span>
+          <Badge
+            variant="secondary"
+            className={cn(
+              row.original.status === "active" &&
+                "bg-emerald-50 text-emerald-700 hover:bg-emerald-50 dark:bg-emerald-950/20 dark:text-emerald-300",
+              row.original.status === "archived" &&
+                "bg-slate-100 text-slate-700 hover:bg-slate-100 dark:bg-slate-950/20 dark:text-slate-300",
+            )}
+          >
+            {row.original.status}
+          </Badge>
         </div>
       );
     },
@@ -101,6 +105,65 @@ export const columns: ColumnDef<Purchase>[] = [
     cell: ({ row }) => {
       const date = new Date(row.getValue("created_at"));
       return date.toLocaleDateString();
+    },
+  },
+  {
+    id: "items",
+    header: "Items",
+    cell: ({ row }) => {
+      return (
+        <div className="flex items-center gap-1">
+          <span>{row.original.unique_items}</span>
+          <span className="text-muted-foreground">/</span>
+          <span>{row.original.total_quantity}</span>
+        </div>
+      );
+    },
+  },
+  {
+    id: "inventory",
+    header: "Inventory",
+    cell: ({ row }) => {
+      const sold = row.original.sold_quantity;
+      const total = row.original.total_quantity;
+      const remaining = row.original.remaining_quantity;
+      const sellThrough = row.original.sell_through_rate;
+
+      return (
+        <div className="flex flex-col">
+          <div className="flex items-center gap-1">
+            <span className="text-muted-foreground">Remaining:</span>
+            <span>{remaining}</span>
+          </div>
+          <div className="text-xs text-muted-foreground">
+            {sellThrough}% sell through
+          </div>
+        </div>
+      );
+    },
+  },
+  {
+    id: "financials",
+    header: "Financials",
+    cell: ({ row }) => {
+      const cost = row.original.total_cost;
+      const revenue = row.original.actual_revenue;
+      const profit = row.original.actual_profit;
+      const margin = row.original.profit_margin;
+
+      return (
+        <div className="flex flex-col">
+          <div className="flex items-center gap-2">
+            <span className="text-green-600">${profit.toFixed(2)}</span>
+            <span className="text-xs text-muted-foreground">
+              ({margin}% margin)
+            </span>
+          </div>
+          <div className="text-xs text-muted-foreground">
+            ${revenue.toFixed(2)} rev / ${cost.toFixed(2)} cost
+          </div>
+        </div>
+      );
     },
   },
 ];
@@ -119,8 +182,9 @@ export default function PurchasesDataTable({ data }: PurchasesDataTableProps) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [selectedPurchase, setSelectedPurchase] =
     React.useState<Purchase | null>(null);
-  const [purchaseToDelete, setPurchaseToDelete] =
+  const [purchaseToArchive, setPurchaseToArchive] =
     React.useState<Purchase | null>(null);
+  const [showArchived, setShowArchived] = React.useState(false);
   const [isMobile, setIsMobile] = React.useState(false);
 
   const queryClient = useQueryClient();
@@ -138,13 +202,28 @@ export default function PurchasesDataTable({ data }: PurchasesDataTableProps) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const { mutate: deletePurchasesMutation } = useMutation({
+  const { mutate: archivePurchasesMutation } = useMutation({
     mutationFn: async (ids: string[]) => {
-      await Promise.all(ids.map((id) => deletePurchase(supabase, id)));
+      await Promise.all(ids.map((id) => archivePurchase(supabase, id)));
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user_purchases"] });
-      toast({ title: "Success", description: "Purchases deleted!" });
+      toast({ title: "Success", description: "Purchases archived!" });
+      table.toggleAllPageRowsSelected(false);
+      setPurchaseToArchive(null);
+    },
+    onError: (error) => {
+      toast({ title: "Error", description: error.message });
+    },
+  });
+
+  const { mutate: restorePurchasesMutation } = useMutation({
+    mutationFn: async (ids: string[]) => {
+      await Promise.all(ids.map((id) => restorePurchase(supabase, id)));
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user_purchases"] });
+      toast({ title: "Success", description: "Purchases restored!" });
       table.toggleAllPageRowsSelected(false);
     },
     onError: (error) => {
@@ -152,8 +231,17 @@ export default function PurchasesDataTable({ data }: PurchasesDataTableProps) {
     },
   });
 
+  const filteredData = React.useMemo(() => {
+    return data.filter((purchase) => {
+      if (showArchived) {
+        return purchase.status === "archived";
+      }
+      return purchase.status !== "archived";
+    });
+  }, [data, showArchived]);
+
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -191,20 +279,40 @@ export default function PurchasesDataTable({ data }: PurchasesDataTableProps) {
             className="max-w-sm"
           />
           <div className="flex items-center gap-2 ml-auto">
+            <Button
+              variant="outline"
+              onClick={() => setShowArchived(!showArchived)}
+            >
+              {showArchived ? "Show Active" : "Show Archived"}
+            </Button>
             {hasSelectedRows && (
               <Button
-                variant="destructive"
+                variant="outline"
                 onClick={() => {
                   const selectedIds = selectedRows.map(
                     (row) => row.original.id,
                   );
-                  setPurchaseToDelete({ id: selectedIds[0] } as Purchase);
+                  const firstSelected = selectedRows[0]?.original;
+                  if (firstSelected && firstSelected.status === "archived") {
+                    restorePurchasesMutation(selectedIds);
+                  } else {
+                    setPurchaseToArchive({ id: selectedIds[0] } as Purchase);
+                  }
                 }}
               >
-                Delete Selected ({selectedRows.length})
+                {selectedRows[0]?.original.status === "archived" ? (
+                  <>
+                    <RefreshCcw className="mr-2 h-4 w-4" />
+                    Restore Selected ({selectedRows.length})
+                  </>
+                ) : (
+                  <>
+                    <Archive className="mr-2 h-4 w-4" />
+                    Archive Selected ({selectedRows.length})
+                  </>
+                )}
               </Button>
             )}
-            <CreatePurchaseDialog onSuccess={handlePurchaseCreated} />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="ml-auto">
@@ -277,21 +385,32 @@ export default function PurchasesDataTable({ data }: PurchasesDataTableProps) {
                           asChild
                           onClick={(e) => e.stopPropagation()}
                         >
-                          <Button variant="ghost" className="h-8 w-8 p-0">
+                          <Button variant="ghost" size="icon">
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            className="text-destructive focus:text-destructive"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setPurchaseToDelete(row.original);
-                            }}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
+                          {row.original.status === "archived" ? (
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                restorePurchasesMutation([row.original.id]);
+                              }}
+                            >
+                              <RefreshCcw className="mr-2 h-4 w-4" />
+                              Restore
+                            </DropdownMenuItem>
+                          ) : (
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setPurchaseToArchive(row.original);
+                              }}
+                            >
+                              <Archive className="mr-2 h-4 w-4" />
+                              Archive
+                            </DropdownMenuItem>
+                          )}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -369,36 +488,40 @@ export default function PurchasesDataTable({ data }: PurchasesDataTableProps) {
       </Sheet>
 
       <Dialog
-        open={!!purchaseToDelete}
-        onOpenChange={(open) => !open && setPurchaseToDelete(null)}
+        open={!!purchaseToArchive}
+        onOpenChange={(open) => !open && setPurchaseToArchive(null)}
       >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              Delete Purchase{hasSelectedRows ? "s" : ""}
+              Archive Purchase{hasSelectedRows ? "s" : ""}
             </DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete{" "}
-              {hasSelectedRows ? "these purchases" : "this purchase"}? This
-              action cannot be undone.
+              Are you sure you want to archive{" "}
+              {hasSelectedRows ? "these purchases" : "this purchase"}? Archived
+              purchases will no longer appear in the active list.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setPurchaseToDelete(null)}>
+            <Button
+              variant="outline"
+              onClick={() => setPurchaseToArchive(null)}
+            >
               Cancel
             </Button>
             <Button
-              variant="destructive"
+              variant="default"
               onClick={() => {
-                if (purchaseToDelete) {
+                if (purchaseToArchive) {
                   const ids = hasSelectedRows
                     ? selectedRows.map((row) => row.original.id)
-                    : [purchaseToDelete.id];
-                  deletePurchasesMutation(ids);
+                    : [purchaseToArchive.id];
+                  archivePurchasesMutation(ids);
+                  setPurchaseToArchive(null);
                 }
               }}
             >
-              Delete
+              Archive
             </Button>
           </DialogFooter>
         </DialogContent>
