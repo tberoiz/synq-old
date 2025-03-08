@@ -201,6 +201,10 @@
       "types": "./dist/components/toast.d.ts",
       "default": "./dist/components/toast.js"
     },
+    "./textarea": {
+      "types": "./dist/components/textarea.d.ts",
+      "default": "./dist/components/textarea.js"
+    },
     "./toaster": {
       "types": "./dist/providers/toaster.d.ts",
       "default": "./dist/providers/toaster.js"
