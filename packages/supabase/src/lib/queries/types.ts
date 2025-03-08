@@ -1,37 +1,101 @@
-import { Database } from "@synq/supabase/types";
+export interface InventoryGroup {
+  id: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+}
 
-// Base types from database
-export type InventoryItem =
-  Database["public"]["Tables"]["user_inventory_items"]["Row"];
-export type InventoryGroup =
-  Database["public"]["Tables"]["user_inventory_groups"]["Row"];
-export type PurchaseBatch =
-  Database["public"]["Tables"]["user_purchase_batches"]["Row"];
-export type ItemView = Database["public"]["Views"]["vw_items_ui_table"]["Row"];
+export interface InventoryItem {
+  id: string;
+  name: string;
+  description?: string;
+  category_id: string;
+  unit_cost: number;
+  quantity: number;
+  created_at: string;
+  updated_at: string;
+  is_archived: boolean;
+}
 
-// Extended types
 export interface InventoryItemWithDetails extends InventoryItem {
-  category?: string;
+  category: InventoryGroup;
+  default_cogs: number;
+  sku?: string;
+  listing_price?: number;
 }
 
 export interface Purchase {
   id: string;
-  name: string;
-  created_at: string;
-  items: PurchaseItem[];
-}
-
-export interface PurchaseItem {
-  id: string;
+  user_id: string;
+  batch_id: string;
+  item_id: string;
   quantity: number;
   unit_cost: number;
+  created_at: string;
+  updated_at: string;
+  is_archived: boolean;
+  status: "active" | "archived";
+  name: string;
+  // Inventory metrics
+  unique_items: number;
+  total_quantity: number;
+  sold_quantity: number;
   remaining_quantity: number;
-  item: {
+  sell_through_rate: number;
+  // Financial metrics
+  total_cost: number;
+  actual_revenue: number;
+  actual_profit: number;
+  profit_margin: number;
+  // Purchase items
+  items: Array<{
     id: string;
-    name: string;
-    sku: string;
     is_archived: boolean;
-  };
+  }>;
+}
+
+export interface PurchaseBatch {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  is_archived: boolean;
+}
+
+export interface CreateItemParams {
+  userId: string;
+  categoryId: string;
+  name: string;
+  description?: string;
+  sku?: string;
+  cogs: number;
+  listingPrice: number;
+}
+
+export interface CreatePurchaseParams {
+  name: string;
+  userId: string;
+  items: Array<{
+    item_id: string;
+    quantity: number;
+    unit_cost: number;
+  }>;
+}
+
+export interface ItemView extends InventoryItem {
+  inventory_group_id: string;
+  default_cogs: number;
+  listing_price: number;
+  sku: string;
+  item_id?: string;
+  item_name?: string;
+}
+
+export interface TransformedPurchaseBatch {
+  id: string;
+  name: string;
+  quantity: number;
+  unit_cost: number;
+  created_at: string;
 }
 
 export interface PurchaseBatchWithNested {
@@ -51,52 +115,20 @@ export interface PaginatedResponse<T> {
 }
 
 export interface ItemUpdateParams {
-  name: string;
-  sku?: string | null;
-  default_cogs: number;
-  listing_price: number;
-  inventory_group_id: string;
+  name?: string;
+  description?: string;
+  inventory_group_id?: string;
+  sku?: string;
+  default_cogs?: number;
+  listing_price?: number;
   is_archived?: boolean;
 }
 
-export interface CreateItemParams {
-  categoryId: string;
-  name: string;
-  sku: string | undefined;
-  cogs: number;
-  listingPrice: number;
-  userId: string;
-}
-
-export interface CreatePurchaseParams {
-  name: string;
-  userId: string;
-  items: {
-    item_id: string;
-    quantity: number;
-    unit_cost: number;
-  }[];
-}
-
-export interface TransformedPurchaseBatch {
-  id: string;
-  name: string;
-  quantity: number;
-  unit_cost: number;
-  created_at: string;
-}
-
-export interface ItemViewWithPurchaseBatches {
-  item_id: string | null;
-  item_name: string | null;
-  sku: string | null;
-  category: string | null;
-  listing_price: number | null;
-  default_cogs: number | null;
-  total_quantity: number | null;
-  total_sold: number | null;
-  user_id: string | null;
-  inventory_group_id: string | null;
-  is_archived: boolean | null;
+export interface ItemViewWithPurchaseBatches extends ItemView {
   purchase_batches: TransformedPurchaseBatch[];
+  item_id: string;
+  item_name: string;
+  category: string;
+  total_quantity: number;
+  total_sold: number;
 }

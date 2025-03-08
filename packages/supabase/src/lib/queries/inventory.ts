@@ -91,24 +91,8 @@ export async function fetchPurchases(
   userId: string,
 ): Promise<Purchase[]> {
   const { data, error } = await supabase
-    .from("user_purchase_batches")
-    .select(
-      `
-      *,
-      items:user_purchase_items (
-        id,
-        quantity,
-        unit_cost,
-        remaining_quantity,
-        item:user_inventory_items (
-          id,
-          name,
-          sku,
-          is_archived
-        )
-      )
-    `,
-    )
+    .from("vw_purchases_ui_table")
+    .select("*")
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
 
@@ -136,14 +120,16 @@ export async function createPurchase(
   const { error: itemsError } = await supabase
     .from("user_purchase_items")
     .insert(
-      params.items.map((item) => ({
-        batch_id: batch.id,
-        item_id: item.item_id,
-        quantity: item.quantity,
-        remaining_quantity: item.quantity,
-        unit_cost: item.unit_cost,
-        user_id: params.userId,
-      })),
+      params.items.map(
+        (item: { item_id: string; quantity: number; unit_cost: number }) => ({
+          batch_id: batch.id,
+          item_id: item.item_id,
+          quantity: item.quantity,
+          remaining_quantity: item.quantity,
+          unit_cost: item.unit_cost,
+          user_id: params.userId,
+        }),
+      ),
     );
 
   if (itemsError) handleSupabaseError(itemsError, "Purchase items creation");
@@ -209,4 +195,28 @@ export async function deletePurchase(
     .eq("id", purchaseId);
 
   if (batchError) handleSupabaseError(batchError, "Delete purchase batch");
+}
+
+export async function archivePurchase(
+  supabase: SupabaseClient,
+  purchaseId: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from("user_purchase_batches")
+    .update({ status: "archived" })
+    .eq("id", purchaseId);
+
+  if (error) handleSupabaseError(error, "Purchase archive");
+}
+
+export async function restorePurchase(
+  supabase: SupabaseClient,
+  purchaseId: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from("user_purchase_batches")
+    .update({ status: "active" })
+    .eq("id", purchaseId);
+
+  if (error) handleSupabaseError(error, "Purchase restore");
 }

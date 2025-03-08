@@ -144,6 +144,13 @@ export type Database = {
             referencedColumns: ["id"];
           },
           {
+            foreignKeyName: "user_purchase_items_batch_id_fkey";
+            columns: ["batch_id"];
+            isOneToOne: false;
+            referencedRelation: "vw_purchases_ui_table";
+            referencedColumns: ["id"];
+          },
+          {
             foreignKeyName: "user_purchase_items_item_id_fkey";
             columns: ["item_id"];
             isOneToOne: false;
@@ -159,11 +166,12 @@ export type Database = {
           },
         ];
       };
-      user_sales: {
+      user_sale_items: {
         Row: {
           created_at: string | null;
           id: string;
           purchase_item_id: string;
+          sale_id: string;
           sale_price: number;
           sold_quantity: number;
           user_id: string;
@@ -172,6 +180,7 @@ export type Database = {
           created_at?: string | null;
           id?: string;
           purchase_item_id: string;
+          sale_id: string;
           sale_price: number;
           sold_quantity: number;
           user_id: string;
@@ -180,25 +189,85 @@ export type Database = {
           created_at?: string | null;
           id?: string;
           purchase_item_id?: string;
+          sale_id?: string;
           sale_price?: number;
           sold_quantity?: number;
           user_id?: string;
         };
         Relationships: [
           {
-            foreignKeyName: "user_sales_purchase_item_id_fkey";
+            foreignKeyName: "user_sale_items_purchase_item_id_fkey";
             columns: ["purchase_item_id"];
             isOneToOne: false;
             referencedRelation: "user_purchase_items";
             referencedColumns: ["id"];
           },
+          {
+            foreignKeyName: "user_sale_items_sale_id_fkey";
+            columns: ["sale_id"];
+            isOneToOne: false;
+            referencedRelation: "user_sales";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "user_sale_items_sale_id_fkey";
+            columns: ["sale_id"];
+            isOneToOne: false;
+            referencedRelation: "vw_sales_ui_table";
+            referencedColumns: ["id"];
+          },
         ];
+      };
+      user_sales: {
+        Row: {
+          created_at: string | null;
+          id: string;
+          notes: string | null;
+          platform: Database["public"]["Enums"]["sale_platform"];
+          platform_fees: number;
+          sale_date: string | null;
+          shipping_cost: number;
+          status: Database["public"]["Enums"]["sale_status"];
+          tax_amount: number;
+          updated_at: string | null;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string | null;
+          id?: string;
+          notes?: string | null;
+          platform: Database["public"]["Enums"]["sale_platform"];
+          platform_fees?: number;
+          sale_date?: string | null;
+          shipping_cost?: number;
+          status?: Database["public"]["Enums"]["sale_status"];
+          tax_amount?: number;
+          updated_at?: string | null;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string | null;
+          id?: string;
+          notes?: string | null;
+          platform?: Database["public"]["Enums"]["sale_platform"];
+          platform_fees?: number;
+          sale_date?: string | null;
+          shipping_cost?: number;
+          status?: Database["public"]["Enums"]["sale_status"];
+          tax_amount?: number;
+          updated_at?: string | null;
+          user_id?: string;
+        };
+        Relationships: [];
       };
     };
     Views: {
       vw_items_ui_table: {
         Row: {
           category: string | null;
+          default_cogs: number | null;
+          inventory_group_id: string | null;
+          is_archived: boolean | null;
           item_id: string | null;
           item_name: string | null;
           listing_price: number | null;
@@ -208,6 +277,58 @@ export type Database = {
           total_sold: number | null;
           user_id: string | null;
         };
+        Relationships: [
+          {
+            foreignKeyName: "user_inventory_items_inventory_group_id_fkey";
+            columns: ["inventory_group_id"];
+            isOneToOne: false;
+            referencedRelation: "user_inventory_groups";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      vw_purchases_ui_table: {
+        Row: {
+          actual_profit: number | null;
+          actual_revenue: number | null;
+          created_at: string | null;
+          id: string | null;
+          items: Json | null;
+          name: string | null;
+          potential_revenue: number | null;
+          profit_margin: number | null;
+          remaining_quantity: number | null;
+          sell_through_rate: number | null;
+          sold_quantity: number | null;
+          status: string | null;
+          total_cost: number | null;
+          total_quantity: number | null;
+          unique_items: number | null;
+          updated_at: string | null;
+          user_id: string | null;
+        };
+        Relationships: [];
+      };
+      vw_sales_ui_table: {
+        Row: {
+          created_at: string | null;
+          id: string | null;
+          items: Json | null;
+          net_profit: number | null;
+          notes: string | null;
+          platform: Database["public"]["Enums"]["sale_platform"] | null;
+          platform_fees: number | null;
+          sale_date: string | null;
+          shipping_cost: number | null;
+          status: Database["public"]["Enums"]["sale_status"] | null;
+          tax_amount: number | null;
+          total_cogs: number | null;
+          total_items: number | null;
+          total_quantity: number | null;
+          total_revenue: number | null;
+          updated_at: string | null;
+          user_id: string | null;
+        };
         Relationships: [];
       };
     };
@@ -215,7 +336,8 @@ export type Database = {
       [_ in never]: never;
     };
     Enums: {
-      [_ in never]: never;
+      sale_platform: "ebay" | "amazon" | "etsy" | "shopify" | "other";
+      sale_status: "listed" | "completed" | "cancelled";
     };
     CompositeTypes: {
       [_ in never]: never;

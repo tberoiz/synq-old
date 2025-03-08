@@ -1,4 +1,5 @@
-import { createClient } from "../client/client";
+"use server";
+import { createClient } from "../client/server";
 
 // Error handling utility
 function handleSupabaseError(error: any, operation: string): never {
@@ -6,7 +7,7 @@ function handleSupabaseError(error: any, operation: string): never {
 }
 
 export async function getUserId(): Promise<string> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: userData, error: userError } = await supabase.auth.getUser();
 
   if (userError) handleSupabaseError(userError, "Get user");

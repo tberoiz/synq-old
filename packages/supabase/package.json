@@ -41,10 +41,6 @@
       "types": "./dist/lib/types/index.d.ts",
       "default": "./dist/lib/types/index.js"
     },
-    "./schemas": {
-      "types": "./dist/lib/schemas/index.d.ts",
-      "default": "./dist/lib/schemas/index.js"
-    },
     "./queries": {
       "types": "./dist/lib/queries/index.d.ts",
       "default": "./dist/lib/queries/index.js"
