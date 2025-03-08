@@ -3,6 +3,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@synq/ui/tabs";
 import { AccountForm } from "@ui/forms/settings/account-form";
 import { NotificationsForm } from "@ui/forms/settings/notifications-form";
 import { User, Bell } from "lucide-react";
+import { PageContainer } from "@ui/layouts/page-container";
+import { PageHeader } from "@ui/layouts/page-header";
 
 export const metadata: Metadata = {
   title: "Settings",
@@ -28,7 +30,8 @@ const tabsNavItems = [
 
 export default function SettingsPage() {
   return (
-    <>
+    <PageContainer>
+      <PageHeader title="Settings" />
       <Tabs defaultValue={tabsNavItems[0]?.key || "default"}>
         <TabsList className="w-full justify-start rounded-t-lg border-b bg-transparent p-0">
           {tabsNavItems.map((tab) => (
@@ -48,6 +51,6 @@ export default function SettingsPage() {
           </TabsContent>
         ))}
       </Tabs>
-    </>
+    </PageContainer>
   );
 }
