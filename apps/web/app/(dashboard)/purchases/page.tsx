@@ -6,12 +6,12 @@ import { Skeleton } from "@synq/ui/skeleton";
 import { createClient } from "@synq/supabase/client";
 import { fetchPurchases } from "@synq/supabase/queries";
 import { getUserId } from "@synq/supabase/queries";
-import { CreatePurchaseDialog } from "@ui/dialogs/inventory/create-purchase-dialog";
-import { PageContainer } from "@ui/layouts/page-container";
-import { PageHeader } from "@ui/layouts/page-header";
+import { CreatePurchaseDialog } from "@/ui/features/inventory/components/dialogs/create-purchase-dialog";
+import { PageContainer } from "@/ui/layouts/server/page-container";
+import { PageHeader } from "@/ui/layouts/server/page-header";
 
 const PurchasesDataTable = lazy(
-  () => import("@ui/data-tables/inventory/purchases-data-table"),
+  () => import("@/ui/primitives/data-table/inventory/purchases-data-table"),
 );
 
 export default function PurchasesPage() {

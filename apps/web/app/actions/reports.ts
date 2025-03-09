@@ -5,7 +5,7 @@ import { z } from "zod";
 import { createClient } from "@synq/supabase/server";
 import { getUserId } from "@synq/supabase/queries";
 import type { ActionResponse, PDFReportData } from "@synq/supabase/types";
-import { generatePLPDF } from "@ui/reports/PLGenerator";
+import { generatePLPDF } from "@ui/features/reports/components/PLGenerator";
 
 const action = createSafeActionClient();
 

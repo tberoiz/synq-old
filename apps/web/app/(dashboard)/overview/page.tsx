@@ -1,8 +1,8 @@
 import { Dialog, DialogTrigger } from "@synq/ui/dialog";
 import { Package, ShoppingCart, Receipt } from "lucide-react";
 import { startOfMonth, endOfMonth } from "date-fns";
-import { GenerateReportButton } from "@ui/reports/GenerateReportButton";
 import { cn } from "@synq/ui/utils";
+import { GenerateReportButton } from "@ui/features/reports/components/GenerateReportButton";
 
 export default function OverviewPage() {
   const startDate = startOfMonth(new Date());

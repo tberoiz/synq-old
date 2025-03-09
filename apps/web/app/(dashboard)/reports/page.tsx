@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { Input } from "@synq/ui/input";
-import { PageContainer } from "@ui/layouts/page-container";
-import { PageHeader } from "@ui/layouts/page-header";
-import { DownloadPLReportButton } from "@ui/reports/DownloadPLReportButton";
+import { PageContainer } from "@/ui/layouts/server/page-container";
+import { PageHeader } from "@/ui/layouts/server/page-header";
 import { startOfMonth, endOfMonth, format } from "date-fns";
+import { DownloadPLReportButton } from "@ui/features/reports/components/DownloadPLReportButton";
 
 export default function PnLReportsPage() {
   const [startDate, setStartDate] = useState<Date>(startOfMonth(new Date()));

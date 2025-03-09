@@ -6,12 +6,12 @@ import { Skeleton } from "@synq/ui/skeleton";
 import { createClient } from "@synq/supabase/client";
 import { fetchItemsView } from "@synq/supabase/queries";
 import { getUserId } from "@synq/supabase/queries";
-import { CreateItemDialog } from "@ui/dialogs/inventory/create-item-dialog";
-import { PageContainer } from "@ui/layouts/page-container";
-import { PageHeader } from "@ui/layouts/page-header";
+import { CreateItemDialog } from "@/ui/features/inventory/components/dialogs/create-item-dialog";
+import { PageContainer } from "@/ui/layouts/server/page-container";
+import { PageHeader } from "@/ui/layouts/server/page-header";
 
 const ItemsDataTable = lazy(
-  () => import("@ui/data-tables/inventory/items-data-table"),
+  () => import("@/ui/primitives/data-table/inventory/items-data-table"),
 );
 
 export default function InventoryPage() {
