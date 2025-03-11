@@ -3,7 +3,7 @@ BEGIN;
 -- Items view for UI
 CREATE OR REPLACE VIEW vw_items_ui_table AS
 WITH completed_sales AS (
-  SELECT 
+  SELECT
     pi.item_id,
     COALESCE(SUM(si.sold_quantity), 0) as total_sold
   FROM user_sale_items si
@@ -88,7 +88,7 @@ LEFT JOIN sale_totals st ON s.id = st.sale_id;
 -- Purchases view for UI
 CREATE OR REPLACE VIEW vw_purchases_ui_table AS
 WITH purchase_stats AS (
-    SELECT 
+    SELECT
         pi.batch_id,
         COUNT(DISTINCT pi.item_id) as unique_items,
         SUM(pi.quantity) as total_quantity,

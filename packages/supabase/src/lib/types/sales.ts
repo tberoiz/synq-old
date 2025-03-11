@@ -61,6 +61,7 @@ export interface SaleItem {
   unit_cost: number;
   total_cost: number;
   profit: number;
+  is_archived: boolean;
 }
 
 export type SaleView = Database["public"]["Views"]["vw_sales_ui_table"]["Row"];

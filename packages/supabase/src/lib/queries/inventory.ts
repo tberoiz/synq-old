@@ -6,7 +6,7 @@ import {
   PurchaseBatch,
   CreateItemParams,
   CreatePurchaseParams,
-} from "./types";
+} from "../types/inventory";
 
 // Error handling utility
 function handleSupabaseError(error: any, operation: string): never {
@@ -100,6 +100,20 @@ export async function fetchPurchases(
   return data;
 }
 
+export async function fetchPurchaseDetails(
+  supabase: SupabaseClient,
+  purchaseId: string,
+): Promise<Purchase> {
+  const { data, error } = await supabase
+    .from("vw_purchases_ui_table")
+    .select("*")
+    .eq("id", purchaseId)
+    .single();
+
+  if (error) handleSupabaseError(error, "Purchase details fetch");
+  return data;
+}
+
 export async function createPurchase(
   supabase: SupabaseClient,
   params: CreatePurchaseParams,
@@ -176,27 +190,6 @@ export async function updatePurchaseItem(
   if (error) handleSupabaseError(error, "Update purchase item");
 }
 
-export async function deletePurchase(
-  supabase: SupabaseClient,
-  purchaseId: string,
-): Promise<void> {
-  // Delete purchase items first
-  const { error: itemsError } = await supabase
-    .from("user_purchase_items")
-    .delete()
-    .eq("batch_id", purchaseId);
-
-  if (itemsError) handleSupabaseError(itemsError, "Delete purchase items");
-
-  // Then delete the purchase batch
-  const { error: batchError } = await supabase
-    .from("user_purchase_batches")
-    .delete()
-    .eq("id", purchaseId);
-
-  if (batchError) handleSupabaseError(batchError, "Delete purchase batch");
-}
-
 export async function archivePurchase(
   supabase: SupabaseClient,
   purchaseId: string,
@@ -219,4 +212,28 @@ export async function restorePurchase(
     .eq("id", purchaseId);
 
   if (error) handleSupabaseError(error, "Purchase restore");
+}
+
+export async function archiveItem(
+  supabase: SupabaseClient,
+  itemId: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from("user_inventory_items")
+    .update({ is_archived: true })
+    .eq("id", itemId);
+
+  if (error) handleSupabaseError(error, "Item archive");
+}
+
+export async function restoreItem(
+  supabase: SupabaseClient,
+  itemId: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from("user_inventory_items")
+    .update({ is_archived: false })
+    .eq("id", itemId);
+
+  if (error) handleSupabaseError(error, "Item restore");
 }

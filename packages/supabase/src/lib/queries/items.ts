@@ -1,12 +1,13 @@
 import { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "../types/database.types";
 import {
   ItemView,
   TransformedPurchaseBatch,
-  PurchaseBatchWithNested,
+  BatchWithDetails,
   PaginatedResponse,
   ItemUpdateParams,
   ItemViewWithPurchaseBatches,
-} from "./types";
+} from "../types/inventory";
 
 // Error handling utility
 function handleSupabaseError(error: any, operation: string): never {
@@ -29,17 +30,21 @@ const ITEMS_VIEW_SELECT = `
   )
 `;
 
+type PurchaseItemWithBatch = Database["public"]["Tables"]["user_purchase_items"]["Row"] & {
+  batch: Database["public"]["Tables"]["user_purchase_batches"]["Row"];
+};
+
 // Transform nested purchase batch data
 function transformPurchaseBatches(
-  batches: PurchaseBatchWithNested[],
+  batches: PurchaseItemWithBatch[],
 ): TransformedPurchaseBatch[] {
   return (
     batches?.map((batch) => ({
-      id: batch.id,
+      id: batch.batch.id,
       name: batch.batch.name,
       quantity: batch.quantity,
       unit_cost: batch.unit_cost,
-      created_at: batch.created_at,
+      created_at: batch.created_at || "",
     })) || []
   );
 }
@@ -63,10 +68,6 @@ export async function fetchItemsView(
     .eq("user_id", params.userId)
     .order("item_name")
     .range(start, end);
-
-  if (!params.includeArchived) {
-    query = query.eq("is_archived", false);
-  }
 
   const { data, error, count } = await query;
 
