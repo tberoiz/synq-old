@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { Input } from "@synq/ui/input";
-import { PageContainer } from "@/ui/layouts/server/page-container";
-import { PageHeader } from "@/ui/layouts/server/page-header";
+import { PageContainer } from "@ui/shared/layouts/server/page-container";
 import { startOfMonth, endOfMonth, format } from "date-fns";
-import { DownloadPLReportButton } from "@ui/features/reports/components/DownloadPLReportButton";
+import { DownloadPLReportButton } from "@ui/modules/reports/components/DownloadPLReportButton";
+import { GenerateReportButton } from "@ui/modules/reports/components/GenerateReportButton";
 
 export default function PnLReportsPage() {
   const [startDate, setStartDate] = useState<Date>(startOfMonth(new Date()));
@@ -15,50 +15,31 @@ export default function PnLReportsPage() {
   const formatDateForInput = (date: Date) => format(date, "yyyy-MM-dd");
   const formatDateForDisplay = (date: Date) => format(date, "MM/dd/yyyy");
 
+  const reportActions = (
+    <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2">
+        <Input
+          type="date"
+          value={formatDateForInput(startDate)}
+          onChange={(e) => setStartDate(new Date(e.target.value))}
+          className="w-[140px]"
+        />
+        <span className="text-muted-foreground">to</span>
+        <Input
+          type="date"
+          value={formatDateForInput(endDate)}
+          onChange={(e) => setEndDate(new Date(e.target.value))}
+          className="w-[140px]"
+        />
+      </div>
+      <GenerateReportButton startDate={startDate} endDate={endDate} />
+      <DownloadPLReportButton startDate={startDate} endDate={endDate} />
+    </div>
+  );
+
   return (
     <PageContainer>
-      <PageHeader title="Automated P&L Reports" />
-
-      {/* Report Generator Section */}
       <div className="p-6 border rounded-lg bg-white shadow-sm">
-        <h3 className="text-lg font-semibold mb-4">Generate P&L Report</h3>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {/* Start Date */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
-              Start Date
-            </label>
-            <Input
-              type="date"
-              value={formatDateForInput(startDate)}
-              onChange={(e) => setStartDate(new Date(e.target.value))}
-              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          {/* End Date */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
-              End Date
-            </label>
-            <Input
-              type="date"
-              value={formatDateForInput(endDate)}
-              onChange={(e) => setEndDate(new Date(e.target.value))}
-              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          {/* Download Button */}
-          <div className="flex items-end">
-            <DownloadPLReportButton startDate={startDate} endDate={endDate} />
-          </div>
-        </div>
-      </div>
-
-      {/* Recent Reports Section */}
-      <div className="p-6 border rounded-lg bg-white shadow-sm">
-        <h3 className="text-lg font-semibold mb-4">Recent Reports</h3>
         <div className="overflow-x-auto">
           <table className="w-full table-auto">
             <thead>

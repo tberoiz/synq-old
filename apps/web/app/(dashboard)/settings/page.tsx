@@ -1,10 +1,10 @@
 import { Metadata } from "next";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@synq/ui/tabs";
-import { AccountForm } from "@/ui/features/settings/components/forms/account-form";
-import { NotificationsForm } from "@/ui/features/settings/components/forms/notifications-form";
 import { User, Bell } from "lucide-react";
-import { PageContainer } from "@/ui/layouts/server/page-container";
-import { PageHeader } from "@/ui/layouts/server/page-header";
+import { PageContainer } from "@ui/shared/layouts/server/page-container";
+import { PageHeader } from "@ui/shared/layouts/server/page-header";
+import { AccountForm } from "@ui/modules/settings/components/forms/account-form";
+import { NotificationsForm } from "@ui/modules/settings/components/forms/notifications-form";
 
 export const metadata: Metadata = {
   title: "Settings",

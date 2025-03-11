@@ -6,19 +6,22 @@ import { Skeleton } from "@synq/ui/skeleton";
 import { createClient } from "@synq/supabase/client";
 import { fetchPurchases } from "@synq/supabase/queries";
 import { getUserId } from "@synq/supabase/queries";
-import { CreatePurchaseDialog } from "@/ui/features/inventory/components/dialogs/create-purchase-dialog";
-import { PageContainer } from "@/ui/layouts/server/page-container";
-import { PageHeader } from "@/ui/layouts/server/page-header";
+import { PageContainer } from "@ui/shared/layouts/server/page-container";
+import { PageHeader } from "@ui/shared/layouts/server/page-header";
+import { CreatePurchaseDialog } from "@ui/modules/inventory/components/dialogs/create-purchase-dialog";
 
 const PurchasesDataTable = lazy(
-  () => import("@/ui/primitives/data-table/inventory/purchases-data-table"),
+  () => import("@ui/modules/inventory/components/tables/purchases-data-table"),
 );
 
 export default function PurchasesPage() {
   const supabase = createClient();
   const { data: userId } = useQuery({
     queryKey: ["user_id"],
-    queryFn: getUserId,
+    queryFn: async () => {
+      const id = await getUserId();
+      return id;
+    },
   });
 
   const { data: purchases } = useQuery({
@@ -33,9 +36,7 @@ export default function PurchasesPage() {
 
   return (
     <PageContainer>
-      <PageHeader title="Purchases">
-        <CreatePurchaseDialog onSuccess={handlePurchaseCreated} />
-      </PageHeader>
+      <PageHeader title="Purchases" />
       <Suspense
         fallback={
           <div className="space-y-4">
@@ -44,7 +45,7 @@ export default function PurchasesPage() {
           </div>
         }
       >
-        <PurchasesDataTable data={purchases || []} />
+        <PurchasesDataTable data={purchases || []} actions={<CreatePurchaseDialog onSuccess={handlePurchaseCreated} />} />
       </Suspense>
     </PageContainer>
   );

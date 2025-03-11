@@ -1,4 +1,5 @@
-import { SignInForm } from "@/ui/features/auth/components/forms/sign-in-form";
+import { SignInForm } from "@ui/modules/auth/components/forms/sign-in-form";
+
 export default function SignInPage() {
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-6 md:p-10">
