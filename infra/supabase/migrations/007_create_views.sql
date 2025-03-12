@@ -24,7 +24,15 @@ SELECT
   i.is_archived,
   COALESCE(SUM(p.remaining_quantity), 0) AS total_quantity,
   COALESCE(cs.total_sold, 0) AS total_sold,
-  JSON_AGG(DISTINCT pb.*) AS purchase_batches
+  JSON_AGG(
+    json_build_object(
+      'batch_id', pb.id,
+      'name', pb.name,
+      'quantity', p.quantity,
+      'unit_cost', p.unit_cost,
+      'created_at', pb.created_at
+    )
+  ) AS purchase_batches
 FROM user_inventory_items i
 LEFT JOIN user_inventory_groups g ON i.inventory_group_id = g.id
 LEFT JOIN user_purchase_items p ON i.id = p.item_id

@@ -1,4 +1,5 @@
 import type { Database } from "./database.types";
+import { ItemTableRow, TransformedPurchaseBatch } from "./items";
 
 export type InventoryItem = Database["public"]["Tables"]["user_inventory_items"]["Row"];
 export type InventoryGroup = Database["public"]["Tables"]["user_inventory_groups"]["Row"];
@@ -16,7 +17,7 @@ export const PURCHASE_STATUS = {
 export type PurchaseStatus = typeof PURCHASE_STATUS[keyof typeof PURCHASE_STATUS];
 
 export type InventoryItemWithDetails = InventoryItem & {
-  category: string | null;
+  category: string;
 };
 
 export interface PurchaseMetrics {
@@ -55,15 +56,10 @@ export type PurchaseItemWithDetails = PurchaseItem & {
 
 export type BatchWithDetails = Pick<PurchaseBatch, "id" | "name" | "created_at" | "status">;
 
-export type TransformedPurchaseBatch = {
-  id: string;
-  name: string;
-  quantity: number;
-  unit_cost: number;
-  created_at: string;
-};
 
-export type ItemViewWithPurchaseBatches = ItemView & {
+
+// Full type for the items view including purchase batches
+export type ItemViewWithPurchaseBatches = ItemTableRow & {
   purchase_batches: TransformedPurchaseBatch[];
 };
 
@@ -71,15 +67,6 @@ export interface PaginatedResponse<T> {
   data: T[];
   count: number;
 }
-
-export type ItemUpdateParams = {
-  name: string;
-  sku: string | null;
-  default_cogs: number;
-  listing_price: number;
-  inventory_group_id: string;
-  is_archived?: boolean;
-};
 
 export type CreateItemParams = {
   categoryId: string;

@@ -1,4 +1,3 @@
-import * as React from "react";
 import { Table } from "@tanstack/react-table";
 import { Input } from "@synq/ui/input";
 import { Search } from "lucide-react";
@@ -23,7 +22,9 @@ export function DataTableHero<TData>({
         <Input
           placeholder={searchPlaceholder}
           className="pl-8"
-          value={(table.getColumn(searchColumn)?.getFilterValue() as string) ?? ""}
+          value={
+            (table.getColumn(searchColumn)?.getFilterValue() as string) ?? ""
+          }
           onChange={(event) =>
             table.getColumn(searchColumn)?.setFilterValue(event.target.value)
           }

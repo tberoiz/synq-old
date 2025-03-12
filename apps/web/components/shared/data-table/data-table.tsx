@@ -1,169 +1,180 @@
 import * as React from "react";
 import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
+  type Table as TanstackTable,
+  type ColumnDef,
+  type ColumnFiltersState,
+  type SortingState,
+  type VisibilityState,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-  flexRender,
 } from "@tanstack/react-table";
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableHero } from "./data-table-hero";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@synq/ui/table";
-import { cn } from "@synq/ui/utils";
+import { DataTableHeader } from "./data-table-header";
+import { DataTableBody } from "./data-table-body";
+import { Table } from "@synq/ui/table";
+import isEqual from "fast-deep-equal";
 
 interface DataTableProps<TData> {
   columns: ColumnDef<TData>[];
   data: TData[];
   actions?: React.ReactNode;
-  defaultPageSize?: number;
   searchPlaceholder?: string;
-  tableComponent?: (filteredData: TData[]) => React.ReactNode;
   enableRowSelection?: boolean;
   selectedRows?: TData[];
   onRowSelectionChange?: (rows: TData[]) => void;
   searchColumn?: string;
   onRowClick?: (row: TData) => void;
+  idKey?: string;
+}
+
+function useTableState() {
+  return {
+    sorting: React.useState<SortingState>([]),
+    columnFilters: React.useState<ColumnFiltersState>([]),
+    columnVisibility: React.useState<VisibilityState>({}),
+    rowSelection: React.useState<Record<string, boolean>>({}),
+  };
 }
 
 export function DataTable<TData>({
   columns,
   data,
   actions,
-  defaultPageSize = 10,
   searchPlaceholder = "Search...",
-  tableComponent,
   enableRowSelection = false,
   selectedRows = [],
   onRowSelectionChange,
   searchColumn = "name",
   onRowClick,
+  idKey = "id",
 }: DataTableProps<TData>) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState<
-    Record<string, boolean>
-  >({});
+  const {
+    sorting: [sorting, setSorting],
+    columnFilters: [columnFilters, setColumnFilters],
+    columnVisibility: [columnVisibility, setColumnVisibility],
+    rowSelection: [rowSelection, setRowSelection],
+  } = useTableState();
 
-  const table = useReactTable({
-    data,
-    columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: enableRowSelection ? setRowSelection : undefined,
-    initialState: {
-      pagination: {
-        pageSize: defaultPageSize,
-      },
-      rowSelection: enableRowSelection
-        ? Object.fromEntries(selectedRows.map((row) => [(row as any).id, true]))
-        : {},
-    },
-    state: {
+  const previousSelectedRows = React.useRef<TData[]>(selectedRows);
+
+  const initialRowSelection = React.useMemo(() => {
+    return enableRowSelection
+      ? Object.fromEntries(
+          selectedRows.map((row) => [(row as any)[idKey], true])
+        )
+      : {};
+  }, [enableRowSelection, selectedRows, idKey]);
+
+  const tableState = React.useMemo(
+    () => ({
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection: enableRowSelection ? rowSelection : {},
-    },
-    enableRowSelection,
-  });
-
-  React.useEffect(() => {
-    if (onRowSelectionChange) {
-      const selectedData = table
-        .getSelectedRowModel()
-        .rows.map((row) => row.original);
-      onRowSelectionChange(selectedData);
-    }
-  }, [rowSelection]);
-
-  const defaultTable = (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-                className={cn(
-                  onRowClick && "cursor-pointer hover:bg-muted/50"
-                )}
-                onClick={() => onRowClick?.(row.original)}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(
-                      cell.column.columnDef.cell,
-                      cell.getContext(),
-                    )}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell
-                colSpan={columns.length}
-                className="h-24 text-center"
-              >
-                No results.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-      <DataTablePagination table={table} />
-    </div>
+    }),
+    [sorting, columnFilters, columnVisibility, rowSelection, enableRowSelection]
   );
 
-  return (
-    <div className="w-full">
-      <DataTableHero
+  const tableOptions = React.useMemo(
+    () => ({
+      data,
+      columns,
+      state: tableState,
+      enableRowSelection,
+      onSortingChange: setSorting,
+      onColumnFiltersChange: setColumnFilters,
+      onColumnVisibilityChange: setColumnVisibility,
+      onRowSelectionChange: enableRowSelection ? setRowSelection : undefined,
+      getCoreRowModel: getCoreRowModel(),
+      getPaginationRowModel: getPaginationRowModel(),
+      getSortedRowModel: getSortedRowModel(),
+      getFilteredRowModel: getFilteredRowModel(),
+      initialState: {
+        pagination: { pageSize: 10 },
+        rowSelection: initialRowSelection,
+      },
+      getRowId: (row: TData) => {
+        const id = (row as any)[idKey];
+        if (id === undefined) {
+          console.warn(`Row ID key "${idKey}" not found in row:`, row);
+        }
+        return id;
+      },
+    }),
+    [
+      data,
+      columns,
+      tableState,
+      enableRowSelection,
+      setSorting,
+      setColumnFilters,
+      setColumnVisibility,
+      setRowSelection,
+      initialRowSelection,
+      idKey,
+    ]
+  );
+
+  const table = useReactTable(tableOptions);
+
+  React.useEffect(() => {
+    if (!onRowSelectionChange) return;
+
+    const selectedData = table
+      .getSelectedRowModel()
+      .rows.map((row) => row.original);
+    
+    if (!isEqual(previousSelectedRows.current, selectedData)) {
+      previousSelectedRows.current = selectedData;
+      onRowSelectionChange(selectedData);
+    }
+  }, [rowSelection, onRowSelectionChange, table]);
+
+  React.useEffect(() => {
+    if (!enableRowSelection) return;
+
+    const newRowSelection = Object.fromEntries(
+      selectedRows.map((row) => [(row as any)[idKey], true])
+    );
+
+    if (!isEqual(newRowSelection, rowSelection)) {
+      setRowSelection(newRowSelection);
+    }
+  }, [selectedRows, enableRowSelection, idKey]);
+
+  const tableHero = React.useMemo(() => (
+    <DataTableHero
+      table={table}
+      searchPlaceholder={searchPlaceholder}
+      actions={actions}
+      searchColumn={searchColumn}
+    />
+  ), [table, searchPlaceholder, actions, searchColumn]);
+
+  const tableContent = React.useMemo(() => (
+    <Table>
+      <DataTableHeader table={table} />
+      <DataTableBody
         table={table}
-        searchPlaceholder={searchPlaceholder}
-        actions={actions}
-        searchColumn={searchColumn}
+        columns={columns}
+        onRowClick={onRowClick}
       />
-      {tableComponent?.(table.getRowModel().rows.map((row) => row.original)) ?? defaultTable}
-    </div>
+    </Table>
+  ), [table, columns, onRowClick]);
+
+  const tablePagination = React.useMemo(() => (
+    <DataTablePagination table={table} />
+  ), [table]);
+
+  return (
+    <>
+      {tableHero}
+      {tableContent}
+      {tablePagination}
+    </>
   );
 }

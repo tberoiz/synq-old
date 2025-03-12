@@ -149,7 +149,6 @@ const PurchaseItemsTable = React.forwardRef<
         <DataTable
           columns={columns}
           data={data}
-          defaultPageSize={10}
           enableRowSelection={false}
           searchPlaceholder="Search items..."
         />

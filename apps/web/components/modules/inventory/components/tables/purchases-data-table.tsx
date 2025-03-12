@@ -254,7 +254,6 @@ export default function PurchasesDataTable({
       <DataTable
         columns={columns}
         data={data}
-        defaultPageSize={10}
         searchPlaceholder="Search purchases..."
         searchColumn="name"
         onRowClick={(purchase) => {

@@ -10,12 +10,11 @@ CREATE TABLE IF NOT EXISTS user_inventory_groups (
 CREATE TABLE IF NOT EXISTS user_inventory_items (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-    inventory_group_id uuid REFERENCES user_inventory_groups(id) ON DELETE SET NULL,
     name text NOT NULL,
-    default_cogs NUMERIC(10,2) DEFAULT 0 CHECK (default_cogs >= 0),
-    listing_price numeric(10,2) NOT NULL CHECK (listing_price >= 0),
+    inventory_group_id uuid REFERENCES user_inventory_groups(id) ON DELETE SET NULL,
+    default_cogs NUMERIC(10,2) DEFAULT 0  NOT NULL CHECK (default_cogs >= 0),
+    listing_price numeric(10,2) DEFAULT 0 NOT NULL CHECK (listing_price >= 0),
     sku text NULL,
-    image_urls text[] DEFAULT ARRAY[]::text[],
     created_at timestamptz DEFAULT now(),
     updated_at timestamptz DEFAULT now(),
     is_archived boolean NOT NULL DEFAULT FALSE
@@ -40,6 +39,26 @@ CREATE TABLE IF NOT EXISTS user_purchase_items (
     unit_cost numeric(10, 2) NOT NULL CHECK (unit_cost >= 0),
     created_at timestamptz DEFAULT now()
 );
+
+-- Indexes for user_inventory_items
+CREATE INDEX idx_inventory_items_user ON user_inventory_items(user_id);
+CREATE INDEX idx_inventory_items_group ON user_inventory_items(inventory_group_id);
+CREATE INDEX idx_inventory_items_archived_user ON user_inventory_items(is_archived, user_id);
+
+-- Indexes for user_purchase_items
+CREATE INDEX idx_purchase_items_item ON user_purchase_items(item_id);
+CREATE INDEX idx_purchase_items_batch ON user_purchase_items(batch_id);
+CREATE INDEX idx_purchase_items_remaining_qty ON user_purchase_items(remaining_quantity);
+CREATE INDEX idx_purchase_items_item_batch ON user_purchase_items(item_id, batch_id);
+
+-- Indexes for user_purchase_batches
+CREATE INDEX idx_purchase_batches_user ON user_purchase_batches(user_id);
+CREATE INDEX idx_purchase_batches_status ON user_purchase_batches(status);
+CREATE INDEX idx_purchase_batches_status_created ON user_purchase_batches(status, created_at);
+
+-- Indexes for user_inventory_groups
+CREATE INDEX idx_inventory_groups_user ON user_inventory_groups(user_id);
+CREATE INDEX idx_inventory_groups_name ON user_inventory_groups(name);
 
 -- Triggers and Functions
 CREATE OR REPLACE FUNCTION update_batch_status()

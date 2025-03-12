@@ -1,5 +1,3 @@
-import { GalleryVerticalEnd } from "lucide-react";
-
 import { cn } from "@synq/ui/utils";
 import { Button } from "@synq/ui/button";
 import { Input } from "@synq/ui/input";
@@ -7,7 +5,7 @@ import { Label } from "@synq/ui/label";
 
 import { signUpWithPassword } from "../../actions/actions";
 import { OAuthButton } from "../components/provider-button";
-import { SynqIcon } from "@/components/primitives/icons/icons";
+import { SynqIcon } from "@ui/shared/icons/icons";
 
 export function SignUpForm({
   className,

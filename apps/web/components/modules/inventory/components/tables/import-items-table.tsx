@@ -125,7 +125,6 @@ export default function ImportItemsTable({
     <DataTable
       columns={columns}
       data={filteredData}
-      defaultPageSize={10}
       enableRowSelection={false}
       searchPlaceholder="Search items..."
     />

@@ -7,3 +7,4 @@ export * from "./actions";
 export * from "./database.types";
 export * from "./sales";
 export * from "./inventory";
+export * from "./items";

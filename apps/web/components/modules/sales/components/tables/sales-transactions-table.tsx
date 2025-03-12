@@ -116,7 +116,6 @@ export function SalesTransactionsTable({
       <DataTable
         columns={columns}
         data={data}
-        defaultPageSize={10}
         searchPlaceholder="Filter sales..."
         searchColumn="sale_date"
         onRowClick={setSelectedSale}

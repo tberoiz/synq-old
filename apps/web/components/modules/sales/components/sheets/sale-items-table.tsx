@@ -59,8 +59,7 @@ export function SaleItemsTable({ items }: SaleItemsTableProps) {
   return (
     <DataTable
       columns={columns}
-      data={items || []}
-      defaultPageSize={10}
+      data={items || []}      
       enableRowSelection={false}
       searchPlaceholder="Search items..."
     />
