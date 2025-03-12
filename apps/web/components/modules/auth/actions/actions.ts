@@ -21,10 +21,12 @@ const signInWithPassword = async (formData: FormData) => {
 
 const signInWithOAuth = async (provider: Provider) => {
   const supabase = await createClient();
+  const redirectUrl = `${window.location.origin}/api/auth/callback`;
+
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
     options: {
-      redirectTo: "http://localhost:3000/api/auth/callback",
+      redirectTo: redirectUrl,
     },
   });
 
