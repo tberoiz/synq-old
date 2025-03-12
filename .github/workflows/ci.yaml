@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Navigate to Supabase directory
+        working-directory: ./infra/supabase  # <-- Add this
+        run: ls -la  # Optional: Verify directory contents
+
+      - name: Start Supabase local development setup
+        working-directory: ./infra/supabase  # <-- Add this
+        run: supabase start
+
+      - name: Apply database migrations
+        working-directory: ./infra/supabase  # <-- Add this
+        run: supabase db push
+
+      - name: Seed database
+        working-directory: ./infra/supabase  # <-- Add this
+        run: supabase db seed
+
+      - name: Verify generated types are checked in
+        working-directory: ./infra/supabase  # <-- Add this
+        run: |
+          supabase gen types typescript --local > types.gen.ts
+          if ! git diff --ignore-space-at-eol --exit-code --quiet types.gen.ts; then
+            echo "Detected uncommitted changes after build. See status below:"
+            git diff
+            exit 1
+          fi
