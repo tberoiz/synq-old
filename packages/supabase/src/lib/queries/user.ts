@@ -1,4 +1,6 @@
 "use server";
+
+import { UserMetadata } from "@supabase/supabase-js";
 import { createClient } from "../client/server";
 
 // Error handling utility
@@ -17,3 +19,11 @@ export async function getUserId(): Promise<string> {
 
   return userData.user.id;
 }
+
+export async function getUserMetadata(): Promise<UserMetadata> {
+  const supabase = await createClient();
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+
+  if (userError) handleSupabaseError(userError, "Get user");
+  return userData.user?.user_metadata || "";
+};

@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState, memo } from "react";
 import { BadgeCheck, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@synq/ui/avatar";
@@ -17,9 +18,10 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@synq/ui/sidebar";
-import { createClient } from "@synq/supabase/client";
 import Link from "next/link";
 import { signOut } from "@ui/modules/auth/actions/actions";
+import { getUserMetadata } from "@synq/supabase/queries";
+import { Button } from "@synq/ui/button";
 
 // Helper function to get the first character of a name
 const getFirstCharacter = (fullName: string) => {
@@ -41,11 +43,7 @@ const NavUser: React.FC = () => {
   // Fetch user info on mount
   useEffect(() => {
     const fetchUserInfo = async () => {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      const metadata = user?.user_metadata;
+      const metadata = await getUserMetadata();
       setUserMetadata({
         name: metadata?.full_name || "",
         email: metadata?.email || "",
@@ -118,13 +116,13 @@ const NavUser: React.FC = () => {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <button
+              <Button
                 onClick={signOut}
                 className="flex w-full items-center gap-2"
               >
                 <LogOut className="h-4 w-4" />
                 <span>Log out</span>
-              </button>
+              </Button>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
