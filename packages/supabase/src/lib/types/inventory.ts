@@ -1,10 +1,14 @@
 import type { Database } from "./database.types";
 import { ItemTableRow, TransformedPurchaseBatch } from "./items";
 
-export type InventoryItem = Database["public"]["Tables"]["user_inventory_items"]["Row"];
-export type InventoryGroup = Database["public"]["Tables"]["user_inventory_groups"]["Row"];
-export type PurchaseBatch = Database["public"]["Tables"]["user_purchase_batches"]["Row"];
-export type PurchaseItem = Database["public"]["Tables"]["user_purchase_items"]["Row"];
+export type InventoryItem =
+  Database["public"]["Tables"]["user_inventory_items"]["Row"];
+export type InventoryGroup =
+  Database["public"]["Tables"]["user_inventory_groups"]["Row"];
+export type PurchaseBatch =
+  Database["public"]["Tables"]["user_purchase_batches"]["Row"];
+export type PurchaseItem =
+  Database["public"]["Tables"]["user_purchase_items"]["Row"];
 export type ItemView = Database["public"]["Views"]["vw_items_ui_table"]["Row"];
 
 export const PURCHASE_STATUS = {
@@ -14,7 +18,8 @@ export const PURCHASE_STATUS = {
   COMPLETED: "completed",
 } as const;
 
-export type PurchaseStatus = typeof PURCHASE_STATUS[keyof typeof PURCHASE_STATUS];
+export type PurchaseStatus =
+  (typeof PURCHASE_STATUS)[keyof typeof PURCHASE_STATUS];
 
 export type InventoryItemWithDetails = InventoryItem & {
   category: string;
@@ -54,9 +59,10 @@ export type PurchaseItemWithDetails = PurchaseItem & {
   is_archived: boolean;
 };
 
-export type BatchWithDetails = Pick<PurchaseBatch, "id" | "name" | "created_at" | "status">;
-
-
+export type BatchWithDetails = Pick<
+  PurchaseBatch,
+  "id" | "name" | "created_at" | "status"
+>;
 
 // Full type for the items view including purchase batches
 export type ItemViewWithPurchaseBatches = ItemTableRow & {

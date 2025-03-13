@@ -7,8 +7,8 @@ export async function getSales(
   options?: {
     limit?: number;
     offset?: number;
-    status?: 'listed' | 'completed' | 'cancelled';
-  }
+    status?: "listed" | "completed" | "cancelled";
+  },
 ): Promise<Sale[]> {
   const supabase = createClient();
   let query = supabase
@@ -45,7 +45,7 @@ export async function createSale(
     purchaseItemId: string;
     quantity: number;
     salePrice: number;
-  }>
+  }>,
 ): Promise<Sale> {
   const supabase = createClient();
 
@@ -103,7 +103,7 @@ export async function updateSale(
       quantity: number;
       salePrice: number;
     }>;
-  }
+  },
 ): Promise<Sale> {
   const supabase = createClient();
 
@@ -123,9 +123,12 @@ export async function updateSale(
   if (updates.status) updateData.status = updates.status;
   if (updates.platform) updateData.platform = updates.platform;
   if (updates.saleDate) updateData.sale_date = updates.saleDate;
-  if (typeof updates.shippingCost === "number") updateData.shipping_cost = updates.shippingCost;
-  if (typeof updates.taxAmount === "number") updateData.tax_amount = updates.taxAmount;
-  if (typeof updates.platformFees === "number") updateData.platform_fees = updates.platformFees;
+  if (typeof updates.shippingCost === "number")
+    updateData.shipping_cost = updates.shippingCost;
+  if (typeof updates.taxAmount === "number")
+    updateData.tax_amount = updates.taxAmount;
+  if (typeof updates.platformFees === "number")
+    updateData.platform_fees = updates.platformFees;
   if ("notes" in updates) updateData.notes = updates.notes;
 
   const { data: updatedSale, error: updateError } = await supabase
@@ -138,10 +141,7 @@ export async function updateSale(
   if (updateError) throw updateError;
 
   if (updates.items?.length) {
-    await supabase
-      .from("user_sale_items")
-      .delete()
-      .eq("sale_id", saleId);
+    await supabase.from("user_sale_items").delete().eq("sale_id", saleId);
 
     const saleItems = updates.items.map((item) => ({
       user_id: userId,
@@ -161,7 +161,10 @@ export async function updateSale(
   return updatedSale as Sale;
 }
 
-export async function deleteSale(userId: string, saleId: string): Promise<void> {
+export async function deleteSale(
+  userId: string,
+  saleId: string,
+): Promise<void> {
   const supabase = createClient();
 
   // Verify ownership

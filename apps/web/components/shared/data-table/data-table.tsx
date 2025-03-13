@@ -64,7 +64,7 @@ export function DataTable<TData>({
   const initialRowSelection = React.useMemo(() => {
     return enableRowSelection
       ? Object.fromEntries(
-          selectedRows.map((row) => [(row as any)[idKey], true])
+          selectedRows.map((row) => [(row as any)[idKey], true]),
         )
       : {};
   }, [enableRowSelection, selectedRows, idKey]);
@@ -76,7 +76,13 @@ export function DataTable<TData>({
       columnVisibility,
       rowSelection: enableRowSelection ? rowSelection : {},
     }),
-    [sorting, columnFilters, columnVisibility, rowSelection, enableRowSelection]
+    [
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+      enableRowSelection,
+    ],
   );
 
   const tableOptions = React.useMemo(
@@ -116,7 +122,7 @@ export function DataTable<TData>({
       setRowSelection,
       initialRowSelection,
       idKey,
-    ]
+    ],
   );
 
   const table = useReactTable(tableOptions);
@@ -127,7 +133,7 @@ export function DataTable<TData>({
     const selectedData = table
       .getSelectedRowModel()
       .rows.map((row) => row.original);
-    
+
     if (!isEqual(previousSelectedRows.current, selectedData)) {
       previousSelectedRows.current = selectedData;
       onRowSelectionChange(selectedData);
@@ -138,7 +144,7 @@ export function DataTable<TData>({
     if (!enableRowSelection) return;
 
     const newRowSelection = Object.fromEntries(
-      selectedRows.map((row) => [(row as any)[idKey], true])
+      selectedRows.map((row) => [(row as any)[idKey], true]),
     );
 
     if (!isEqual(newRowSelection, rowSelection)) {
@@ -146,29 +152,36 @@ export function DataTable<TData>({
     }
   }, [selectedRows, enableRowSelection, idKey]);
 
-  const tableHero = React.useMemo(() => (
-    <DataTableHero
-      table={table}
-      searchPlaceholder={searchPlaceholder}
-      actions={actions}
-      searchColumn={searchColumn}
-    />
-  ), [table, searchPlaceholder, actions, searchColumn]);
-
-  const tableContent = React.useMemo(() => (
-    <Table>
-      <DataTableHeader table={table} />
-      <DataTableBody
+  const tableHero = React.useMemo(
+    () => (
+      <DataTableHero
         table={table}
-        columns={columns}
-        onRowClick={onRowClick}
+        searchPlaceholder={searchPlaceholder}
+        actions={actions}
+        searchColumn={searchColumn}
       />
-    </Table>
-  ), [table, columns, onRowClick]);
+    ),
+    [table, searchPlaceholder, actions, searchColumn],
+  );
 
-  const tablePagination = React.useMemo(() => (
-    <DataTablePagination table={table} />
-  ), [table]);
+  const tableContent = React.useMemo(
+    () => (
+      <Table>
+        <DataTableHeader table={table} />
+        <DataTableBody
+          table={table}
+          columns={columns}
+          onRowClick={onRowClick}
+        />
+      </Table>
+    ),
+    [table, columns, onRowClick],
+  );
+
+  const tablePagination = React.useMemo(
+    () => <DataTablePagination table={table} />,
+    [table],
+  );
 
   return (
     <>

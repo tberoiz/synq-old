@@ -46,13 +46,9 @@ export default function SaleDetailsSheet({
 
     try {
       setIsUpdating(true);
-      await updateSale(
-        await getUserId(),
-        sale.id,
-        {
-          status: "completed",
-        }
-      );
+      await updateSale(await getUserId(), sale.id, {
+        status: "completed",
+      });
 
       await queryClient.invalidateQueries({ queryKey: ["sales"] });
       await queryClient.invalidateQueries({ queryKey: ["user_inv_items"] });
@@ -82,7 +78,7 @@ export default function SaleDetailsSheet({
       side={isMobile ? "bottom" : "right"}
       className={cn(
         "w-full sm:max-w-xl flex flex-col",
-        isMobile && "h-[90vh] mt-auto"
+        isMobile && "h-[90vh] mt-auto",
       )}
     >
       <div className="flex h-full flex-col">
@@ -157,7 +153,7 @@ export default function SaleDetailsSheet({
                     sale.status === "completed" &&
                       "bg-green-50 text-green-700 hover:bg-green-50 dark:bg-green-950/20 dark:text-green-300",
                     sale.status === "cancelled" &&
-                      "bg-red-50 text-red-700 hover:bg-red-50 dark:bg-red-950/20 dark:text-red-300"
+                      "bg-red-50 text-red-700 hover:bg-red-50 dark:bg-red-950/20 dark:text-red-300",
                   )}
                 >
                   {sale.status === "listed" ? (

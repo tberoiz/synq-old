@@ -46,7 +46,7 @@ interface PurchaseDetailsSheetProps {
   purchase: Purchase | null;
   isMobile: boolean;
   onSaveBatch: (
-    updates: { id: string; quantity: number; unit_cost: number }[]
+    updates: { id: string; quantity: number; unit_cost: number }[],
   ) => void;
 }
 
@@ -98,7 +98,7 @@ export default function PurchaseDetailsSheet({
         data.item_id,
         data.quantity,
         data.unit_cost,
-        userId
+        userId,
       );
     },
     onSuccess: () => {
@@ -167,7 +167,7 @@ export default function PurchaseDetailsSheet({
       ]);
       toast({ title: "Success", description: "Purchase archived!" });
       const closeButton = document.querySelector(
-        '[role="dialog"]'
+        '[role="dialog"]',
       ) as HTMLButtonElement;
       closeButton?.click();
     },
@@ -190,7 +190,7 @@ export default function PurchaseDetailsSheet({
       ]);
       toast({ title: "Success", description: "Purchase restored!" });
       const closeButton = document.querySelector(
-        '[role="dialog"]'
+        '[role="dialog"]',
       ) as HTMLButtonElement;
       closeButton?.click();
     },
@@ -204,7 +204,7 @@ export default function PurchaseDetailsSheet({
   }
 
   const handleImportItems = async (
-    selectedItems: InventoryItemWithDetails[]
+    selectedItems: InventoryItemWithDetails[],
   ) => {
     if (!userId) {
       toast({
@@ -224,9 +224,9 @@ export default function PurchaseDetailsSheet({
             item.id,
             1,
             item.default_cogs || 0,
-            userId
-          )
-        )
+            userId,
+          ),
+        ),
       );
 
       await Promise.all([
@@ -272,7 +272,7 @@ export default function PurchaseDetailsSheet({
   };
 
   const handleSaveBatch = async (
-    updates: Map<string, { quantity: number; unit_cost: number }>
+    updates: Map<string, { quantity: number; unit_cost: number }>,
   ) => {
     setIsSaving(true);
     try {
@@ -288,8 +288,8 @@ export default function PurchaseDetailsSheet({
             id: update.id,
             quantity: update.quantity,
             unit_cost: update.unit_cost,
-          })
-        )
+          }),
+        ),
       );
 
       await Promise.all([
@@ -362,7 +362,7 @@ export default function PurchaseDetailsSheet({
                     purchaseDetails.status === "active" &&
                       "bg-emerald-50 text-emerald-700 hover:bg-emerald-50 dark:bg-emerald-950/20 dark:text-emerald-300",
                     purchaseDetails.status === "archived" &&
-                      "bg-slate-100 text-slate-700 hover:bg-slate-100 dark:bg-slate-950/20 dark:text-slate-300"
+                      "bg-slate-100 text-slate-700 hover:bg-slate-100 dark:bg-slate-950/20 dark:text-slate-300",
                   )}
                 >
                   {purchaseDetails.status}

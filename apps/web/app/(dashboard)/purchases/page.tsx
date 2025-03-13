@@ -45,7 +45,10 @@ export default function PurchasesPage() {
           </div>
         }
       >
-        <PurchasesDataTable data={purchases || []} actions={<CreatePurchaseDialog onSuccess={handlePurchaseCreated} />} />
+        <PurchasesDataTable
+          data={purchases || []}
+          actions={<CreatePurchaseDialog onSuccess={handlePurchaseCreated} />}
+        />
       </Suspense>
     </PageContainer>
   );

@@ -1,4 +1,4 @@
-'use server'
+"use server";
 
 import { createClient } from "@synq/supabase/server";
 import { fetchItemsView, getUserId } from "@synq/supabase/queries";

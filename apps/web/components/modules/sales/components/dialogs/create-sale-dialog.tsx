@@ -33,7 +33,12 @@ import {
 } from "@synq/ui/select";
 import { Input } from "@synq/ui/input";
 import { Textarea } from "@synq/ui/textarea";
-import { PlusIcon, ArrowLeftIcon, ArrowRightIcon, CheckIcon } from "lucide-react";
+import {
+  PlusIcon,
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  CheckIcon,
+} from "lucide-react";
 import { format } from "date-fns";
 import { SaleItemsTable } from "./sale-items-table";
 import { createSale, getUserId } from "@synq/supabase/queries";
@@ -41,16 +46,16 @@ import { createClient } from "@synq/supabase/client";
 import { cn } from "@synq/ui/utils";
 
 const steps = [
-  { id: 'items', title: 'Select Items' },
-  { id: 'details', title: 'Sale Details' },
-  { id: 'review', title: 'Review & Create' }
+  { id: "items", title: "Select Items" },
+  { id: "details", title: "Sale Details" },
+  { id: "review", title: "Review & Create" },
 ] as const;
 
-type Step = typeof steps[number]['id'];
+type Step = (typeof steps)[number]["id"];
 
 export function CreateSaleDialog() {
   const [open, setOpen] = React.useState(false);
-  const [currentStep, setCurrentStep] = React.useState<Step>('items');
+  const [currentStep, setCurrentStep] = React.useState<Step>("items");
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const supabase = createClient();
@@ -67,14 +72,14 @@ export function CreateSaleDialog() {
     },
   });
 
-  const items = form.watch('items');
+  const items = form.watch("items");
   const canProceed = React.useMemo(() => {
     switch (currentStep) {
-      case 'items':
+      case "items":
         return items.length > 0;
-      case 'details':
-        return form.watch('platform') && form.watch('status');
-      case 'review':
+      case "details":
+        return form.watch("platform") && form.watch("status");
+      case "review":
         return true;
       default:
         return false;
@@ -85,7 +90,7 @@ export function CreateSaleDialog() {
     mutationFn: async (data: CreateSaleInput) => {
       const userId = await getUserId();
       if (!userId) throw new Error("User ID not found");
-      
+
       const sale = await createSale(
         userId,
         {
@@ -101,9 +106,9 @@ export function CreateSaleDialog() {
           purchaseItemId: item.purchaseItemId,
           quantity: item.quantity,
           salePrice: item.salePrice,
-        }))
+        })),
       );
-      
+
       return sale;
     },
     onSuccess: (data) => {
@@ -114,7 +119,7 @@ export function CreateSaleDialog() {
       });
       setOpen(false);
       form.reset();
-      setCurrentStep('items');
+      setCurrentStep("items");
     },
     onError: (error: Error) => {
       console.error("Mutation error:", error);
@@ -127,37 +132,43 @@ export function CreateSaleDialog() {
   });
 
   const onNext = () => {
-    const currentIndex = steps.findIndex(step => step.id === currentStep);
+    const currentIndex = steps.findIndex((step) => step.id === currentStep);
     if (currentIndex < steps.length - 1) {
       setCurrentStep(steps[currentIndex + 1]!.id);
     }
   };
 
   const onPrevious = () => {
-    const currentIndex = steps.findIndex(step => step.id === currentStep);
+    const currentIndex = steps.findIndex((step) => step.id === currentStep);
     if (currentIndex > 0) {
       setCurrentStep(steps[currentIndex - 1]!.id);
     }
   };
 
   const calculateTotals = React.useMemo(() => {
-    return items.reduce((acc, item) => {
-      const subtotal = (item.quantity || 0) * (item.salePrice || 0);
-      return {
-        subtotal: acc.subtotal + subtotal,
-        totalItems: acc.totalItems + (item.quantity || 0),
-      };
-    }, { subtotal: 0, totalItems: 0 });
+    return items.reduce(
+      (acc, item) => {
+        const subtotal = (item.quantity || 0) * (item.salePrice || 0);
+        return {
+          subtotal: acc.subtotal + subtotal,
+          totalItems: acc.totalItems + (item.quantity || 0),
+        };
+      },
+      { subtotal: 0, totalItems: 0 },
+    );
   }, [items]);
 
   return (
-    <Dialog open={open} onOpenChange={(newOpen) => {
-      if (!newOpen) {
-        form.reset();
-        setCurrentStep('items');
-      }
-      setOpen(newOpen);
-    }}>
+    <Dialog
+      open={open}
+      onOpenChange={(newOpen) => {
+        if (!newOpen) {
+          form.reset();
+          setCurrentStep("items");
+        }
+        setOpen(newOpen);
+      }}
+    >
       <DialogTrigger asChild>
         <Button size="sm" variant="outline">
           <PlusIcon className="h-4 w-4" />
@@ -178,13 +189,17 @@ export function CreateSaleDialog() {
           <div className="relative flex justify-between">
             {steps.map((step, index) => (
               <div key={step.id} className="flex flex-col items-center">
-                <div className={cn(
-                  "w-8 h-8 rounded-full flex items-center justify-center relative z-10 transition-colors",
-                  currentStep === step.id ? "bg-primary text-primary-foreground" :
-                  index < steps.findIndex(s => s.id === currentStep) ? "bg-primary/80 text-primary-foreground" :
-                  "bg-muted text-muted-foreground"
-                )}>
-                  {index < steps.findIndex(s => s.id === currentStep) ? (
+                <div
+                  className={cn(
+                    "w-8 h-8 rounded-full flex items-center justify-center relative z-10 transition-colors",
+                    currentStep === step.id
+                      ? "bg-primary text-primary-foreground"
+                      : index < steps.findIndex((s) => s.id === currentStep)
+                        ? "bg-primary/80 text-primary-foreground"
+                        : "bg-muted text-muted-foreground",
+                  )}
+                >
+                  {index < steps.findIndex((s) => s.id === currentStep) ? (
                     <CheckIcon className="h-4 w-4" />
                   ) : (
                     index + 1
@@ -202,18 +217,19 @@ export function CreateSaleDialog() {
             className="space-y-4"
           >
             <div className="min-h-[400px]">
-              {currentStep === 'items' && (
+              {currentStep === "items" && (
                 <div className="space-y-4">
                   <SaleItemsTable />
                   {items.length > 0 && (
                     <div className="text-sm text-muted-foreground">
-                      Selected {items.length} unique items ({calculateTotals.totalItems} total)
+                      Selected {items.length} unique items (
+                      {calculateTotals.totalItems} total)
                     </div>
                   )}
                 </div>
               )}
 
-              {currentStep === 'details' && (
+              {currentStep === "details" && (
                 <div className="grid grid-cols-1 gap-4">
                   <FormField
                     control={form.control}
@@ -279,7 +295,9 @@ export function CreateSaleDialog() {
                           <Input
                             type="date"
                             value={
-                              field.value ? format(field.value, "yyyy-MM-dd") : ""
+                              field.value
+                                ? format(field.value, "yyyy-MM-dd")
+                                : ""
                             }
                             onChange={(e) =>
                               field.onChange(new Date(e.target.value))
@@ -381,14 +399,17 @@ export function CreateSaleDialog() {
                 </div>
               )}
 
-              {currentStep === 'review' && (
+              {currentStep === "review" && (
                 <div className="space-y-6">
                   <div className="rounded-lg border p-4">
                     <h3 className="font-medium mb-2">Sale Summary</h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span>Items</span>
-                        <span>{items.length} unique items ({calculateTotals.totalItems} total)</span>
+                        <span>
+                          {items.length} unique items (
+                          {calculateTotals.totalItems} total)
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span>Subtotal</span>
@@ -396,56 +417,60 @@ export function CreateSaleDialog() {
                       </div>
                       <div className="flex justify-between">
                         <span>Platform</span>
-                        <span className="capitalize">{form.watch('platform')}</span>
+                        <span className="capitalize">
+                          {form.watch("platform")}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span>Status</span>
-                        <span className="capitalize">{form.watch('status')}</span>
+                        <span className="capitalize">
+                          {form.watch("status")}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span>Shipping Cost</span>
-                        <span>${form.watch('shippingCost').toFixed(2)}</span>
+                        <span>${form.watch("shippingCost").toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Tax Amount</span>
-                        <span>${form.watch('taxAmount').toFixed(2)}</span>
+                        <span>${form.watch("taxAmount").toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Platform Fees</span>
-                        <span>${form.watch('platformFees').toFixed(2)}</span>
+                        <span>${form.watch("platformFees").toFixed(2)}</span>
                       </div>
                       <div className="border-t pt-2 mt-2 font-medium flex justify-between">
                         <span>Total</span>
-                        <span>${(
-                          calculateTotals.subtotal + 
-                          (form.watch('shippingCost') || 0) + 
-                          (form.watch('taxAmount') || 0) + 
-                          (form.watch('platformFees') || 0)
-                        ).toFixed(2)}</span>
+                        <span>
+                          $
+                          {(
+                            calculateTotals.subtotal +
+                            (form.watch("shippingCost") || 0) +
+                            (form.watch("taxAmount") || 0) +
+                            (form.watch("platformFees") || 0)
+                          ).toFixed(2)}
+                        </span>
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="text-sm text-muted-foreground">
-                    Please review all details before creating the sale. This action cannot be undone.
+                    Please review all details before creating the sale. This
+                    action cannot be undone.
                   </div>
                 </div>
               )}
             </div>
 
             <DialogFooter className="mt-4 gap-2">
-              {currentStep !== 'items' && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={onPrevious}
-                >
+              {currentStep !== "items" && (
+                <Button type="button" variant="outline" onClick={onPrevious}>
                   <ArrowLeftIcon className="h-4 w-4 mr-2" />
                   Back
                 </Button>
               )}
-              
-              {currentStep === 'items' && (
+
+              {currentStep === "items" && (
                 <Button
                   type="button"
                   variant="outline"
@@ -455,12 +480,8 @@ export function CreateSaleDialog() {
                 </Button>
               )}
 
-              {currentStep !== 'review' ? (
-                <Button
-                  type="button"
-                  onClick={onNext}
-                  disabled={!canProceed}
-                >
+              {currentStep !== "review" ? (
+                <Button type="button" onClick={onNext} disabled={!canProceed}>
                   Next
                   <ArrowRightIcon className="h-4 w-4 ml-2" />
                 </Button>

@@ -26,4 +26,4 @@ export async function getUserMetadata(): Promise<UserMetadata> {
 
   if (userError) handleSupabaseError(userError, "Get user");
   return userData.user?.user_metadata || "";
-};
+}

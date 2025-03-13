@@ -11,9 +11,7 @@ export function SaleItemsTable({ items }: SaleItemsTableProps) {
     {
       accessorKey: "name",
       header: "Item",
-      cell: ({ row }) => (
-        <div className="font-medium">{row.original.name}</div>
-      ),
+      cell: ({ row }) => <div className="font-medium">{row.original.name}</div>,
     },
     {
       accessorKey: "sku",
@@ -59,7 +57,7 @@ export function SaleItemsTable({ items }: SaleItemsTableProps) {
   return (
     <DataTable
       columns={columns}
-      data={items || []}      
+      data={items || []}
       enableRowSelection={false}
       searchPlaceholder="Search items..."
     />

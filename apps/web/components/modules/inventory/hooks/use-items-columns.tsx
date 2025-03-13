@@ -84,7 +84,7 @@ export function useItemsColumns({
           ),
         },
       ] as ColumnDef<ItemTableRow>[],
-    [onArchive, onRestore]
+    [onArchive, onRestore],
   );
 }
 

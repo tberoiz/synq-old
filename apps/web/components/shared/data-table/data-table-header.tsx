@@ -17,7 +17,7 @@ export function DataTableHeader<TData>({ table }: DataTableHeaderProps<TData>) {
                 ? null
                 : flexRender(
                     header.column.columnDef.header,
-                    header.getContext()
+                    header.getContext(),
                   )}
             </TableHead>
           ))}

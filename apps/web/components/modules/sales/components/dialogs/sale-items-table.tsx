@@ -14,7 +14,12 @@ import {
   TableHeader,
   TableRow,
 } from "@synq/ui/table";
-import { PlusIcon, TrashIcon, ChevronDownIcon, ChevronRightIcon } from "lucide-react";
+import {
+  PlusIcon,
+  TrashIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
+} from "lucide-react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { CreateSaleInput } from "@synq/supabase/types";
 import { format } from "date-fns";
@@ -49,7 +54,9 @@ export function SaleItemsTable() {
     control,
     name: "items",
   });
-  const [expandedBatches, setExpandedBatches] = React.useState<Set<string>>(new Set());
+  const [expandedBatches, setExpandedBatches] = React.useState<Set<string>>(
+    new Set(),
+  );
 
   // Fetch available purchase items
   const { data: purchaseItems, isLoading } = useQuery({
@@ -58,8 +65,8 @@ export function SaleItemsTable() {
       try {
         const supabase = createClient();
         const userId = await getUserId();
-        console.log('Fetching items for user:', userId);
-        
+        console.log("Fetching items for user:", userId);
+
         const { data, error } = await supabase
           .from("user_purchase_items")
           .select(
@@ -84,39 +91,42 @@ export function SaleItemsTable() {
           .order("created_at", { ascending: false });
 
         if (error) {
-          console.error('Supabase query error:', error);
+          console.error("Supabase query error:", error);
           throw error;
         }
 
-        console.log('Fetched purchase items:', data);
+        console.log("Fetched purchase items:", data);
         return data as unknown as PurchaseItem[];
       } catch (err) {
-        console.error('Error in queryFn:', err);
+        console.error("Error in queryFn:", err);
         throw err;
       }
     },
   });
 
   const groupedByBatch = React.useMemo(() => {
-    console.log('Grouping items:', purchaseItems);
+    console.log("Grouping items:", purchaseItems);
     if (!purchaseItems) return [];
-    
-    const groups = purchaseItems.reduce((acc, item) => {
-      const key = item.batch.id;
-      if (!acc[key]) {
-        acc[key] = {
-          batchId: item.batch.id,
-          batchName: item.batch.name,
-          purchaseDate: item.batch.created_at,
-          items: []
-        };
-      }
-      acc[key].items.push(item);
-      return acc;
-    }, {} as Record<string, BatchGroup>);
+
+    const groups = purchaseItems.reduce(
+      (acc, item) => {
+        const key = item.batch.id;
+        if (!acc[key]) {
+          acc[key] = {
+            batchId: item.batch.id,
+            batchName: item.batch.name,
+            purchaseDate: item.batch.created_at,
+            items: [],
+          };
+        }
+        acc[key].items.push(item);
+        return acc;
+      },
+      {} as Record<string, BatchGroup>,
+    );
 
     const result = Object.values(groups);
-    console.log('Grouped batches:', result);
+    console.log("Grouped batches:", result);
     return result;
   }, [purchaseItems]);
 
@@ -170,7 +180,7 @@ export function SaleItemsTable() {
             ) : (
               groupedByBatch.map((batch) => (
                 <React.Fragment key={batch.batchId}>
-                  <TableRow 
+                  <TableRow
                     className="cursor-pointer hover:bg-muted/50"
                     onClick={() => toggleBatch(batch.batchId)}
                   >
@@ -189,32 +199,33 @@ export function SaleItemsTable() {
                     </TableCell>
                     <TableCell colSpan={4}></TableCell>
                   </TableRow>
-                  {expandedBatches.has(batch.batchId) && batch.items.map((item) => (
-                    <TableRow key={item.id} className="bg-muted/30">
-                      <TableCell></TableCell>
-                      <TableCell className="pl-8">{item.item.name}</TableCell>
-                      <TableCell>{item.item.sku}</TableCell>
-                      <TableCell className="text-right">
-                        {item.remaining_quantity}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        ${item.unit_cost.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            addItem(item);
-                          }}
-                        >
-                          <PlusIcon className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {expandedBatches.has(batch.batchId) &&
+                    batch.items.map((item) => (
+                      <TableRow key={item.id} className="bg-muted/30">
+                        <TableCell></TableCell>
+                        <TableCell className="pl-8">{item.item.name}</TableCell>
+                        <TableCell>{item.item.sku}</TableCell>
+                        <TableCell className="text-right">
+                          {item.remaining_quantity}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          ${item.unit_cost.toFixed(2)}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              addItem(item);
+                            }}
+                          >
+                            <PlusIcon className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
                 </React.Fragment>
               ))
             )}

@@ -33,7 +33,7 @@ export async function fetchItemsView(
     page: number;
     pageSize?: number;
     includeArchived?: boolean;
-  }
+  },
 ): Promise<PaginatedResponse<ItemTableRow>> {
   const pageSize = params.pageSize || DEFAULT_ITEMS_PER_PAGE;
   const start = (params.page - 1) * pageSize;
@@ -42,9 +42,12 @@ export async function fetchItemsView(
   // Build the query
   let query = supabase
     .from("vw_items_ui_table")
-    .select(`item_id, item_name, sku, category, listing_price, is_archived, total_quantity`, {
-      count: "exact",
-    })
+    .select(
+      `item_id, item_name, sku, category, listing_price, is_archived, total_quantity`,
+      {
+        count: "exact",
+      },
+    )
     .eq("user_id", params.userId)
     .order("item_name")
     .range(start, end);
@@ -65,7 +68,7 @@ export async function fetchItemsView(
  */
 export async function fetchItemDetails(
   supabase: SupabaseClient,
-  itemId: Pick<ItemDetails, "item_id">
+  itemId: Pick<ItemDetails, "item_id">,
 ): Promise<ItemDetails> {
   const { data, error } = await supabase
     .from("vw_items_ui_table")
@@ -93,7 +96,7 @@ function transformPurchaseBatches(
     quantity: number;
     unit_cost: number;
     created_at: string;
-  }> | null
+  }> | null,
 ): TransformedPurchaseBatch[] {
   return (
     batches?.map((batch) => ({
@@ -116,7 +119,7 @@ function transformPurchaseBatches(
 export async function updateItemDetails(
   supabase: SupabaseClient,
   itemId: Pick<ItemDetails, "item_id">,
-  updates: ItemUpdateParams
+  updates: ItemUpdateParams,
 ): Promise<void> {
   const { error } = await supabase
     .from("user_inventory_items")

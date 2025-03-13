@@ -115,7 +115,7 @@ export default function PurchasesDataTable({
   });
 
   const handleSaveBatch = async (
-    updates: { id: string; quantity: number; unit_cost: number }[]
+    updates: { id: string; quantity: number; unit_cost: number }[],
   ) => {
     const supabase = createClient();
     await Promise.all(
@@ -123,8 +123,8 @@ export default function PurchasesDataTable({
         updatePurchaseItem(supabase, update.id, {
           quantity: update.quantity,
           unit_cost: update.unit_cost,
-        })
-      )
+        }),
+      ),
     );
     await queryClient.invalidateQueries({
       queryKey: ["purchases"],
@@ -193,7 +193,7 @@ export default function PurchasesDataTable({
             row.original.status === "archived" &&
               "bg-red-50 text-red-700 hover:bg-red-50 dark:bg-red-950/20 dark:text-red-300",
             row.original.status === "active" &&
-              "bg-green-50 text-green-700 hover:bg-green-50 dark:bg-green-950/20 dark:text-green-300"
+              "bg-green-50 text-green-700 hover:bg-green-50 dark:bg-green-950/20 dark:text-green-300",
           )}
         >
           {row.original.status === "archived" ? "Archived" : "Active"}

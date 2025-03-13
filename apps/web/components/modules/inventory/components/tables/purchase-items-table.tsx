@@ -13,7 +13,7 @@ interface PurchaseItemsTableProps {
   data: PurchaseItemWithDetails[];
   onRemoveItem: (id: string) => void;
   onSaveBatch: (
-    updates: Map<string, { quantity: number; unit_cost: number }>
+    updates: Map<string, { quantity: number; unit_cost: number }>,
   ) => void;
   onDirtyChange?: (isDirty: boolean) => void;
   showHeader?: boolean;
@@ -29,7 +29,7 @@ const PurchaseItemsTable = React.forwardRef<
 >(
   (
     { data, onRemoveItem, onSaveBatch, onDirtyChange, showHeader = true },
-    ref
+    ref,
   ) => {
     const [updates, setUpdates] = React.useState<
       Map<string, { quantity: number; unit_cost: number }>
@@ -96,7 +96,7 @@ const PurchaseItemsTable = React.forwardRef<
               onChange={(e) =>
                 handleQuantityChange(
                   row.original.id,
-                  parseInt(e.target.value, 10)
+                  parseInt(e.target.value, 10),
                 )
               }
             />
@@ -119,7 +119,7 @@ const PurchaseItemsTable = React.forwardRef<
               onChange={(e) =>
                 handleUnitCostChange(
                   row.original.id,
-                  parseFloat(e.target.value)
+                  parseFloat(e.target.value),
                 )
               }
             />
@@ -154,7 +154,7 @@ const PurchaseItemsTable = React.forwardRef<
         />
       </div>
     );
-  }
+  },
 );
 
 PurchaseItemsTable.displayName = "PurchaseItemsTable";

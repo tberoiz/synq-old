@@ -30,7 +30,7 @@ export default function ImportItemsTable({
     return data.filter(
       (item) =>
         item.name.toLowerCase().includes(query) ||
-        item?.sku?.toLowerCase().includes(query)
+        item?.sku?.toLowerCase().includes(query),
     );
   }, [data, searchQuery]);
 
@@ -73,7 +73,7 @@ export default function ImportItemsTable({
             }
             setSelectedItems(newSelected);
             onSelectionChange(
-              filteredData.filter((item) => newSelected.has(item.id))
+              filteredData.filter((item) => newSelected.has(item.id)),
             );
           }}
         />

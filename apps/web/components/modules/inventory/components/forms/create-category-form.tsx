@@ -17,10 +17,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@synq/ui/form";
-import {
-  DialogClose,
-  DialogFooter,
-} from "@synq/ui/dialog";
+import { DialogClose, DialogFooter } from "@synq/ui/dialog";
 
 const categorySchema = z.object({
   name: z

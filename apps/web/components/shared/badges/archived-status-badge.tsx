@@ -23,7 +23,7 @@ export default function ArchiveStatusBadge({
       variant="secondary"
       className={cn(
         "transition-colors hover:bg-opacity-80 dark:hover:bg-opacity-30",
-        statusStyles
+        statusStyles,
       )}
       aria-label={`Status: ${status}`}
     >

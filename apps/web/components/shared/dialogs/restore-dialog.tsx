@@ -28,7 +28,10 @@ interface RestoreDialogProps<T> {
   queryKey?: string[];
 }
 
-export function useRestoreDialog<T>({ queryKey, onRestore }: UseRestoreDialogProps<T> = {}) {
+export function useRestoreDialog<T>({
+  queryKey,
+  onRestore,
+}: UseRestoreDialogProps<T> = {}) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [selectedItem, setSelectedItem] = React.useState<T | null>(null);
   const queryClient = useQueryClient();

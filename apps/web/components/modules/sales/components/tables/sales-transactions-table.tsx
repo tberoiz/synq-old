@@ -96,9 +96,7 @@ interface SalesTransactionsTableProps {
   data: Sale[];
 }
 
-export function SalesTransactionsTable({
-  data,
-}: SalesTransactionsTableProps) {
+export function SalesTransactionsTable({ data }: SalesTransactionsTableProps) {
   const [selectedSale, setSelectedSale] = React.useState<Sale | null>(null);
   const [isMobile, setIsMobile] = React.useState(false);
 

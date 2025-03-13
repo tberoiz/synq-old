@@ -20,11 +20,15 @@ import { useItemsColumns } from "@ui/modules/inventory/hooks/use-items-columns";
 // Types
 import { ItemTableRow } from "@synq/supabase/types";
 
-
 export function ItemsTableClient({ items }: { items: ItemTableRow[] }) {
   const queryClient = useQueryClient();
-  const [selectedItemId, setSelectedItemId] = React.useState<Pick<ItemTableRow, "item_id"> | null>(null);
-  const [dialogType, setDialogType] = React.useState<"archive" | "restore" | null>(null);
+  const [selectedItemId, setSelectedItemId] = React.useState<Pick<
+    ItemTableRow,
+    "item_id"
+  > | null>(null);
+  const [dialogType, setDialogType] = React.useState<
+    "archive" | "restore" | null
+  >(null);
   const supabase = React.useMemo(() => createClient(), []);
 
   const handleArchive = async () => {
@@ -66,7 +70,9 @@ export function ItemsTableClient({ items }: { items: ItemTableRow[] }) {
         enableRowSelection={false}
         searchColumn="item_name"
         idKey="item_id"
-        onRowClick={(item) => setSelectedItemId(item.item_id ? { item_id: item.item_id } : null)}
+        onRowClick={(item) =>
+          setSelectedItemId(item.item_id ? { item_id: item.item_id } : null)
+        }
       />
       <ItemDetailsSheet
         itemId={selectedItemId}
