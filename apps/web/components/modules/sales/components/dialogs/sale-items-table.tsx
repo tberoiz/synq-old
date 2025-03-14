@@ -23,7 +23,6 @@ import {
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { CreateSaleInput } from "@synq/supabase/types";
 import { format } from "date-fns";
-import { cn } from "@synq/ui/utils";
 
 interface PurchaseItem {
   id: string;
