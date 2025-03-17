@@ -6,19 +6,10 @@ import {
   ItemTableRow,
   TransformedPurchaseBatch,
 } from "lib/types/items";
+import { handleSupabaseError } from "../utils/error";
 
 // Constants
 const DEFAULT_ITEMS_PER_PAGE = 10;
-
-/**
- * Handles Supabase errors by throwing a descriptive error message.
- * @param error - The error object returned by Supabase.
- * @param operation - A string describing the operation that failed.
- * @throws {Error} - Throws an error with a descriptive message.
- */
-function handleSupabaseError(error: any, operation: string): never {
-  throw new Error(`${operation} failed: ${error.message}`);
-}
 
 /**
  * Fetches a paginated list of items from the `vw_items_ui_table` view.
@@ -80,33 +71,40 @@ export async function fetchItemDetails(
 
   return {
     ...data,
-    purchase_batches: transformPurchaseBatches(data.purchase_batches),
+    purchase_batches: _transformPurchaseBatches(data.purchase_batches),
   };
 }
 
+type CreateItemParams = {
+  categoryId: string;
+  name: string;
+  sku?: string;
+  cogs: number;
+  listingPrice: number;
+  userId: string;
+};
+
 /**
- * Transforms purchase batches into a standardized format.
- * @param batches - An array of purchase batches or null.
- * @returns {TransformedPurchaseBatch[]} - An array of transformed purchase batches.
+ * Creates a item in the `user_inventory_items` table.
+ * @param supabase - The Supabase client instance.
+ * @param params - The params of the item to create.
+ * @returns {Promise<void>}
  */
-function transformPurchaseBatches(
-  batches: Array<{
-    batch_id: string;
-    name: string;
-    quantity: number;
-    unit_cost: number;
-    created_at: string;
-  }> | null,
-): TransformedPurchaseBatch[] {
-  return (
-    batches?.map((batch) => ({
-      id: batch.batch_id,
-      name: batch.name,
-      quantity: batch.quantity,
-      unit_cost: batch.unit_cost,
-      created_at: batch.created_at,
-    })) || []
-  );
+export async function createItem(
+  supabase: SupabaseClient,
+  params: CreateItemParams,
+): Promise<void> {
+  const { error } = await supabase.from("user_inventory_items").insert({
+    user_id: params.userId,
+    inventory_group_id: params.categoryId,
+    name: params.name,
+    sku: params.sku,
+    default_cogs: params.cogs,
+    listing_price: params.listingPrice,
+    is_archived: false,
+  });
+
+  if (error) handleSupabaseError(error, "Item creation");
 }
 
 /**
@@ -130,4 +128,65 @@ export async function updateItemDetails(
     .eq("id", itemId.item_id);
 
   if (error) handleSupabaseError(error, "Item update");
+}
+
+/**
+ * Archives an item from the `user_inventory_items` table.
+ * @param supabase - The Supabase client instance.
+ * @param itemId - The ID of the item to update.
+ * @returns {Promise<void>}
+ */
+export async function archiveItem(
+  supabase: SupabaseClient,
+  itemId: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from("user_inventory_items")
+    .update({ is_archived: true })
+    .eq("id", itemId);
+
+  if (error) handleSupabaseError(error, "Item archive");
+}
+
+/**
+ * Restore an item from the `user_inventory_items` table.
+ * @param supabase - The Supabase client instance.
+ * @param itemId - The ID of the item to update.
+ * @returns {Promise<void>}
+ */
+export async function restoreItem(
+  supabase: SupabaseClient,
+  itemId: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from("user_inventory_items")
+    .update({ is_archived: false })
+    .eq("id", itemId);
+
+  if (error) handleSupabaseError(error, "Item restore");
+}
+
+/**
+ * Transforms purchase batches into a standardized format.
+ * @param batches - An array of purchase batches or null.
+ * @returns {TransformedPurchaseBatch[]} - An array of transformed purchase batches.
+ */
+function _transformPurchaseBatches(
+  batches: Array<{
+    batch_id: string;
+    name: string;
+    quantity: number;
+    unit_cost: number;
+    created_at: string;
+  }> | null,
+): TransformedPurchaseBatch[] {
+  return (
+    batches?.map((batch) => ({
+      id: batch.batch_id,
+      name: batch.name,
+      quantity: batch.quantity,
+      unit_cost: batch.unit_cost,
+      created_at: batch.created_at,
+    })) || []
+  );
 }

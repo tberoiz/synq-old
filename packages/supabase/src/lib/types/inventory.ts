@@ -59,29 +59,12 @@ export type PurchaseItemWithDetails = PurchaseItem & {
   is_archived: boolean;
 };
 
-export type BatchWithDetails = Pick<
-  PurchaseBatch,
-  "id" | "name" | "created_at" | "status"
->;
-
-// Full type for the items view including purchase batches
-export type ItemViewWithPurchaseBatches = ItemTableRow & {
-  purchase_batches: TransformedPurchaseBatch[];
-};
-
 export interface PaginatedResponse<T> {
   data: T[];
   count: number;
 }
 
-export type CreateItemParams = {
-  categoryId: string;
-  name: string;
-  sku?: string;
-  cogs: number;
-  listingPrice: number;
-  userId: string;
-};
+
 
 export type CreatePurchaseParams = {
   name: string;

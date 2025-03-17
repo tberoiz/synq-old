@@ -1,10 +1,8 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import {
   InventoryGroup,
-  InventoryItemWithDetails,
   Purchase,
   PurchaseBatch,
-  CreateItemParams,
   CreatePurchaseParams,
 } from "../types/inventory";
 
@@ -24,65 +22,6 @@ export async function fetchCategories(
 
   if (error) handleSupabaseError(error, "Categories fetch");
   return data;
-}
-
-// Inventory Items
-export async function fetchInventoryItems(
-  supabase: SupabaseClient,
-  includeArchived: boolean = false,
-): Promise<InventoryItemWithDetails[]> {
-  let query = supabase
-    .from("user_inventory_items")
-    .select(
-      `
-      *,
-      category:user_inventory_groups (
-        name
-      )
-    `,
-    )
-    .order("name");
-
-  if (!includeArchived) {
-    query = query.eq("is_archived", false);
-  }
-
-  const { data, error } = await query;
-
-  if (error) handleSupabaseError(error, "Inventory items fetch");
-  return data.map((item) => ({
-    ...item,
-    category: item.category?.name,
-  }));
-}
-
-export async function createCustomItem(
-  supabase: SupabaseClient,
-  params: CreateItemParams,
-): Promise<void> {
-  const { error } = await supabase.from("user_inventory_items").insert({
-    user_id: params.userId,
-    inventory_group_id: params.categoryId,
-    name: params.name,
-    sku: params.sku,
-    default_cogs: params.cogs,
-    listing_price: params.listingPrice,
-    is_archived: false,
-  });
-
-  if (error) handleSupabaseError(error, "Item creation");
-}
-
-export async function deleteInventoryItem(
-  supabase: SupabaseClient,
-  itemId: string,
-): Promise<void> {
-  const { error } = await supabase
-    .from("user_inventory_items")
-    .delete()
-    .eq("id", itemId);
-
-  if (error) handleSupabaseError(error, "Item deletion");
 }
 
 // Purchases
@@ -214,26 +153,3 @@ export async function restorePurchase(
   if (error) handleSupabaseError(error, "Purchase restore");
 }
 
-export async function archiveItem(
-  supabase: SupabaseClient,
-  itemId: string,
-): Promise<void> {
-  const { error } = await supabase
-    .from("user_inventory_items")
-    .update({ is_archived: true })
-    .eq("id", itemId);
-
-  if (error) handleSupabaseError(error, "Item archive");
-}
-
-export async function restoreItem(
-  supabase: SupabaseClient,
-  itemId: string,
-): Promise<void> {
-  const { error } = await supabase
-    .from("user_inventory_items")
-    .update({ is_archived: false })
-    .eq("id", itemId);
-
-  if (error) handleSupabaseError(error, "Item restore");
-}

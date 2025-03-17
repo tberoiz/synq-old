@@ -6,8 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { createClient } from "@synq/supabase/client";
 import { useToast } from "@synq/ui/use-toast";
-import { getUserId } from "@synq/supabase/queries";
-import { fetchInventoryItems, createPurchase } from "@synq/supabase/queries";
+import { fetchItemsView, getUserId } from "@synq/supabase/queries";
+import { createPurchase } from "@synq/supabase/queries";
 import { Button } from "@synq/ui/button";
 import { Input } from "@synq/ui/input";
 import { Label } from "@synq/ui/label";
@@ -31,7 +31,7 @@ const purchaseSchema = z.object({
         item_id: z.string(),
         quantity: z.number().min(1),
         unit_cost: z.number().min(0),
-      }),
+      })
     )
     .min(1),
 });
@@ -56,21 +56,23 @@ export default function CreatePurchaseForm({
   const { toast } = useToast();
 
   // Fetch user ID
-  const { data: userId } = useQuery({
-    queryKey: ["user_id"],
-    queryFn: getUserId,
-  });
-
   // Fetch available items
   const { data: inventoryItems, isLoading: isItemsLoading } = useQuery({
     queryKey: ["inventory_items"],
-    queryFn: () => fetchInventoryItems(supabase, false),
+    queryFn: async () => {
+      const userId = await getUserId();
+      return fetchItemsView(supabase, {
+        userId,
+        page: 1,
+        includeArchived: false,
+      });
+    },
   });
 
   // Create purchase mutation
   const { mutate: createPurchaseMutation, isPending } = useMutation({
     mutationFn: async (data: PurchaseFormData) => {
-      if (!userId) throw new Error("User ID is required");
+      const userId = await getUserId();
       return createPurchase(supabase, {
         name: data.name,
         userId,
@@ -119,7 +121,7 @@ export default function CreatePurchaseForm({
 
   // Helper function to get item details
   const getItemDetails = (itemId: string) => {
-    return inventoryItems?.find((item) => item.id === itemId);
+    return inventoryItems?.data?.find((item) => item.id === itemId);
   };
 
   return (
@@ -139,7 +141,7 @@ export default function CreatePurchaseForm({
         <div className="flex items-center justify-between">
           <Label>Select Items</Label>
           <ImportItemsDialog
-            items={inventoryItems || []}
+            items={inventoryItems?.data || []}
             title="Select Items for Purchase"
             onImport={handleImportItems}
             loading={isItemsLoading}
@@ -182,7 +184,7 @@ export default function CreatePurchaseForm({
                                   `items.${index}.quantity` as const,
                                   {
                                     valueAsNumber: true,
-                                  },
+                                  }
                                 )}
                               />
                             </TableCell>
@@ -196,7 +198,7 @@ export default function CreatePurchaseForm({
                                   `items.${index}.unit_cost` as const,
                                   {
                                     valueAsNumber: true,
-                                  },
+                                  }
                                 )}
                               />
                             </TableCell>
@@ -207,7 +209,7 @@ export default function CreatePurchaseForm({
                                 size="icon"
                                 onClick={() => {
                                   const newItems = formItems.filter(
-                                    (_, i) => i !== index,
+                                    (_, i) => i !== index
                                   );
                                   setValue("items", newItems);
                                 }}
@@ -230,7 +232,7 @@ export default function CreatePurchaseForm({
 
       <Button
         type="submit"
-        disabled={isPending || !userId || formItems.length === 0}
+        disabled={isPending || formItems.length === 0}
         className="w-full"
       >
         {isPending ? "Creating..." : "Create Purchase"}

@@ -7,7 +7,7 @@ import { Button } from "@synq/ui/button";
 import { Input } from "@synq/ui/input";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useToast } from "@synq/ui/use-toast";
-import { createCustomItem, fetchCategories } from "@synq/supabase/queries";
+import { createItem, fetchCategories } from "@synq/supabase/queries";
 import {
   Form,
   FormControl,
@@ -102,7 +102,7 @@ export const CreateItemForm = ({ onSuccess }: { onSuccess?: () => void }) => {
     }
 
     try {
-      await createCustomItem(supabase, {
+      await createItem(supabase, {
         categoryId: data.categoryId,
         name: data.name,
         sku: data.sku,
