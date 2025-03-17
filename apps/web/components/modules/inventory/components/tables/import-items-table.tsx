@@ -22,7 +22,7 @@ export default function ImportItemsTable({
   onSelectionChange,
 }: ImportItemsTableProps) {
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery] = useState("");
 
   const filteredData = useMemo(() => {
     if (!searchQuery) return data;
@@ -37,7 +37,7 @@ export default function ImportItemsTable({
   const columns: ColumnDef<ImportItem>[] = [
     {
       id: "select",
-      header: ({ table }) => (
+      header: () => (
         <CheckSquare
           className={`h-4 w-4 cursor-pointer ${
             selectedItems.size === filteredData.length

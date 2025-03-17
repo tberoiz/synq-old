@@ -39,6 +39,7 @@ export default function PnLReportsPage() {
 
   return (
     <PageContainer>
+      {reportActions}
       <div className="p-6 border rounded-lg bg-white shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full table-auto">

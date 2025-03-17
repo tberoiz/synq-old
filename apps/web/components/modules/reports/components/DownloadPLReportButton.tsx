@@ -5,12 +5,10 @@ import { generatePLReport } from "@ui/modules/reports/actions/reports";
 import { Download } from "lucide-react";
 import type {
   PDFReportData,
-  ActionResponse,
   ActionError,
 } from "@synq/supabase/types";
 import { Button } from "@synq/ui/button";
 import { useToast } from "@synq/ui/use-toast";
-import type { SafeActionResult } from "next-safe-action";
 
 interface DownloadPLReportButtonProps {
   startDate: Date;

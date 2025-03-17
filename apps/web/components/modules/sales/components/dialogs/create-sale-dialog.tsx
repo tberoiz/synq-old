@@ -1,12 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { createSaleSchema, type CreateSaleInput } from "@synq/supabase/types";
-import { useToast } from "@synq/ui/use-toast";
-import { Button } from "@synq/ui/button";
+import {useForm} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {useMutation, useQueryClient} from "@tanstack/react-query";
+import {type CreateSaleInput, createSaleSchema} from "@synq/supabase/types";
+import {useToast} from "@synq/ui/use-toast";
+import {Button} from "@synq/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -16,34 +16,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@synq/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@synq/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@synq/ui/select";
-import { Input } from "@synq/ui/input";
-import { Textarea } from "@synq/ui/textarea";
-import {
-  PlusIcon,
-  ArrowLeftIcon,
-  ArrowRightIcon,
-  CheckIcon,
-} from "lucide-react";
-import { format } from "date-fns";
-import { SaleItemsTable } from "./sale-items-table";
-import { createSale, getUserId } from "@synq/supabase/queries";
-import { createClient } from "@synq/supabase/client";
-import { cn } from "@synq/ui/utils";
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage,} from "@synq/ui/form";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@synq/ui/select";
+import {Input} from "@synq/ui/input";
+import {Textarea} from "@synq/ui/textarea";
+import {ArrowLeftIcon, ArrowRightIcon, CheckIcon, PlusIcon,} from "lucide-react";
+import {format} from "date-fns";
+import {SaleItemsTable} from "./sale-items-table";
+import {createSale, getUserId} from "@synq/supabase/queries";
+import {cn} from "@synq/ui/utils";
 
 const steps = [
   { id: "items", title: "Select Items" },
@@ -58,7 +39,6 @@ export function CreateSaleDialog() {
   const [currentStep, setCurrentStep] = React.useState<Step>("items");
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const supabase = createClient();
 
   const form = useForm<CreateSaleInput>({
     resolver: zodResolver(createSaleSchema),
@@ -91,28 +71,26 @@ export function CreateSaleDialog() {
       const userId = await getUserId();
       if (!userId) throw new Error("User ID not found");
 
-      const sale = await createSale(
-        userId,
-        {
-          status: data.status,
-          platform: data.platform,
-          saleDate: data.saleDate || new Date(),
-          shippingCost: data.shippingCost,
-          taxAmount: data.taxAmount,
-          platformFees: data.platformFees,
-          notes: data.notes,
-        },
-        data.items.map((item) => ({
-          purchaseItemId: item.purchaseItemId,
-          quantity: item.quantity,
-          salePrice: item.salePrice,
-        })),
+      return await createSale(
+          userId,
+          {
+            status: data.status,
+            platform: data.platform,
+            saleDate: data.saleDate || new Date(),
+            shippingCost: data.shippingCost,
+            taxAmount: data.taxAmount,
+            platformFees: data.platformFees,
+            notes: data.notes,
+          },
+          data.items.map((item) => ({
+            purchaseItemId: item.purchaseItemId,
+            quantity: item.quantity,
+            salePrice: item.salePrice,
+          })),
       );
-
-      return sale;
     },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["sales"] });
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ["sales"]}).then(() => {});
       toast({
         title: "Sale created",
         description: "Your sale has been created successfully.",

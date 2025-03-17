@@ -8,11 +8,12 @@ import { DataTable } from "@ui/shared/data-table/data-table";
 import { createClient } from "@synq/supabase/client";
 import { archiveItem, restoreItem } from "@synq/supabase/queries";
 
-// Internal Components
+// Dialogs
 import { CreateItemDialog } from "../dialogs/create-item-dialog";
 import { ArchiveDialog } from "@ui/shared/dialogs/archive-dialog";
 import { RestoreDialog } from "@ui/shared/dialogs/restore-dialog";
 
+// Sheets
 import ItemDetailsSheet from "../sheets/item-details-sheet";
 
 // Columns
@@ -74,6 +75,7 @@ export function ItemsTableClient({ items }: { items: ItemTableRow[] }) {
           setSelectedItemId(item.item_id ? { item_id: item.item_id } : null)
         }
       />
+
       <ItemDetailsSheet
         itemId={selectedItemId}
         open={!!selectedItemId}

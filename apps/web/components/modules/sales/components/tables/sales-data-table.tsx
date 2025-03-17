@@ -78,7 +78,7 @@ const columns: ColumnDef<Sale>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => {
+    cell: ({  }) => {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

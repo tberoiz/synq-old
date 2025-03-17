@@ -28,7 +28,7 @@ const PurchaseItemsTable = React.forwardRef<
   PurchaseItemsTableProps
 >(
   (
-    { data, onRemoveItem, onSaveBatch, onDirtyChange, showHeader = true },
+    { data, onRemoveItem, onDirtyChange },
     ref,
   ) => {
     const [updates, setUpdates] = React.useState<

@@ -26,7 +26,6 @@ interface ImportItemsDialogProps {
 export function ImportItemsDialog({
   items,
   title,
-  actions,
   onImport,
   loading = false,
 }: ImportItemsDialogProps) {

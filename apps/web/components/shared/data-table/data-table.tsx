@@ -1,6 +1,5 @@
 import * as React from "react";
 import {
-  type Table as TanstackTable,
   type ColumnDef,
   type ColumnFiltersState,
   type SortingState,

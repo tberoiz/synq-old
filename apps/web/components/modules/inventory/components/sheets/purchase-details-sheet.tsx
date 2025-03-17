@@ -38,7 +38,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@synq/ui/card";
 import PurchaseItemsTable, {
   type PurchaseItemsTableRef,
 } from "@ui/modules/inventory/components/tables/purchase-items-table";
-import { PurchaseItem, InventoryItemWithDetails } from "@synq/supabase/types";
+import { InventoryItemWithDetails } from "@synq/supabase/types";
 import { CreateItemDialog } from "../dialogs/create-item-dialog";
 import { ImportItemsDialog } from "../dialogs/import-items-dialog";
 
@@ -53,7 +53,6 @@ interface PurchaseDetailsSheetProps {
 export default function PurchaseDetailsSheet({
   purchase,
   isMobile,
-  onSaveBatch,
 }: PurchaseDetailsSheetProps) {
   const queryClient = useQueryClient();
   const supabase = createClient();
@@ -84,7 +83,7 @@ export default function PurchaseDetailsSheet({
     enabled: !!purchase,
   });
 
-  const { mutate: addItemMutation } = useMutation({
+  useMutation({
     mutationFn: async (data: {
       item_id: string;
       quantity: number;
@@ -98,7 +97,7 @@ export default function PurchaseDetailsSheet({
         data.item_id,
         data.quantity,
         data.unit_cost,
-        userId,
+        userId
       );
     },
     onSuccess: () => {

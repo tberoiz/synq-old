@@ -1,13 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { toast } from "@synq/ui/use-toast";
-import { Button } from "@synq/ui/button";
-import { Checkbox } from "@synq/ui/checkbox";
 import {
   Form,
   FormControl,
@@ -15,9 +12,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from "@synq/ui/form";
-import { RadioGroup, RadioGroupItem } from "@synq/ui/radio-group";
 import { Switch } from "@synq/ui/switch";
 
 const notificationsFormSchema = z.object({
