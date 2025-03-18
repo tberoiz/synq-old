@@ -83,7 +83,7 @@ Next.js Specifics
     ```
   
 Key Conventions
-  - Use 'nuqs' for URL search parameter state management.
+  - use yarn as package manager for everything.
   - Optimize Web Vitals (LCP, CLS, FID).
   - Limit 'use client':
     - Favor server components and Next.js SSR.

@@ -1,5 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js";
-import { PaginatedResponse } from "../types/inventory";
+import { PaginatedResponse } from "../types/actions";
 import {
   ItemDetails,
   ItemUpdateParams,
@@ -32,35 +32,86 @@ export async function fetchItemsView(
   const start = (params.page - 1) * pageSize;
   const end = start + pageSize - 1;
 
-  // Build the query
-  let query = supabase
-    .from("vw_items_ui_table")
-    .select(
-      `item_id, item_name, sku, category, listing_price, is_archived, total_quantity`,
-      {
-        count: "exact",
-      },
-    )
-    .eq("user_id", params.userId)
-    .order("item_name")
-    .range(start, end);
+  try {
+    // Build the query
+    let query = supabase
+      .from("vw_items_ui_table")
+      .select(
+        `item_id, item_name, sku, category, listing_price, is_archived, total_quantity`,
+        {
+          count: "exact",
+        },
+      )
+      .eq("user_id", params.userId);
 
-  // Add search filter if searchTerm is provided
-  if (params.searchTerm) {
-    query = query.ilike("item_name", `%${params.searchTerm}%`);
+    // Add archived filter if specified
+    if (!params.includeArchived) {
+      query = query.eq("is_archived", false);
+    }
+
+    // Add search filter if searchTerm is provided
+    if (params.searchTerm) {
+      query = query.ilike("item_name", `%${params.searchTerm}%`);
+    }
+
+    // Add category filter if categoryId is provided
+    if (params.categoryId) {
+      query = query.eq("inventory_group_id", params.categoryId);
+    }
+
+    // Add ordering and pagination
+    query = query.order("item_name").range(start, end);
+
+    // Execute the query
+    const { data, error, count } = await query;
+
+    if (error) {
+      // Handle pagination range error
+      if (error.code === "PGRST103") {
+        // If we're requesting a page beyond the available data, return the last available page
+        const totalPages = Math.ceil((count ?? 0) / pageSize);
+        const lastPage = Math.max(1, totalPages);
+        
+        if (params.page > lastPage) {
+          // Recursive call to fetch the last available page
+          return fetchItemsView(supabase, {
+            ...params,
+            page: lastPage,
+          });
+        }
+      }
+
+      console.error("Supabase query error:", {
+        error,
+        params,
+        queryDetails: {
+          table: "vw_items_ui_table",
+          filters: {
+            userId: params.userId,
+            includeArchived: params.includeArchived,
+            searchTerm: params.searchTerm,
+            categoryId: params.categoryId,
+          },
+          pagination: {
+            start,
+            end,
+            pageSize,
+            currentPage: params.page,
+            totalCount: count,
+          },
+        },
+      });
+      handleSupabaseError(error, "Items fetch");
+    }
+
+    return { data: data as ItemTableRow[], count: count ?? 0 };
+  } catch (error) {
+    console.error("Error in fetchItemsView:", {
+      error,
+      params,
+    });
+    throw error;
   }
-
-  // Add category filter if categoryId is provided
-  if (params.categoryId) {
-    query = query.eq("inventory_group_id", params.categoryId);
-  }
-
-  // Execute the query
-  const { data, error, count } = await query;
-
-  if (error) handleSupabaseError(error, "Items fetch");
-
-  return { data: data as ItemTableRow[], count: count ?? 0 };
 }
 
 /**
@@ -202,3 +253,5 @@ function _transformPurchaseBatches(
     })) || []
   );
 }
+
+

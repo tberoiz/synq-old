@@ -6,6 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from "@synq/ui/dialog";
 import { Button } from "@synq/ui/button";
 import { Plus } from "lucide-react";
@@ -24,6 +25,9 @@ export const CreateItemDialog = () => (
         <DialogTitle className="flex items-center gap-2">
           Add New Item
         </DialogTitle>
+        <DialogDescription>
+          Add a new item to your inventory with details like name, category, and price.
+        </DialogDescription>
       </DialogHeader>
       <CreateItemForm />
     </DialogContent>

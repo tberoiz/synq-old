@@ -4,8 +4,6 @@ import { createClient } from "@synq/supabase/server";
 import { fetchItemsView, getUserId } from "@synq/supabase/queries";
 import { ItemsTableClient } from "./items-table-client";
 
-
-// TODO: Add pagination
 async function getItems() {
   const supabase = await createClient();
   const userId = await getUserId();

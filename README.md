@@ -1,81 +1,113 @@
-# Turborepo starter
+<div align="center">
+  <img src="./apps/web/public/brand/synq-icon.png" alt="Synq Logo" width="50" height="50"  />
+</div>
+<p align="center">| <a href="https://trysynq.com">Demo</a> | <a href="https://trysynq/docs">Documentation</a> |
+<br />
 
-This is an official starter Turborepo.
+Synq is a personal project developed to help individual online sellers manage their inventory and sales more efficiently. Born from the need to move beyond spreadsheet-based tracking, this tool aims to provide a simple yet powerful solution for small-scale e-commerce operations.
 
-## Using this example
+  <img src="./apps/web/public/brand/synq-eyecatcher.png" alt="Synq Logo" width="100%" height="100%"  />
 
-Run the following command:
+## Project Goals
 
-```sh
-npx create-turbo@latest
-```
+- 🎓 **Learning Experience**: A hands-on project to enhance full-stack development skills
+- 🛍️ **Practical Solution**: Help individual sellers track inventory and sales without complex enterprise software
+- 💡 **Technical Growth**: Implement modern web technologies and best practices
+- 📊 **Data Management**: Create an intuitive system for managing product data and sales records
 
-## What's inside?
+## Features
 
-This Turborepo includes the following packages/apps:
+- 📦 **Simple Inventory Tracking** – Monitor stock levels and product details
+- 📊 **Sales Overview** – Track sales across different platforms
+- 💰 **Basic Profitability** – Calculate costs and revenue
+- 🔄 **Data Import/Export** – Easy migration from spreadsheets
+- 📈 **Basic Reports** – Generate simple financial insights
 
-### Apps and Packages
+## Tech Stack
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@synq/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@synq/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@synq/typescript-config`: `tsconfig.json`s used throughout the monorepo
+- **Frontend:**
+  - Next.js 15 (App Router)
+  - React 19
+  - TypeScript 5.5
+  - Tailwind CSS 3.4
+  - Radix UI components
+  - next-safe-action for server actions
+  - React Query for data fetching
+  - React Hook Form with Zod validation
+  - Recharts for data visualization
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+- **Backend:**
+  - Next.js API Routes
+  - Supabase for authentication and database
+  - Prisma ORM for database operations
 
-### Utilities
+- **Development:**
+  - Turborepo for monorepo management
+  - ESLint and Prettier for code quality
+  - TypeScript for type safety
 
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-pnpm build
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-```
-cd my-turborepo
-pnpm dev
-```
-
-### Remote Caching
-
-Turborepo can use a technique known as [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup), then enter the following commands:
+## Project Structure
 
 ```
-cd my-turborepo
-npx turbo login
+synq/
+├── apps/                    # Applications
+│   ├── web/               # Next.js web application (port 3000)
+│   └── desktop/           # Electron desktop application (port 3001)
+├── packages/              # Shared packages
+│   ├── ui/               # Shared UI components
+│   ├── supabase/         # Supabase client and utilities
+│   ├── eslint-config/    # Shared ESLint configuration
+│   └── typescript-config/ # Shared TypeScript configuration
+└── .github/              # GitHub workflows and templates
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+## Getting Started
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+### Prerequisites
 
-```
-npx turbo link
-```
+- Node.js 18.17 or later
+- Yarn 1.22.19 or later
+- Supabase account (free tier is sufficient)
 
-## Useful Links
+### Installation
 
-Learn more about the power of Turborepo:
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/synq.git
+   cd synq
+   ```
 
-- [Tasks](https://turbo.build/repo/docs/core-concepts/monorepos/running-tasks)
-- [Caching](https://turbo.build/repo/docs/core-concepts/caching)
-- [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching)
-- [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
-- [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
-- [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
+2. Install dependencies:
+   ```bash
+   yarn install
+   ```
+
+3. Set up environment variables:
+   ```bash
+   cp apps/web/.env.example apps/web/.env.local
+   ```
+   Fill in your Supabase credentials in `apps/web/.env.local`
+
+4. Start the development server:
+   ```bash
+   yarn dev
+   ```
+
+The application will be available at `http://localhost:3000`
+
+## Development
+
+- `yarn dev` - Start development server
+- `yarn build` - Build the application
+- `yarn start` - Start production server
+- `yarn lint` - Run ESLint
+- `yarn type-check` - Run TypeScript type checking
+- `yarn format` - Format code with Prettier
+
+## Contributing
+
+Feel free to open issues or submit pull requests if you have suggestions for improvements. This is a learning project, and any feedback is welcome!
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

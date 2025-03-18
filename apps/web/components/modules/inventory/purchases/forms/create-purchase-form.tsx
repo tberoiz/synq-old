@@ -11,7 +11,7 @@ import { createPurchase } from "@synq/supabase/queries";
 import { Button } from "@synq/ui/button";
 import { Input } from "@synq/ui/input";
 import { Label } from "@synq/ui/label";
-import { InventoryItemWithDetails } from "@synq/supabase/types";
+import { ImportItem } from "@synq/supabase/types";
 import {
   Table,
   TableBody,
@@ -21,7 +21,7 @@ import {
   TableRow,
 } from "@synq/ui/table";
 import { Trash2 } from "lucide-react";
-import { ImportItemsDialog } from "../dialogs/import-items-dialog";
+import { ImportItemsDialog } from "../../purchases/dialogs/import-items-dialog";
 
 const purchaseSchema = z.object({
   name: z.string().min(2),
@@ -107,10 +107,10 @@ export default function CreatePurchaseForm({
 
   const formItems = watch("items") || [];
 
-  const handleImportItems = (selectedItems: InventoryItemWithDetails[]) => {
+  const handleImportItems = (selectedItems: ImportItem[]) => {
     // Transform selected items into the format expected by the form
     const newItems: PurchaseItem[] = selectedItems.map((item) => ({
-      item_id: item.id,
+      item_id: item.item_id,
       quantity: 1,
       unit_cost: 0,
     }));
@@ -121,7 +121,7 @@ export default function CreatePurchaseForm({
 
   // Helper function to get item details
   const getItemDetails = (itemId: string) => {
-    return inventoryItems?.data?.find((item) => item.id === itemId);
+    return inventoryItems?.data?.find((item: { id: string; name: string }) => item.id === itemId);
   };
 
   return (

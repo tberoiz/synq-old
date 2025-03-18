@@ -1,6 +1,5 @@
 import { createClient } from "@synq/supabase/client";
-import type { Database } from "@synq/supabase/types";
-import type { Sale, SaleItem } from "@synq/supabase/types";
+import type { Sale } from "@synq/supabase/types";
 
 export async function getSales(
   userId: string,

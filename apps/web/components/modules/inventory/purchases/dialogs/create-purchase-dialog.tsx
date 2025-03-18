@@ -12,9 +12,10 @@ import { Plus } from "lucide-react";
 import { Button } from "@synq/ui/button";
 import { useRef } from "react";
 import CreatePurchaseForm from "../forms/create-purchase-form";
+import { PurchaseDetails } from "@synq/supabase/types";
 
 interface CreatePurchaseDialogProps {
-  onSuccess?: (purchase: any) => void;
+  onSuccess?: (purchase: PurchaseDetails) => void;
 }
 
 export const CreatePurchaseDialog = ({
@@ -22,7 +23,7 @@ export const CreatePurchaseDialog = ({
 }: CreatePurchaseDialogProps) => {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
-  const handleSuccess = (purchase: any) => {
+  const handleSuccess = (purchase: PurchaseDetails) => {
     closeButtonRef.current?.click();
     onSuccess?.(purchase);
   };

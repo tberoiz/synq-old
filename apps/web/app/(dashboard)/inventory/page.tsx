@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { Skeleton } from "@synq/ui/skeleton";
 
 // Internal
-import ItemsDataTable from "@ui/modules/inventory/components/tables/items-data-table";
+import ItemsDataTable from "@ui/modules/inventory/items/tables/items-data-table";
 
 export default async function InventoryPage() {
   return (

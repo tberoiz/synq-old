@@ -1,8 +1,7 @@
 "use client";
 
 import React from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient} from "@tanstack/react-query";
 
 // External
 import { DataTable } from "@ui/shared/data-table/data-table";
@@ -21,7 +20,7 @@ import ItemDetailsSheet from "../sheets/item-details-sheet";
 import { CategoryFilter } from "../filters/category-filter";
 
 // Columns
-import { useItemsColumns } from "@ui/modules/inventory/hooks/use-items-columns";
+import { useItemsColumns } from "@ui/modules/inventory/items/hooks/use-items-columns";
 // Types
 import { ItemTableRow } from "@synq/supabase/types";
 

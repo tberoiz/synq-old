@@ -21,7 +21,6 @@
     "date-fns": "^4.1.0",
     "next": "15.0.3",
     "next-safe-action": "^7.10.4",
-    "nuqs": "^2.4.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-error-boundary": "^5.0.0",

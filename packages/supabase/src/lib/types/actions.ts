@@ -18,3 +18,8 @@ export interface ActionResponse<T = unknown> {
   data?: T;
   error?: ActionError;
 }
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  count: number;
+}
