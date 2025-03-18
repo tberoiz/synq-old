@@ -24,6 +24,8 @@ export async function fetchItemsView(
     page: number;
     pageSize?: number;
     includeArchived?: boolean;
+    searchTerm?: string;
+    categoryId?: string | null;
   },
 ): Promise<PaginatedResponse<ItemTableRow>> {
   const pageSize = params.pageSize || DEFAULT_ITEMS_PER_PAGE;
@@ -42,6 +44,16 @@ export async function fetchItemsView(
     .eq("user_id", params.userId)
     .order("item_name")
     .range(start, end);
+
+  // Add search filter if searchTerm is provided
+  if (params.searchTerm) {
+    query = query.ilike("item_name", `%${params.searchTerm}%`);
+  }
+
+  // Add category filter if categoryId is provided
+  if (params.categoryId) {
+    query = query.eq("inventory_group_id", params.categoryId);
+  }
 
   // Execute the query
   const { data, error, count } = await query;

@@ -177,7 +177,7 @@ export default function PurchasesDataTable({
     {
       accessorKey: "total_cost",
       header: "Total Cost",
-      cell: ({ row }) => <div>${row.original.total_cost.toFixed(2)}</div>,
+      cell: ({ row }) => <div>${row.original.total_cost?.toFixed(2)}</div>,
     },
     {
       accessorKey: "status",

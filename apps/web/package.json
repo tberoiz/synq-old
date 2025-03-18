@@ -25,7 +25,9 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-error-boundary": "^5.0.0",
-    "react-scan": "^0.2.14"
+    "react-intersection-observer": "^9.16.0",
+    "react-scan": "^0.2.14",
+    "use-debounce": "^10.0.4"
   },
   "devDependencies": {
     "@synq/eslint-config": "*",

@@ -6,16 +6,16 @@ import {
   type VisibilityState,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { DataTablePagination } from "./data-table-pagination";
 import { DataTableHero } from "./data-table-hero";
 import { DataTableHeader } from "./data-table-header";
 import { DataTableBody } from "./data-table-body";
 import { Table } from "@synq/ui/table";
 import isEqual from "fast-deep-equal";
+import { useInView } from "react-intersection-observer";
+import { Spinner } from "@ui/shared/spinner";
 
 interface DataTableProps<TData> {
   columns: ColumnDef<TData>[];
@@ -28,6 +28,11 @@ interface DataTableProps<TData> {
   searchColumn?: string;
   onRowClick?: (row: TData) => void;
   idKey?: string;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
+  onLoadMore?: () => void;
+  onSearch?: (term: string) => void;
+  filterComponent?: React.ReactNode;
 }
 
 function useTableState() {
@@ -50,6 +55,11 @@ export function DataTable<TData>({
   searchColumn = "name",
   onRowClick,
   idKey = "id",
+  hasNextPage,
+  isFetchingNextPage,
+  onLoadMore,
+  onSearch,
+  filterComponent,
 }: DataTableProps<TData>) {
   const {
     sorting: [sorting, setSorting],
@@ -57,6 +67,10 @@ export function DataTable<TData>({
     columnVisibility: [columnVisibility, setColumnVisibility],
     rowSelection: [rowSelection, setRowSelection],
   } = useTableState();
+
+  const { ref, inView } = useInView({
+    threshold: 0,
+  });
 
   const previousSelectedRows = React.useRef<TData[]>(selectedRows);
 
@@ -95,11 +109,9 @@ export function DataTable<TData>({
       onColumnVisibilityChange: setColumnVisibility,
       onRowSelectionChange: enableRowSelection ? setRowSelection : undefined,
       getCoreRowModel: getCoreRowModel(),
-      getPaginationRowModel: getPaginationRowModel(),
       getSortedRowModel: getSortedRowModel(),
       getFilteredRowModel: getFilteredRowModel(),
       initialState: {
-        pagination: { pageSize: 10 },
         rowSelection: initialRowSelection,
       },
       getRowId: (row: TData) => {
@@ -151,6 +163,12 @@ export function DataTable<TData>({
     }
   }, [selectedRows, enableRowSelection, idKey]);
 
+  React.useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage && onLoadMore) {
+      onLoadMore();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, onLoadMore]);
+
   const tableHero = React.useMemo(
     () => (
       <DataTableHero
@@ -158,35 +176,33 @@ export function DataTable<TData>({
         searchPlaceholder={searchPlaceholder}
         actions={actions}
         searchColumn={searchColumn}
+        onSearch={onSearch}
+        filterComponent={filterComponent}
       />
     ),
-    [table, searchPlaceholder, actions, searchColumn],
-  );
-
-  const tableContent = React.useMemo(
-    () => (
-      <Table>
-        <DataTableHeader table={table} />
-        <DataTableBody
-          table={table}
-          columns={columns}
-          onRowClick={onRowClick}
-        />
-      </Table>
-    ),
-    [table, columns, onRowClick],
-  );
-
-  const tablePagination = React.useMemo(
-    () => <DataTablePagination table={table} />,
-    [table],
+    [table, searchPlaceholder, actions, searchColumn, onSearch, filterComponent],
   );
 
   return (
-    <>
+    <div>
       {tableHero}
-      {tableContent}
-      {tablePagination}
-    </>
+      <div className="rounded-md border">
+        <Table>
+          <DataTableHeader table={table} />
+          <DataTableBody
+            table={table}
+            columns={columns}
+            onRowClick={onRowClick}
+          />
+        </Table>
+      </div>
+      <div ref={ref} className="h-4 w-full">
+        {isFetchingNextPage && (
+          <div className="py-4">
+            <Spinner size="sm" />
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
