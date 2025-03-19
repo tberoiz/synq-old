@@ -133,8 +133,8 @@ export function ArchiveDialog<T>({
             variant="destructive"
             onClick={(e: React.MouseEvent) => {
               e.stopPropagation();
+              e.preventDefault();
               if (selectedItem) {
-                e.preventDefault();
                 archiveMutation.mutate(selectedItem);
               }
             }}

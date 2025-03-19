@@ -1,6 +1,6 @@
 import { type ColumnDef } from "@tanstack/react-table";
 import { Sale } from "@synq/supabase/types";
-import { DataTable } from "@ui/shared/data-table/data-table";
+import { DataTable } from "@ui/shared/components/data-table/data-table";
 
 interface SaleItemsTableProps {
   items: Sale["items"];

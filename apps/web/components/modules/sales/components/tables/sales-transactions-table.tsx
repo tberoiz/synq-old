@@ -10,7 +10,7 @@ import { cn } from "@synq/ui/utils";
 import { Sheet } from "@synq/ui/sheet";
 import { CreateSaleDialog } from "@ui/modules/sales/components/dialogs/create-sale-dialog";
 import SaleDetailsSheet from "@ui/modules/sales/components/sheets/sale-details-sheet";
-import { DataTable } from "@ui/shared/data-table/data-table";
+import { DataTable } from "@ui/shared/components/data-table/data-table";
 
 export const columns: ColumnDef<Sale>[] = [
   {

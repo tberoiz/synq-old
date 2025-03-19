@@ -5,7 +5,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
 
 // External
-import { DataTable } from "@ui/shared/data-table/data-table";
+import { DataTable } from "@ui/shared/components/data-table/data-table";
 import { createClient } from "@synq/supabase/client";
 import {
   archivePurchase,
@@ -17,15 +17,15 @@ import {
 } from "@synq/supabase/queries";
 
 // Dialogs
-import { ArchiveDialog } from "@ui/shared/dialogs/archive-dialog";
-import { RestoreDialog } from "@ui/shared/dialogs/restore-dialog";
+import { ArchiveDialog } from "@ui/shared/components/dialogs/archive-dialog";
+import { RestoreDialog } from "@ui/shared/components/dialogs/restore-dialog";
 
 // Sheets
 import { Sheet } from "@synq/ui/sheet";
 import PurchaseDetailsSheet from "../sheets/purchase-details-sheet";
 
 // Columns
-import { usePurchaseColumns } from "../hooks/use-purchase-columns";
+import { usePurchaseColumns } from "../../hooks/use-purchase-columns";
 
 // Types
 import { PurchaseDetails } from "@synq/supabase/types";

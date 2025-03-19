@@ -21,7 +21,7 @@ import {
   TableRow,
 } from "@synq/ui/table";
 import { Trash2 } from "lucide-react";
-import { ImportItemsDialog } from "../../purchases/dialogs/import-items-dialog";
+import { ImportItemsDialog } from "../dialogs/import-items-dialog";
 
 const purchaseSchema = z.object({
   name: z.string().min(2),

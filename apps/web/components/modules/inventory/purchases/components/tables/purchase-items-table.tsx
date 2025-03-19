@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { PurchaseItemWithDetails } from "@synq/supabase/types";
-import { DataTable } from "@ui/shared/data-table/data-table";
+import { DataTable } from "@ui/shared/components/data-table/data-table";
 import { usePurchaseItemsColumns } from "@ui/modules/inventory/purchases/hooks/use-purchase-items-columns";
 
 interface PurchaseItemsTableProps {

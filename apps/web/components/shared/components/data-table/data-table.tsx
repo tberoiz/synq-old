@@ -15,7 +15,7 @@ import { DataTableBody } from "./data-table-body";
 import { Table } from "@synq/ui/table";
 import isEqual from "fast-deep-equal";
 import { useInView } from "react-intersection-observer";
-import { Spinner } from "@ui/shared/spinner";
+import { CircularSpinner } from "@ui/shared/components/spinners/circular-spinner";
 
 interface DataTableProps<TData> {
   columns: ColumnDef<TData>[];
@@ -199,7 +199,7 @@ export function DataTable<TData>({
       <div ref={ref} className="h-4 w-full">
         {isFetchingNextPage && (
           <div className="py-4">
-            <Spinner size="sm" />
+            <CircularSpinner size="sm" />
           </div>
         )}
       </div>

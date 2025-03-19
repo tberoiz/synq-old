@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { Skeleton } from "@synq/ui/skeleton";
 
 // Internal
-import PurchasesDataTable from "@ui/modules/inventory/purchases/tables/purchases-data-table";
+import PurchasesDataTable from "@ui/modules/inventory/purchases/components/tables/purchases-data-table";
 
 export default async function PurchasesPage() {
   return (

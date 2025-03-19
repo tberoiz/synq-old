@@ -5,7 +5,7 @@ interface SpinnerProps {
   size?: "sm" | "md" | "lg";
 }
 
-export function Spinner({ className, size = "md" }: SpinnerProps) {
+export function CircularSpinner({ className, size = "md" }: SpinnerProps) {
   const sizeClasses = {
     sm: "h-3 w-3",
     md: "h-4 w-4",

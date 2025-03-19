@@ -37,10 +37,10 @@ import { Badge } from "@synq/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@synq/ui/card";
 import PurchaseItemsTable, {
   type PurchaseItemsTableRef,
-} from "@ui/modules/inventory/purchases/tables/purchase-items-table";
+} from "@ui/modules/inventory/purchases/components/tables/purchase-items-table";
 import { InventoryItemWithDetails } from "@synq/supabase/types";
 import { ImportItemsDialog } from "../dialogs/import-items-dialog";
-import { CreateItemDialog } from "../../items/dialogs/create-item-dialog";
+import { CreateItemDialog } from "@ui/modules/inventory/items/components/dialogs/create-item-dialog";
 import { ImportItem } from "@synq/supabase/types";
 
 interface PurchaseDetailsSheetProps {

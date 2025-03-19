@@ -125,8 +125,8 @@ export function RestoreDialog<T>({
           <Button
             onClick={(e: React.MouseEvent) => {
               e.stopPropagation();
+              e.preventDefault();
               if (selectedItem) {
-                e.preventDefault();
                 restoreMutation.mutate(selectedItem);
               }
             }}

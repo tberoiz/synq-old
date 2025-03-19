@@ -37,7 +37,7 @@ export async function fetchItemsView(
     let query = supabase
       .from("vw_items_ui_table")
       .select(
-        `item_id, item_name, sku, category, listing_price, is_archived, total_quantity`,
+        `item_id, item_name, sku, category, listing_price, is_archived, total_quantity, total_sold`,
         {
           count: "exact",
         },
@@ -71,7 +71,7 @@ export async function fetchItemsView(
         // If we're requesting a page beyond the available data, return the last available page
         const totalPages = Math.ceil((count ?? 0) / pageSize);
         const lastPage = Math.max(1, totalPages);
-        
+
         if (params.page > lastPage) {
           // Recursive call to fetch the last available page
           return fetchItemsView(supabase, {

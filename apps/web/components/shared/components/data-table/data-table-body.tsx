@@ -21,7 +21,7 @@ export function DataTableBody<TData>({
           <TableRow
             key={row.id}
             data-state={row.getIsSelected() && "selected"}
-            className={cn(onRowClick && "cursor-pointer hover:bg-muted/50")}
+            className="bg-muted/50 hover:bg-muted/80 cursor-pointer"
             onClick={() => onRowClick?.(row.original)}
           >
             {row.getVisibleCells().map((cell) => (

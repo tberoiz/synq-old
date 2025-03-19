@@ -5,9 +5,9 @@ import { Skeleton } from "@synq/ui/skeleton";
 import { Search } from "lucide-react";
 import { ImportItemWithDetails } from "@synq/supabase/types";
 import { Input } from "@synq/ui/input";
-import { DataTable } from "@ui/shared/data-table/data-table";
+import { DataTable } from "@ui/shared/components/data-table/data-table";
 import { useDebounce } from "use-debounce";
-import { useImportItemsColumns } from "../hooks/use-import-items-columns";
+import { useImportItemsColumns } from "../../hooks/use-import-items-columns";
 
 interface ImportItemsTableProps {
   data: ImportItemWithDetails[];

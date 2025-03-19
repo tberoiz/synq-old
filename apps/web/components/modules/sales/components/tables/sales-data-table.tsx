@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@synq/ui/dropdown-menu";
 import { cn } from "@synq/ui/utils";
-import { DataTable } from "@ui/shared/data-table/data-table";
+import { DataTable } from "@ui/shared/components/data-table/data-table";
 
 interface SalesDataTableProps {
   data: Sale[];

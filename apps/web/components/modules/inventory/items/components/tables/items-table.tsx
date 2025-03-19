@@ -18,7 +18,7 @@ async function getItems() {
   return items?.data ?? [];
 }
 
-export default async function ItemsDataTable() {
+export default async function ItemsTable() {
   const items = await getItems();
 
   return <ItemsTableClient items={items} />;

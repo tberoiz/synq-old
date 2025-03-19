@@ -1,15 +1,35 @@
+"use client";
+
+// Core
 import { useMemo } from "react";
-import { ColumnDef } from "@tanstack/react-table";
-import { Button } from "@synq/ui/button";
-import { MoreVertical, Archive, RefreshCcw } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@synq/ui/dropdown-menu";
-import ArchiveStatusBadge from "@ui/shared/badges/archived-status-badge";
+
+// Types
 import { ItemTableRow } from "@synq/supabase/types";
+import { type ColumnDef } from "@tanstack/react-table";
+
+// Components
+import { Button } from "@synq/ui/button";
+import {
+  Archive,
+  RefreshCcw,
+  Package,
+  Tag,
+  Hash,
+  DollarSign,
+  FolderTree,
+  Boxes,
+  Archive as ArchiveIcon,
+  ShoppingCart,
+  PackageX,
+} from "lucide-react";
+import { cn } from "@synq/ui/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@synq/ui/tooltip";
+import { Progress } from "@synq/ui/progress";
 
 export function useItemsColumns({
   onArchive,
@@ -23,99 +43,228 @@ export function useItemsColumns({
       [
         {
           accessorKey: "item_name",
-          header: () => <div className="w-[35%]">Name</div>,
+          header: () => (
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Boxes className="h-4 w-4" />
+              <span>Name</span>
+            </div>
+          ),
+          cell: ({ row }) => {
+            const isArchived = row.original.is_archived;
+
+            return (
+              <div
+                className={cn(
+                  "flex items-center gap-2",
+                  isArchived && "opacity-60"
+                )}
+              >
+                {isArchived ? (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onRestore(row.original);
+                          }}
+                        >
+                          <RefreshCcw className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="text-xs">
+                        <p>Restore Item</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                ) : (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onArchive(row.original);
+                          }}
+                        >
+                          <Archive className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="text-xs">
+                        <p>Archive Item</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+                <div className="flex items-center gap-2">
+                  <span
+                    className={cn(
+                      "font-medium",
+                      isArchived && "text-muted-foreground"
+                    )}
+                  >
+                    {row.getValue("item_name")}
+                  </span>
+                  {isArchived && (
+                    <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-muted/50 text-muted-foreground text-xs font-medium">
+                      <ArchiveIcon className="h-3 w-3" />
+                      <span>Archived</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          },
+        },
+        {
+          id: "remaining",
+          header: () => (
+            <div className="flex items-center justify-center gap-2 text-muted-foreground">
+              <PackageX className="h-4 w-4" />
+              <span>Stock</span>
+            </div>
+          ),
+          cell: ({ row }) => {
+            const totalQuantity = row.original.total_quantity ?? 0;
+            const remaining = totalQuantity - (row.original.total_sold ?? 0);
+
+            return (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center justify-center gap-2 cursor-help">
+                      <PackageX
+                        className={cn(
+                          "h-4 w-4",
+                          remaining === 0
+                            ? "text-destructive"
+                            : "text-muted-foreground"
+                        )}
+                      />
+                      {remaining === 0 ? (
+                        <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-destructive/10 text-destructive text-xs font-medium">
+                          <span>Out of Stock</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1">
+                          <span
+                            className={cn(
+                              "font-medium",
+                              remaining < 10 && "text-warning"
+                            )}
+                          >
+                            {remaining}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            / {totalQuantity}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="text-xs">
+                    <div className="flex flex-col gap-1">
+                      <p>Remaining: {remaining}</p>
+                      <p>Total Sold: {row.original.total_sold ?? 0}</p>
+                      <p>Total Quantity: {totalQuantity}</p>
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            );
+          },
+        },
+        {
+          accessorKey: "listing_price",
+          header: () => (
+            <div className="flex items-center justify-center gap-2 text-muted-foreground">
+              <DollarSign className="h-4 w-4" />
+              <span>Price</span>
+            </div>
+          ),
           cell: ({ row }) => (
-            <div className="flex items-center gap-2">
-              <span className="font-medium">{row.getValue("item_name")}</span>
+            <div className="text-center font-medium">
+              ${row.original.listing_price.toFixed(2)}
             </div>
           ),
         },
         {
-          accessorKey: "sku",
-          header: () => <div className="w-24">SKU</div>,
+          id: "sold",
+          header: () => (
+            <div className="flex items-center justify-center gap-2 text-muted-foreground">
+              <ShoppingCart className="h-4 w-4" />
+              <span>Sold</span>
+            </div>
+          ),
+          cell: ({ row }) => {
+            const totalSold = row.original.total_sold ?? 0;
+
+            return (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center justify-center gap-2 cursor-help">
+                      <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium text-muted-foreground">
+                        {totalSold}
+                      </span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="text-xs">
+                    <p>Total Items Sold</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            );
+          },
+        },
+        {
+          id: "sku",
+          header: () => (
+            <div className="flex items-center justify-center gap-2 text-muted-foreground">
+              <Hash className="h-4 w-4" />
+              <span>SKU</span>
+            </div>
+          ),
           cell: ({ row }) => (
-            <p className="w-24 truncate">{row.getValue("sku")}</p>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="w-28 text-center text-primary cursor-help">
+                    {row.original.sku ?? "-"}
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="text-xs">
+                  <p>Stock Keeping Unit</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           ),
         },
         {
           accessorKey: "category",
-          header: () => <div className="w-28">Category</div>,
-          cell: ({ row }) => (
-            <div className="w-28 truncate">{row.getValue("category")}</div>
-          ),
-        },
-        {
-          accessorKey: "listing_price",
-          header: () => <div className="w-16 text-right">Price</div>,
-          cell: ({ row }) => (
-            <div className="w-16 text-right">
-              ${row.getValue("listing_price")}
+          header: () => (
+            <div className="flex items-center justify-center gap-2 text-muted-foreground">
+              <FolderTree className="h-4 w-4" />
+              <span>Category</span>
             </div>
           ),
-        },
-        {
-          id: "inventory",
-          header: () => <span className="w-28 text-center">Stock</span>,
           cell: ({ row }) => (
-            <span className="w-28 text-center text-primary">
-              {row.original.total_quantity ?? 0}
-            </span>
-          ),
-        },
-        {
-          accessorKey: "is_archived",
-          header: () => <span className=" text-center">Status</span>,
-          cell: ({ row }) => (
-            <div className="flex justify-center">
-              <ArchiveStatusBadge
-                isArchived={row.original.is_archived ?? false}
-              />
+            <div className="flex items-center justify-center gap-1.5">
+              <Tag className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="truncate">{row.getValue("category")}</span>
             </div>
-          ),
-        },
-        {
-          id: "actions",
-          cell: ({ row }) => (
-            <ActionsCell
-              item={row.original}
-              onArchive={onArchive}
-              onRestore={onRestore}
-            />
           ),
         },
       ] as ColumnDef<ItemTableRow>[],
-    [onArchive, onRestore],
+    [onArchive, onRestore]
   );
 }
-
-const ActionsCell = ({
-  item,
-  onArchive,
-  onRestore,
-}: {
-  item: ItemTableRow;
-  onArchive: (item: ItemTableRow) => void;
-  onRestore: (item: ItemTableRow) => void;
-}) => (
-  <DropdownMenu>
-    <DropdownMenuTrigger asChild>
-      <Button variant="ghost" className="h-8 w-8 p-0">
-        <span className="sr-only">Open menu</span>
-        <MoreVertical className="h-4 w-4" />
-      </Button>
-    </DropdownMenuTrigger>
-    <DropdownMenuContent align="end">
-      {item.is_archived ? (
-        <DropdownMenuItem onClick={() => onRestore(item)}>
-          <RefreshCcw className="mr-2 h-4 w-4" />
-          Restore
-        </DropdownMenuItem>
-      ) : (
-        <DropdownMenuItem onClick={() => onArchive(item)}>
-          <Archive className="mr-2 h-4 w-4" />
-          Archive
-        </DropdownMenuItem>
-      )}
-    </DropdownMenuContent>
-  </DropdownMenu>
-);

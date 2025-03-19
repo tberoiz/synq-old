@@ -8,10 +8,12 @@ export interface ItemTableRow {
   user_id: string;
   item_name: string;
   total_quantity: number;
+  total_sold: number;
   sku: string | null;
   category: string;
   listing_price: number;
   is_archived: boolean;
+  remaining_quantity: number;
 }
 
 /**
@@ -22,7 +24,6 @@ export interface ItemTableRow {
 export interface ItemDetails extends ItemTableRow {
   default_cogs: number;
   inventory_group_id: string;
-  total_sold: number;
   purchase_batches: TransformedPurchaseBatch[];
 }
 
