@@ -9,7 +9,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { DataTableHero } from "./data-table-hero";
+import { DataTableFilters } from "./data-table-filters";
 import { DataTableHeader } from "./data-table-header";
 import { DataTableBody } from "./data-table-body";
 import { Table } from "@synq/ui/table";
@@ -171,7 +171,7 @@ export function DataTable<TData>({
 
   const tableHero = React.useMemo(
     () => (
-      <DataTableHero
+      <DataTableFilters
         table={table}
         searchPlaceholder={searchPlaceholder}
         actions={actions}

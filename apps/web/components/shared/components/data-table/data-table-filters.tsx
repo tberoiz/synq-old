@@ -13,7 +13,7 @@ interface HeroProps<TData> {
   filterComponent?: React.ReactNode;
 }
 
-export function DataTableHero<TData>({
+export function DataTableFilters<TData>({
   table,
   searchPlaceholder = "Search...",
   actions,

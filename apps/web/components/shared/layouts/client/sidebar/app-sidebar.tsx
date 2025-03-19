@@ -23,14 +23,12 @@ import {
 } from "@synq/ui/sidebar";
 import Link from "next/link";
 import { cn } from "@synq/ui/utils";
-// import { SynqIcon } from "@/components/primitives/icons/icons";
 import { usePathname } from "next/navigation";
 import { SynqIcon } from "@ui/shared/icons/icons";
 
 const navItems = [
   { title: "Overview", url: "/overview", icon: ChartLine },
   { title: "Inventory", url: "/inventory", icon: Package },
-  { title: "Purchases", url: "/purchases", icon: ShoppingCart },
   { title: "Sales", url: "/sales", icon: WalletCards },
   { title: "Reports", url: "/reports", icon: Receipt },
   { title: "Settings", url: "/settings", icon: Settings },
