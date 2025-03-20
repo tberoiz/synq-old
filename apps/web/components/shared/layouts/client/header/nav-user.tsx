@@ -19,8 +19,7 @@ import {
   useSidebar,
 } from "@synq/ui/sidebar";
 import Link from "next/link";
-import { signOut } from "@ui/modules/auth/actions/actions";
-import { getUserMetadata } from "@synq/supabase/queries";
+import { getUserMetadata, signOut } from "@synq/supabase/queries";
 import { Button } from "@synq/ui/button";
 
 // Helper function to get the first character of a name
