@@ -1,5 +1,7 @@
 "use client";
 
+// CORE
+
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -107,7 +109,7 @@ export default function CreatePurchaseForm({
 
   const formItems = watch("items") || [];
 
-  const handleImportItems = (selectedItems: ImportItem[]) => {
+  const handleImportItems = async (selectedItems: ImportItem[]) => {
     // Transform selected items into the format expected by the form
     const newItems: PurchaseItem[] = selectedItems.map((item) => ({
       item_id: item.item_id,
@@ -141,10 +143,8 @@ export default function CreatePurchaseForm({
         <div className="flex items-center justify-between">
           <Label>Select Items</Label>
           <ImportItemsDialog
-            items={inventoryItems?.data || []}
             title="Select Items for Purchase"
             onImport={handleImportItems}
-            loading={isItemsLoading}
           />
         </div>
 

@@ -2,7 +2,7 @@ import { Table } from "@tanstack/react-table";
 import { Input } from "@synq/ui/input";
 import { Search } from "lucide-react";
 import { useDebounce } from "use-debounce";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 interface HeroProps<TData> {
   table: Table<TData>;

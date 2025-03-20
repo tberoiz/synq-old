@@ -34,4 +34,4 @@ export function useItems(initialData?: ItemTableRow[]) {
       isFetchingNextPage: infiniteQuery.isFetchingNextPage,
     },
   };
-} 
+}

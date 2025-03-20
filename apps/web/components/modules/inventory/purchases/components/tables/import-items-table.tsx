@@ -1,39 +1,39 @@
 "use client";
 
 import { useState, useMemo, useCallback } from "react";
-import { Skeleton } from "@synq/ui/skeleton";
-import { Search } from "lucide-react";
 import { ImportItemWithDetails } from "@synq/supabase/types";
 import { Input } from "@synq/ui/input";
 import { DataTable } from "@ui/shared/components/data-table/data-table";
 import { useDebounce } from "use-debounce";
-import { useImportItemsColumns } from "../../hooks/use-import-items-columns";
+import { useItemsColumns } from "@ui/modules/inventory/items/hooks/use-items-columns";
+import { type ColumnDef } from "@tanstack/react-table";
+import { useItems } from "@ui/modules/inventory/items/hooks/use-items";
+import { CreateItemDialog } from "@ui/modules/inventory/items/components/dialogs/create-item-dialog";
 
 interface ImportItemsTableProps {
-  data: ImportItemWithDetails[];
-  loading?: boolean;
   onSelectionChange: (items: ImportItemWithDetails[]) => void;
 }
 
 export default function ImportItemsTable({
-  data,
-  loading,
   onSelectionChange,
 }: ImportItemsTableProps) {
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedValue] = useDebounce(searchTerm, 300);
 
+  // Use the cached items data
+  const { items, setFilters } = useItems();
+
   const filteredData = useMemo(() => {
-    if (!debouncedValue) return data;
+    if (!debouncedValue) return items;
     const query = debouncedValue.toLowerCase();
-    return data.filter(
+    return items.filter(
       (item) =>
         item.item_name.toLowerCase().includes(query) ||
         (item.sku?.toLowerCase() || "").includes(query) ||
         (item.category?.toLowerCase() || "").includes(query)
     );
-  }, [data, debouncedValue]);
+  }, [items, debouncedValue]);
 
   const handleSelectAll = useCallback(() => {
     if (selectedItems.size === filteredData.length) {
@@ -42,68 +42,98 @@ export default function ImportItemsTable({
     } else {
       const newSelected = new Set(filteredData.map((item) => item.item_id));
       setSelectedItems(newSelected);
-      onSelectionChange(filteredData);
+      onSelectionChange(filteredData as ImportItemWithDetails[]);
     }
   }, [filteredData, selectedItems.size, onSelectionChange]);
 
-  const handleSelectItem = useCallback((itemId: string) => {
-    const newSelected = new Set(selectedItems);
-    if (newSelected.has(itemId)) {
-      newSelected.delete(itemId);
-    } else {
-      newSelected.add(itemId);
-    }
-    setSelectedItems(newSelected);
-    onSelectionChange(
-      filteredData.filter((item) => newSelected.has(item.item_id))
-    );
-  }, [selectedItems, filteredData, onSelectionChange]);
+  const handleSelectItem = useCallback(
+    (itemId: string) => {
+      const newSelected = new Set(selectedItems);
+      if (newSelected.has(itemId)) {
+        newSelected.delete(itemId);
+      } else {
+        newSelected.add(itemId);
+      }
+      setSelectedItems(newSelected);
+      onSelectionChange(
+        filteredData.filter((item) =>
+          newSelected.has(item.item_id)
+        ) as ImportItemWithDetails[]
+      );
+    },
+    [selectedItems, filteredData, onSelectionChange]
+  );
 
-  const columns = useImportItemsColumns({
-    selectedItems,
-    filteredData,
-    onSelectAll: handleSelectAll,
-    onSelectItem: handleSelectItem,
+  // Get the base columns from useItemsColumns
+  const baseColumns = useItemsColumns({
+    onArchive: () => {}, // No-op since we don't need archive functionality
+    onRestore: () => {}, // No-op since we don't need restore functionality
   });
 
-  if (loading) {
-    return (
-      <div className="space-y-4">
-        <div className="relative">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+  // Filter and modify columns to only show what we need
+  const columns = useMemo(() => {
+    const selectColumn: ColumnDef<ImportItemWithDetails> = {
+      id: "select",
+      header: () => (
+        <div className="flex items-center justify-center">
           <Input
-            placeholder="Search items..."
-            className="pl-8"
-            disabled
+            type="checkbox"
+            className="h-4 w-4 rounded focus:ring-primary"
+            checked={selectedItems.size === filteredData.length}
+            onChange={handleSelectAll}
           />
         </div>
-        <div className="border rounded-md overflow-x-auto">
-          <Skeleton className="h-24 w-full" />
+      ),
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center">
+          <input
+            type="checkbox"
+            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+            checked={selectedItems.has(row.original.item_id)}
+            onChange={() => handleSelectItem(row.original.item_id)}
+          />
         </div>
-      </div>
-    );
-  }
+      ),
+    };
+
+    // Only keep the columns we need
+    const neededColumns = baseColumns.filter((col) => {
+      const key = (col as { accessorKey?: string }).accessorKey;
+      return (
+        key === "item_name" || key === "category" || key === "listing_price"
+      );
+    });
+
+    return [
+      selectColumn,
+      ...neededColumns,
+    ] as ColumnDef<ImportItemWithDetails>[];
+  }, [
+    baseColumns,
+    selectedItems,
+    filteredData.length,
+    handleSelectAll,
+    handleSelectItem,
+  ]);
+
+  const handleSearch = useCallback(
+    (term: string) => setFilters((prev) => ({ ...prev, searchTerm: term })),
+    [setFilters]
+  );
 
   return (
-    <div className="space-y-4">
-      <div className="relative">
-        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search items..."
-          className="pl-8"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
-      <div className="border rounded-md">
+    <div className="h-full flex flex-col">
+      <div className="flex-1 min-h-0 overflow-auto">
         <DataTable
           columns={columns}
           data={filteredData}
           enableRowSelection={false}
           searchPlaceholder="Search items..."
           searchColumn="item_name"
-          onSearch={setSearchTerm}
-          idKey="item_id"
+          onSearch={handleSearch}
+          idKey="import_item_id"
+          actions={<CreateItemDialog />}
+          onRowClick={(item) => handleSelectItem(item.item_id)}
         />
       </div>
     </div>

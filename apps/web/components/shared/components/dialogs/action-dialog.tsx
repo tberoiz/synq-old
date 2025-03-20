@@ -16,18 +16,14 @@ interface ActionDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   actionType: "archive" | "restore" | null;
-  itemId: string | null;
   onConfirm: () => Promise<void>;
-  queryKey: string[];
 }
 
 export function ActionDialog({
   isOpen,
   onOpenChange,
   actionType,
-  itemId,
   onConfirm,
-  queryKey,
 }: ActionDialogProps) {
   const isArchive = actionType === "archive";
   const title = isArchive ? "Archive Item" : "Restore Item";

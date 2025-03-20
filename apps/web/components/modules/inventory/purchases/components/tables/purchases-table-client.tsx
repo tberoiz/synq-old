@@ -1,51 +1,54 @@
 "use client";
 
-import React from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { useQueryClient } from "@tanstack/react-query";
+// REACT
+import React, { useCallback, useMemo } from "react";
 
-// External
+// COMPONENTS
 import { DataTable } from "@ui/shared/components/data-table/data-table";
-import { createClient } from "@synq/supabase/client";
-import {
-  archivePurchase,
-  restorePurchase,
-  fetchPurchases,
-  getUserId,
-  updatePurchaseItem,
-  fetchPurchaseDetails,
-} from "@synq/supabase/queries";
-
-// Dialogs
-import { ArchiveDialog } from "@ui/shared/components/dialogs/archive-dialog";
-import { RestoreDialog } from "@ui/shared/components/dialogs/restore-dialog";
-
-// Sheets
 import { Sheet } from "@synq/ui/sheet";
-import PurchaseDetailsSheet from "../sheets/purchase-details-sheet";
+import { CreatePurchaseDialog } from "@ui/modules/inventory/purchases/components/dialogs/create-purchase-dialog";
+import PurchaseDetailsSheet from "@ui/modules/inventory/purchases/components/sheets/purchase-details-sheet";
 
-// Columns
-import { usePurchaseColumns } from "../../hooks/use-purchase-columns";
+// HOOKS
+import { usePurchaseColumns } from "@ui/modules/inventory/purchases/hooks/use-purchase-columns";
+import { usePurchases } from "@ui/modules/inventory/purchases/hooks/use-purchases";
+
+// Queries
+import { usePurchaseDetailsQuery } from "@ui/modules/inventory/purchases/queries/purchases";
 
 // Types
 import { PurchaseDetails } from "@synq/supabase/types";
 import { PurchaseTableRow } from "@synq/supabase/types";
-import { CreatePurchaseDialog } from "../dialogs/create-purchase-dialog";
+import { ActionDialog } from "@ui/shared/components/dialogs/action-dialog";
+
+import { useQueryState } from 'nuqs'
 
 export function PurchasesTableClient({
   purchases: initialPurchases,
 }: {
   purchases: PurchaseTableRow[];
 }) {
-  const queryClient = useQueryClient();
-  const [selectedPurchase, setSelectedPurchase] =
-    React.useState<PurchaseDetails | null>(null);
+  const [detailsPurchaseId, setDetailsPurchaseId] = useQueryState('purchaseId', {
+    parse: (value): Pick<PurchaseDetails, "id"> | null => 
+      value ? { id: value } : null,
+    serialize: (value) => value?.id ?? null
+  });
+  const [actionPurchaseId, setActionPurchaseId] = React.useState<string | null>(null);
   const [dialogType, setDialogType] = React.useState<
     "archive" | "restore" | null
   >(null);
-  const [searchTerm, setSearchTerm] = React.useState("");
   const [isMobile, setIsMobile] = React.useState(false);
-  const supabase = React.useMemo(() => createClient(), []);
+
+  const { data: selectedPurchaseDetails } = usePurchaseDetailsQuery(
+    detailsPurchaseId ? { id: detailsPurchaseId.id } : null
+  );
+
+  const {
+    purchases: allPurchases,
+    setFilters,
+    mutations: { archive, restore, updateItem },
+    infiniteQuery,
+  } = usePurchases(initialPurchases);
 
   React.useEffect(() => {
     const checkMobile = () => {
@@ -56,148 +59,106 @@ export function PurchasesTableClient({
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery({
-    queryKey: ["user_purchases", searchTerm],
-    queryFn: async ({ pageParam = 1 }) => {
-      const userId = await getUserId();
-      const showArchived = true;
-      const response = await fetchPurchases(supabase, {
-        userId,
-        page: pageParam,
-        includeArchived: showArchived,
-        searchTerm,
-      });
-      return {
-        data: response.data,
-        nextPage: response.data.length === 10 ? pageParam + 1 : 0,
-      };
-    },
-    getNextPageParam: (lastPage) => lastPage.nextPage || undefined,
-    initialData: !searchTerm
-      ? {
-          pages: [{ data: initialPurchases, nextPage: 2 }],
-          pageParams: [1],
-        }
-      : undefined,
-    initialPageParam: 1,
-  });
+  const handleSearch = useCallback(
+    (term: string) => setFilters((prev) => ({ ...prev, searchTerm: term })),
+    [setFilters]
+  );
 
-  const allPurchases = React.useMemo(() => {
-    const purchases = data?.pages.flatMap((page) => page.data) ?? [];
-    // Create a Map to store unique purchases by id
-    const uniquePurchases = new Map<string, PurchaseTableRow>();
-    purchases.forEach((purchase) => {
-      if (purchase.id) {
-        uniquePurchases.set(purchase.id, purchase);
+  const handleDialogAction = useCallback(async () => {
+    if (!actionPurchaseId) return;
+
+    try {
+      if (dialogType === "archive") {
+        await archive(actionPurchaseId);
+      } else if (dialogType === "restore") {
+        await restore(actionPurchaseId);
       }
-    });
-    return Array.from(uniquePurchases.values());
-  }, [data]);
+    } catch (error) {
+      console.error("Operation failed:", error);
+    } finally {
+      setDialogType(null);
+      setActionPurchaseId(null);
+    }
+  }, [actionPurchaseId, dialogType, archive, restore]);
 
-  const handleSearch = React.useCallback((term: string) => {
-    setSearchTerm(term);
-  }, []);
-
-  const handleArchive = async () => {
-    if (!selectedPurchase?.id) return;
-    await archivePurchase(supabase, selectedPurchase.id);
-    queryClient.invalidateQueries({ queryKey: ["user_purchases"] });
-    setDialogType(null);
-  };
-
-  const handleRestore = async () => {
-    if (!selectedPurchase?.id) return;
-    await restorePurchase(supabase, selectedPurchase.id);
-    queryClient.invalidateQueries({ queryKey: ["user_purchases"] });
-    setDialogType(null);
-  };
-
-  const handleSaveBatch = async (
-    updates: { id: string; quantity: number; unit_cost: number }[]
-  ) => {
-    await Promise.all(
-      updates.map((update) =>
-        updatePurchaseItem(supabase, update.id, {
-          quantity: update.quantity,
-          unit_cost: update.unit_cost,
-        })
-      )
-    );
-    await queryClient.invalidateQueries({
-      queryKey: ["user_purchases"],
-    });
-  };
-
-  const handleViewDetails = async (purchase: PurchaseTableRow) => {
-    const details = await fetchPurchaseDetails(supabase, purchase.id);
-    setSelectedPurchase(details);
-  };
+  const handleSaveBatch = useCallback(
+    async (updates: { id: string; quantity: number; unit_cost: number }[]) => {
+      await Promise.all(
+        updates.map((update) =>
+          updateItem({
+            id: update.id,
+            quantity: update.quantity,
+            unit_cost: update.unit_cost,
+          })
+        )
+      );
+    },
+    [updateItem]
+  );
 
   const columns = usePurchaseColumns({
-    onArchive: (purchase) => {
+    onArchive: useCallback((purchase) => {
       if (purchase.id) {
-        handleViewDetails(purchase);
+        setActionPurchaseId(purchase.id);
         setDialogType("archive");
       }
-    },
-    onRestore: (purchase) => {
+    }, []),
+    onRestore: useCallback((purchase) => {
       if (purchase.id) {
-        handleViewDetails(purchase);
+        setActionPurchaseId(purchase.id);
         setDialogType("restore");
       }
-    },
-    onViewDetails: handleViewDetails,
+    }, []),
+    onViewDetails: useCallback((purchase) => {
+      if (purchase.id) {
+        setDetailsPurchaseId({ id: purchase.id });
+      }
+    }, []),
   });
+
+  const tableProps = useMemo(
+    () => ({
+      columns,
+      data: allPurchases,
+      actions: <CreatePurchaseDialog />,
+      searchPlaceholder: "Search purchases...",
+      enableRowSelection: false,
+      searchColumn: "name",
+      idKey: "id",
+      onRowClick: (purchase: PurchaseTableRow) =>
+        setDetailsPurchaseId(purchase.id ? { id: purchase.id } : null),
+      hasNextPage: infiniteQuery.hasNextPage,
+      isFetchingNextPage: infiniteQuery.isFetchingNextPage,
+      onLoadMore: () => infiniteQuery.fetchNextPage(),
+      onSearch: handleSearch,
+    }),
+    [columns, allPurchases, infiniteQuery, handleSearch]
+  );
 
   return (
     <>
-      <DataTable
-        columns={columns}
-        data={allPurchases}
-        searchPlaceholder="Search purchases..."
-        searchColumn="name"
-        onRowClick={handleViewDetails}
-        hasNextPage={hasNextPage}
-        isFetchingNextPage={isFetchingNextPage}
-        onLoadMore={() => fetchNextPage()}
-        onSearch={handleSearch}
-        actions={<CreatePurchaseDialog />}
-      />
+      <DataTable {...tableProps} />
 
       <Sheet
-        open={!!selectedPurchase}
-        onOpenChange={(open) => !open && setSelectedPurchase(null)}
+        open={!!selectedPurchaseDetails}
+        onOpenChange={(open) => !open && setDetailsPurchaseId(null)}
       >
-        {selectedPurchase && (
+        {selectedPurchaseDetails && (
           <PurchaseDetailsSheet
-            purchase={selectedPurchase}
+            purchase={selectedPurchaseDetails}
             isMobile={isMobile}
             onSaveBatch={handleSaveBatch}
-            open={!!selectedPurchase}
-            onOpenChange={(open) => !open && setSelectedPurchase(null)}
+            open={!!selectedPurchaseDetails}
+            onOpenChange={(open) => !open && setDetailsPurchaseId(null)}
           />
         )}
       </Sheet>
 
-      <ArchiveDialog
-        isOpen={dialogType === "archive"}
+      <ActionDialog
+        actionType={dialogType}
+        isOpen={!!dialogType}
         onOpenChange={(open: boolean) => !open && setDialogType(null)}
-        selectedItem={{ id: selectedPurchase?.id || "" }}
-        onArchive={handleArchive}
-        queryKey={["user_purchases"]}
-      />
-
-      <RestoreDialog
-        isOpen={dialogType === "restore"}
-        onOpenChange={(open: boolean) => !open && setDialogType(null)}
-        selectedItem={{ id: selectedPurchase?.id || "" }}
-        onRestore={handleRestore}
-        queryKey={["user_purchases"]}
+        onConfirm={handleDialogAction}
       />
     </>
   );

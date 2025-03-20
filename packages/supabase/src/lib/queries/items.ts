@@ -32,16 +32,10 @@ export async function fetchItemsView(
   const start = (params.page - 1) * pageSize;
   const end = start + pageSize - 1;
 
-  try {
     // Build the query
     let query = supabase
       .from("vw_items_ui_table")
-      .select(
-        `item_id, item_name, sku, category, listing_price, is_archived, total_quantity, total_sold`,
-        {
-          count: "exact",
-        },
-      )
+      .select("item_id, item_name, sku, category, listing_price, is_archived, total_quantity, total_sold")
       .eq("user_id", params.userId);
 
     // Add archived filter if specified
@@ -60,58 +54,16 @@ export async function fetchItemsView(
     }
 
     // Add ordering and pagination
-    query = query.order("item_name").range(start, end);
+    query = query.order("total_quantity", { ascending: false }).range(start, end);
 
     // Execute the query
     const { data, error, count } = await query;
 
     if (error) {
-      // Handle pagination range error
-      if (error.code === "PGRST103") {
-        // If we're requesting a page beyond the available data, return the last available page
-        const totalPages = Math.ceil((count ?? 0) / pageSize);
-        const lastPage = Math.max(1, totalPages);
-
-        if (params.page > lastPage) {
-          // Recursive call to fetch the last available page
-          return fetchItemsView(supabase, {
-            ...params,
-            page: lastPage,
-          });
-        }
-      }
-
-      console.error("Supabase query error:", {
-        error,
-        params,
-        queryDetails: {
-          table: "vw_items_ui_table",
-          filters: {
-            userId: params.userId,
-            includeArchived: params.includeArchived,
-            searchTerm: params.searchTerm,
-            categoryId: params.categoryId,
-          },
-          pagination: {
-            start,
-            end,
-            pageSize,
-            currentPage: params.page,
-            totalCount: count,
-          },
-        },
-      });
       handleSupabaseError(error, "Items fetch");
     }
 
-    return { data: data as ItemTableRow[], count: count ?? 0 };
-  } catch (error) {
-    console.error("Error in fetchItemsView:", {
-      error,
-      params,
-    });
-    throw error;
-  }
+    return { data: (data ?? []) as ItemTableRow[], count: count ?? 0 };
 }
 
 /**

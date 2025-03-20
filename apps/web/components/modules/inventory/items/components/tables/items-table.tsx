@@ -9,13 +9,13 @@ async function getItems() {
   const userId = await getUserId();
   const showArchived = true;
 
-  const items = await fetchItemsView(supabase, {
+  const result = await fetchItemsView(supabase, {
     userId,
     page: 1,
     includeArchived: showArchived,
   });
 
-  return items?.data ?? [];
+  return result.data;
 }
 
 export default async function ItemsTable() {

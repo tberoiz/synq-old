@@ -1,4 +1,4 @@
-"use server";
+"use client";
 
 // React & External Dependencies
 import { Suspense } from "react";
@@ -8,18 +8,25 @@ import { Skeleton } from "@synq/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@synq/ui/tabs";
 import { Button } from "@synq/ui/button";
 
+// Icons
+import { List, Package, Settings } from "lucide-react";
+
+// Query Management
+import { useQueryState } from "nuqs";
+
 // Internal Components
 import ItemsTable from "@ui/modules/inventory/items/components/tables/items-table";
 import PurchasesDataTable from "@ui/modules/inventory/purchases/components/tables/purchases-data-table";
 
-// Icons
-import { List, Package, Settings } from "lucide-react";
+export default function InventoryTabs() {
+  const [tab, setTab] = useQueryState("tab", {
+    defaultValue: "items",
+    parse: (value) => (["items", "batches"].includes(value) ? value : "items"),
+    serialize: (value) => value
+  });
 
-import { useQueryState } from "nuqs";
-
-export default async function InventoryPage() {
   return (
-    <Tabs defaultValue="items" className="space-y-4">
+    <Tabs value={tab} onValueChange={setTab} className="space-y-4">
       <div className="flex items-center gap-2">
         <TabsList>
           <TabsTrigger value="items">

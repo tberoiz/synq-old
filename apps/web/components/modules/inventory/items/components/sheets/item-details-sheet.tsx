@@ -20,7 +20,7 @@ import { useIsMobile } from "@synq/ui/use-mobile";
 // Local Components
 import { EditItemForm } from "../forms/edit-item-form";
 
-// API Hooks
+// API
 import { useItemDetailsQuery, useCategoriesQuery } from "../../queries/items";
 
 interface ItemDetailsSheetProps {
@@ -36,8 +36,9 @@ export function ItemDetailsSheet({
 }: ItemDetailsSheetProps): React.ReactElement {
   // API Hooks
   const { data: item, isLoading: isLoadingItem } = useItemDetailsQuery(itemId);
-  const { data: categories, isLoading: isLoadingCategories } = useCategoriesQuery();
-  
+  const { data: categories, isLoading: isLoadingCategories } =
+    useCategoriesQuery();
+
   // UI Hooks
   const isMobile = useIsMobile();
 
@@ -46,7 +47,7 @@ export function ItemDetailsSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent 
+      <SheetContent
         side={isMobile ? "bottom" : "right"}
         className={cn(
           "flex flex-col",
@@ -60,9 +61,7 @@ export function ItemDetailsSheet({
 
         <div className="flex-1 overflow-y-auto py-4">
           {isLoading && (
-            <div className="text-center text-muted-foreground">
-              Loading...
-            </div>
+            <div className="text-center text-muted-foreground">Loading...</div>
           )}
 
           {!isLoading && (!item || !categories) && (

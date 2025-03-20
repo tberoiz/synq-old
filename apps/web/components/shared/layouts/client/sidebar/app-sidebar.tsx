@@ -7,7 +7,6 @@ import {
   WalletCards,
   Settings,
   Receipt,
-  ShoppingCart,
 } from "lucide-react";
 import {
   Sidebar,

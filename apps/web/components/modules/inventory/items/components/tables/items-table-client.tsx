@@ -17,18 +17,20 @@ import { CategoryFilter } from "@ui/modules/inventory/items/components/filters/c
 import { useItemsColumns } from "@ui/modules/inventory/items/hooks/use-items-columns";
 import { useItems } from "@ui/modules/inventory/items/hooks/use-items";
 
-// CONSTANTS
-const QUERY_KEY = ["user_inv_items"];
+import { useQueryState } from 'nuqs'
 
 export function ItemsTableClient({
   items: initialItems,
 }: {
   items: ItemTableRow[];
 }) {
-  const [detailsItemId, setDetailsItemId] = React.useState<Pick<
-    ItemDetails,
-    "item_id"
-  > | null>(null);
+
+  const [detailsItemId, setDetailsItemId] = useQueryState('itemId', {
+    parse: (value): Pick<ItemDetails, "item_id"> | null =>
+      value ? { item_id: value } : null,
+    serialize: (value) => value?.item_id ?? null
+  });
+
   const [actionItemId, setActionItemId] = React.useState<string | null>(null);
   const [dialogType, setDialogType] = React.useState<
     "archive" | "restore" | null
@@ -116,9 +118,7 @@ export function ItemsTableClient({
         isOpen={!!dialogType}
         onOpenChange={(open: boolean) => !open && setDialogType(null)}
         actionType={dialogType}
-        itemId={actionItemId}
         onConfirm={handleDialogAction}
-        queryKey={QUERY_KEY}
       />
     </>
   );

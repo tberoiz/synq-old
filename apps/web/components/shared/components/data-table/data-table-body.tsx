@@ -1,7 +1,6 @@
 import type { ColumnDef, Table } from "@tanstack/react-table";
 import { TableBody, TableCell, TableRow } from "@synq/ui/table";
 import { flexRender } from "@tanstack/react-table";
-import { cn } from "@synq/ui/utils";
 
 interface DataTableBodyProps<TData> {
   table: Table<TData>;

@@ -32,21 +32,27 @@ export async function fetchPurchases(
   let query = supabase
     .from("vw_purchases_ui_table")
     .select("id, user_id, name, created_at, total_cost, status, potential_revenue, actual_revenue")
-    .eq("user_id", params.userId)
-    .eq("status", params.includeArchived ? "active" : "archived")
-    .order("created_at", { ascending: false })
-    .range(start, end);
+    .eq("user_id", params.userId);
+
+  // Add archived filter is specified
+  if (params.includeArchived) {
+      query = query.eq("status", params.includeArchived ? "active" : "archived");
+  }
 
   // Add search filter if searchTerm is provided
   if (params.searchTerm) {
     query = query.ilike("name", `%${params.searchTerm}%`);
   }
 
+  // Add ordering and pagination
+  query = query.order("created_at", { ascending: false }).range(start, end);
+
+  // Excute the query
   const { data, error, count } = await query;
 
   if (error) handleSupabaseError(error, "Purchases fetch");
 
-  return { data: data as PurchaseTableRow[], count: count ?? 0 };
+  return { data: (data ?? []) as PurchaseTableRow[], count: count ?? 0 };
 }
 
 export type CreatePurchaseParams = {

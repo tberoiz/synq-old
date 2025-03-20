@@ -13,9 +13,14 @@ import {
   getUserId,
   fetchItemDetails,
   fetchCategories,
+  updateItemDetails,
 } from "@synq/supabase/queries";
 import { itemKeys, categoryKeys, type ItemFilters } from "./keys";
-import type { ItemTableRow, ItemDetails } from "@synq/supabase/types";
+import type {
+  ItemTableRow,
+  ItemDetails,
+  ItemUpdateParams,
+} from "@synq/supabase/types";
 
 export function useInfiniteItemsQuery(
   filters: ItemFilters,
@@ -73,9 +78,33 @@ export function useItemMutations() {
     },
   });
 
+  const updateMutation = useMutation({
+    mutationFn: async ({
+      itemId,
+      updates,
+    }: {
+      itemId: Pick<ItemDetails, "item_id">;
+      updates: ItemUpdateParams;
+    }) => {
+      await updateItemDetails(supabase, itemId, updates);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: itemKeys.all });
+    },
+  });
+
+  const createMutation = useMutation({
+    mutationFn: async (itemId: string) => {},
+  });
+
   return {
     archive: archiveMutation.mutateAsync,
     restore: restoreMutation.mutateAsync,
+    update: {
+      mutate: updateMutation.mutateAsync,
+      isPending: updateMutation.isPending,
+    },
+    create: createMutation.mutateAsync,
   };
 }
 

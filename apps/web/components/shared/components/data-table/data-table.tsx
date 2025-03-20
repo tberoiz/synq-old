@@ -187,14 +187,20 @@ export function DataTable<TData>({
     <div>
       {tableHero}
       <div className="rounded-md border">
-        <Table>
-          <DataTableHeader table={table} />
-          <DataTableBody
-            table={table}
-            columns={columns}
-            onRowClick={onRowClick}
-          />
-        </Table>
+        <div className="relative">
+          <Table>
+            <DataTableHeader table={table} />
+          </Table>
+          <div className="max-h-[60vh] overflow-auto">
+            <Table>
+              <DataTableBody
+                table={table}
+                columns={columns}
+                onRowClick={onRowClick}
+              />
+            </Table>
+          </div>
+        </div>
       </div>
       <div ref={ref} className="h-4 w-full">
         {isFetchingNextPage && (

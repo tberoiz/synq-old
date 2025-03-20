@@ -1,47 +1,40 @@
 "use client";
 
+// REACT
+import React, { useState, useRef } from "react";
+
+// UI COMPONENTS
+import { SheetHeader, SheetTitle, SheetContent, Sheet } from "@synq/ui/sheet";
+import { useToast } from "@synq/ui/use-toast";
+import { Button } from "@synq/ui/button";
+import { Input } from "@synq/ui/input";
+import { Badge } from "@synq/ui/badge";
+import PurchaseItemsTable, {
+  type PurchaseItemsTableRef,
+} from "@ui/modules/inventory/purchases/components/tables/purchase-items-table";
+import { Avatar, AvatarFallback, AvatarImage } from "@synq/ui/avatar";
+import { ImportItemsDialog } from "../dialogs/import-items-dialog";
+
+// API
+import { useQueryClient } from "@tanstack/react-query";
+import { type PurchaseDetails } from "@synq/supabase/types";
+import { ImportItem } from "@synq/supabase/types";
+
+// ICONS
 import {
   DollarSign,
   Box,
   TrendingUp,
-  ShoppingCart,
-  BarChart,
-  PieChart,
   Pencil,
   Check,
   X,
+  Tag,
+  User,
 } from "lucide-react";
-import {
-  SheetHeader,
-  SheetTitle,
-  SheetContent,
-  Sheet,
-} from "@synq/ui/sheet";
-import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
-import { createClient } from "@synq/supabase/client";
-import { useToast } from "@synq/ui/use-toast";
-import {
-  addItemToPurchase,
-  fetchItemsView,
-  fetchPurchaseDetails,
-  getUserId,
-  updatePurchaseItem,
-} from "@synq/supabase/queries";
-import { type PurchaseDetails } from "@synq/supabase/types";
 
-import { Button } from "@synq/ui/button";
-import { Input } from "@synq/ui/input";
-import React, { useState, useRef } from "react";
+// UTILS
 import { cn } from "@synq/ui/utils";
-import { Badge } from "@synq/ui/badge";
-import { Card, CardHeader, CardTitle, CardContent } from "@synq/ui/card";
-import PurchaseItemsTable, {
-  type PurchaseItemsTableRef,
-} from "@ui/modules/inventory/purchases/components/tables/purchase-items-table";
-import { InventoryItemWithDetails } from "@synq/supabase/types";
-import { ImportItemsDialog } from "../dialogs/import-items-dialog";
-import { CreateItemDialog } from "@ui/modules/inventory/items/components/dialogs/create-item-dialog";
-import { ImportItem } from "@synq/supabase/types";
+import { usePurchaseDetailsSheetQueries } from "../../queries/purchase-details-sheet";
 
 interface PurchaseDetailsSheetProps {
   purchase: PurchaseDetails | null;
@@ -56,12 +49,10 @@ interface PurchaseDetailsSheetProps {
 export default function PurchaseDetailsSheet({
   purchase,
   isMobile,
-  onSaveBatch,
   open,
   onOpenChange,
 }: PurchaseDetailsSheetProps) {
   const queryClient = useQueryClient();
-  const supabase = createClient();
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   const [isTableDirty, setIsTableDirty] = useState(false);
@@ -69,130 +60,19 @@ export default function PurchaseDetailsSheet({
   const [editedName, setEditedName] = useState("");
   const tableRef = useRef<PurchaseItemsTableRef>(null);
 
-  const { data: userId } = useQuery({
-    queryKey: ["user_id"],
-    queryFn: getUserId,
-    enabled: !!purchase,
-  });
-
-  const { data: purchaseDetails } = useQuery<PurchaseDetails | null>({
-    queryKey: ["purchase_details", purchase?.id],
-    queryFn: () => {
-      if (!purchase?.id) return null;
-      return fetchPurchaseDetails(supabase, purchase.id);
-    },
-    enabled: !!purchase?.id,
-    initialData: purchase || null,
-  });
+  const {
+    userId,
+    purchaseDetails,
+    updateItem,
+    updateName,
+    removeItem,
+    importItems,
+  } = usePurchaseDetailsSheetQueries(purchase?.id ?? null);
 
   if (!purchase || !purchaseDetails) return null;
 
   const details: PurchaseDetails = purchaseDetails;
   const items = details.items || [];
-
-  const { data: inventoryItems, isLoading: isItemsLoading } = useQuery({
-    queryKey: ["inventory_items"],
-    queryFn: async () => {
-      const userId = await getUserId();
-      return fetchItemsView(supabase, {
-        userId,
-        page: 10,
-        includeArchived: false,
-      });
-    },
-    enabled: !!purchase,
-  });
-
-  useMutation({
-    mutationFn: async (data: {
-      item_id: string;
-      quantity: number;
-      unit_cost: number;
-    }) => {
-      if (!userId || !purchase)
-        throw new Error("User ID and Purchase are required");
-      return addItemToPurchase(
-        supabase,
-        purchase.id,
-        data.item_id,
-        data.quantity,
-        data.unit_cost,
-        userId
-      );
-    },
-    onSuccess: () => {
-      Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["user_purchases"] }),
-        queryClient.invalidateQueries({
-          queryKey: ["purchase_details", purchase?.id],
-        }),
-        queryClient.invalidateQueries({ queryKey: ["inventory_items"] }),
-        queryClient.invalidateQueries({ queryKey: ["items_view"] }),
-      ]);
-      toast({ title: "Success", description: "Item added to purchase!" });
-    },
-    onError: (error) => {
-      toast({ title: "Error", description: error.message });
-    },
-  });
-
-  const { mutate: updateItemMutation } = useMutation({
-    mutationFn: async (data: {
-      id: string;
-      quantity: number;
-      unit_cost: number;
-    }) => {
-      return updatePurchaseItem(supabase, data.id, {
-        quantity: data.quantity,
-        unit_cost: data.unit_cost,
-      });
-    },
-    onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["user_purchases"] }),
-        queryClient.invalidateQueries({
-          queryKey: ["purchase_details", purchase?.id],
-        }),
-        queryClient.invalidateQueries({ queryKey: ["inventory_items"] }),
-        queryClient.invalidateQueries({ queryKey: ["items_view"] }),
-        queryClient.invalidateQueries({ queryKey: ["item_details"] }),
-        queryClient.invalidateQueries({ queryKey: ["inventory_stats"] }),
-        queryClient.invalidateQueries({ queryKey: ["purchase_stats"] }),
-      ]);
-
-      queryClient.refetchQueries({
-        queryKey: ["purchase_details", purchase?.id],
-        exact: true,
-      });
-
-      toast({ title: "Success", description: "Item updated!" });
-    },
-    onError: (error) => {
-      toast({ title: "Error", description: error.message });
-    },
-  });
-
-  const { mutate: updateNameMutation } = useMutation({
-    mutationFn: async (name: string) => {
-      const { error } = await supabase
-        .from("user_purchase_batches")
-        .update({ name })
-        .eq("id", details.id);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["purchase_details", details.id],
-      });
-      queryClient.invalidateQueries({ queryKey: ["user_purchases"] });
-      setIsEditingName(false);
-      toast({ title: "Success", description: "Purchase name updated!" });
-    },
-    onError: (error: any) => {
-      toast({ title: "Error", description: error.message });
-    },
-  });
 
   const handleNameEdit = () => {
     setEditedName(details.name);
@@ -201,7 +81,14 @@ export default function PurchaseDetailsSheet({
 
   const handleNameSave = () => {
     if (editedName.trim() !== details.name) {
-      updateNameMutation(editedName.trim());
+      updateName(editedName.trim())
+        .then(() => {
+          setIsEditingName(false);
+          toast({ title: "Success", description: "Purchase name updated!" });
+        })
+        .catch((error: any) => {
+          toast({ title: "Error", description: error.message });
+        });
     } else {
       setIsEditingName(false);
     }
@@ -212,9 +99,7 @@ export default function PurchaseDetailsSheet({
     setEditedName("");
   };
 
-  const handleImportItems = async (
-    selectedItems: ImportItem[]
-  ) => {
+  const handleImportItems = async (selectedItems: ImportItem[]) => {
     if (!userId) {
       toast({
         title: "Error",
@@ -225,27 +110,7 @@ export default function PurchaseDetailsSheet({
     }
 
     try {
-      await Promise.all(
-        selectedItems.map((item) =>
-          addItemToPurchase(
-            supabase,
-            details.id,
-            item.item_id,
-            1,
-            item.listing_price || 0,
-            userId
-          )
-        )
-      );
-
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["user_purchases"] }),
-        queryClient.invalidateQueries({
-          queryKey: ["purchase_details", details.id],
-        }),
-        queryClient.invalidateQueries({ queryKey: ["inventory_items"] }),
-        queryClient.invalidateQueries({ queryKey: ["items_view"] }),
-      ]);
+      await importItems(selectedItems);
       toast({ title: "Success", description: "Items added to purchase!" });
     } catch (error) {
       console.error("Error adding items:", error);
@@ -259,21 +124,7 @@ export default function PurchaseDetailsSheet({
 
   const handleRemoveItem = async (purchaseItemId: string) => {
     try {
-      const { error } = await supabase
-        .from("user_purchase_items")
-        .delete()
-        .eq("id", purchaseItemId);
-
-      if (error) throw error;
-
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["user_purchases"] }),
-        queryClient.invalidateQueries({
-          queryKey: ["purchase_details", details.id],
-        }),
-        queryClient.invalidateQueries({ queryKey: ["inventory_items"] }),
-        queryClient.invalidateQueries({ queryKey: ["items_view"] }),
-      ]);
+      await removeItem(purchaseItemId);
       toast({ title: "Success", description: "Item removed from purchase!" });
     } catch (error: any) {
       toast({ title: "Error", description: error.message });
@@ -293,32 +144,13 @@ export default function PurchaseDetailsSheet({
 
       await Promise.all(
         updatesArray.map((update) =>
-          updateItemMutation({
+          updateItem({
             id: update.id,
             quantity: update.quantity,
             unit_cost: update.unit_cost,
           })
         )
       );
-
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["user_purchases"] }),
-        queryClient.invalidateQueries({
-          queryKey: ["purchase_details", details.id],
-        }),
-        queryClient.invalidateQueries({ queryKey: ["purchase_details"] }),
-        queryClient.invalidateQueries({ queryKey: ["inventory_items"] }),
-        queryClient.invalidateQueries({ queryKey: ["items_view"] }),
-        queryClient.invalidateQueries({ queryKey: ["item_details"] }),
-        queryClient.invalidateQueries({ queryKey: ["user_inv_items"] }),
-        queryClient.invalidateQueries({ queryKey: ["inventory_stats"] }),
-        queryClient.invalidateQueries({ queryKey: ["purchase_stats"] }),
-      ]);
-
-      await queryClient.refetchQueries({
-        queryKey: ["purchase_details", details.id],
-        exact: true,
-      });
 
       toast({ title: "Success", description: "Purchase items updated!" });
     } catch (error: any) {
@@ -333,62 +165,68 @@ export default function PurchaseDetailsSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side={isMobile ? "bottom" : "right"}
-        className={cn("w-full sm:max-w-xl lg:max-w-2xl", isMobile && "h-[90vh]")}
+        className={cn(
+          "w-full sm:max-w-xl lg:max-w-2xl",
+          isMobile && "h-[90vh]"
+        )}
       >
         <div className="flex flex-col h-full">
           <div className="flex-1 overflow-y-auto">
             <SheetHeader className="px-6 pt-6">
-              <SheetTitle className="flex items-center gap-2">
-                <Box className="h-6 w-6" />
-                <div>
-                  {isEditingName ? (
-                    <div className="flex items-center gap-2">
-                      <Input
-                        value={editedName}
-                        onChange={(e) => setEditedName(e.target.value)}
-                        className="h-8 w-[200px]"
-                        autoFocus
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            handleNameSave();
-                          }
-                        }}
-                      />
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={handleNameSave}
-                      >
-                        <Check className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={handleNameCancel}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <div className="text-lg font-medium truncate max-w-[500px]">
-                        {details.name}
+              <SheetTitle className="flex items-start gap-4">
+                <Box className="h-6 w-6 mt-1" />
+                <div className="flex-1 space-y-1">
+                  <div className="flex items-center gap-2">
+                    {isEditingName ? (
+                      <div className="flex items-center gap-2">
+                        <Input
+                          value={editedName}
+                          onChange={(e) => setEditedName(e.target.value)}
+                          className="h-8 w-[200px]"
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              handleNameSave();
+                            }
+                          }}
+                        />
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={handleNameSave}
+                        >
+                          <Check className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={handleNameCancel}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={handleNameEdit}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  )}
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <div className="text-lg font-medium truncate max-w-[500px]">
+                          {details.name}
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={handleNameEdit}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                   <Badge
                     variant="secondary"
                     className={cn(
+                      "capitalize",
                       details.status === "active" &&
                         "bg-emerald-50 text-emerald-700 hover:bg-emerald-50 dark:bg-emerald-950/20 dark:text-emerald-300",
                       details.status === "archived" &&
@@ -402,100 +240,79 @@ export default function PurchaseDetailsSheet({
             </SheetHeader>
 
             <div className="p-6 space-y-6">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                <Card>
-                  <CardHeader className="p-4 pb-2">
-                    <CardTitle className="text-sm font-medium flex items-center gap-2">
-                      <Box className="h-4 w-4 text-blue-600" />
-                      Total Items
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-4 pt-1">
-                    <div className="text-lg">
-                      {items.reduce((acc, item) => acc + item.quantity, 0)}
-                    </div>
-                  </CardContent>
-                </Card>
+              <div className="grid grid-cols-3 gap-4 py-4">
+                {/* Total COGS Card */}
+                <div className="p-4 border rounded-lg bg-blue-50">
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="h-5 w-5 text-blue-600" />
+                    <p className="text-sm text-blue-600">Total COGS</p>
+                  </div>
+                  <p className="text-lg font-semibold text-blue-900">
+                    ${(details.total_cost || 0).toFixed(2)}
+                  </p>
+                </div>
 
-                <Card>
-                  <CardHeader className="p-4 pb-2">
-                    <CardTitle className="text-sm font-medium flex items-center gap-2">
-                      <DollarSign className="h-4 w-4 text-purple-600" />
-                      Total Cost
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-4 pt-1">
-                    <div className="text-lg">
-                      ${(details.total_cost || 0).toFixed(2)}
-                    </div>
-                  </CardContent>
-                </Card>
+                {/* Total Listing Price Card */}
+                <div className="p-4 border rounded-lg bg-purple-50">
+                  <div className="flex items-center gap-2">
+                    <Tag className="h-5 w-5 text-purple-600" />
+                    <p className="text-sm text-purple-600">
+                      Total Listing Price
+                    </p>
+                  </div>
+                  <p className="text-lg font-semibold text-purple-900">
+                    $
+                    {(
+                      items?.reduce(
+                        (acc, item) =>
+                          acc +
+                          (item.listing_price || 0) * (item.quantity || 0),
+                        0
+                      ) || 0
+                    ).toFixed(2)}
+                  </p>
+                </div>
 
-                <Card>
-                  <CardHeader className="p-4 pb-2">
-                    <CardTitle className="text-sm font-medium flex items-center gap-2">
-                      <TrendingUp className="h-4 w-4 text-green-600" />
-                      Remaining
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-4 pt-1">
-                    <div className="text-lg">
-                      {items.reduce((acc, item) => acc + item.remaining_quantity, 0)}
-                    </div>
-                  </CardContent>
-                </Card>
+                {/* Total Profit Card */}
+                <div className="p-4 border rounded-lg bg-green-50">
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5 text-green-600" />
+                    <p className="text-sm text-green-600">Total Profit</p>
+                  </div>
+                  <p className="text-lg font-semibold text-green-900">
+                    $
+                    {(
+                      (items?.reduce(
+                        (acc, item) =>
+                          acc +
+                          (item.listing_price || 0) * (item.quantity || 0),
+                        0
+                      ) || 0) - (details.total_cost || 0)
+                    ).toFixed(2)}
+                  </p>
+                </div>
+              </div>
 
-                <Card>
-                  <CardHeader className="p-4 pb-2">
-                    <CardTitle className="text-sm font-medium flex items-center gap-2">
-                      <ShoppingCart className="h-4 w-4 text-amber-600" />
-                      Sold
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-4 pt-1">
-                    <div className="text-lg">
-                      {items.reduce((acc, item) => acc + (item.quantity - item.remaining_quantity), 0)}
-                    </div>
-                  </CardContent>
-                </Card>
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold mb-4">Suppliers</h3>
 
-                <Card>
-                  <CardHeader className="p-4 pb-2">
-                    <CardTitle className="text-sm font-medium flex items-center gap-2">
-                      <BarChart className="h-4 w-4 text-indigo-600" />
-                      Sell Through
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-4 pt-1">
-                    <div className="text-lg">
-                      {(() => {
-                        const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
-                        const soldItems = items.reduce((acc, item) => acc + (item.quantity - item.remaining_quantity), 0);
-                        return totalItems > 0 ? ((soldItems / totalItems) * 100).toFixed(1) : "0.0";
-                      })()}%
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="p-4 pb-2">
-                    <CardTitle className="text-sm font-medium flex items-center gap-2">
-                      <PieChart className="h-4 w-4 text-rose-600" />
-                      Margin
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-4 pt-1">
-                    <div className="text-lg">
-                      {(() => {
-                        const totalRevenue = items.reduce((acc, item) => 
-                          acc + (item.listing_price * (item.quantity - item.remaining_quantity)), 0);
-                        const totalCost = items.reduce((acc, item) => 
-                          acc + (item.unit_cost * (item.quantity - item.remaining_quantity)), 0);
-                        return totalRevenue > 0 ? (((totalRevenue - totalCost) / totalRevenue) * 100).toFixed(1) : "0.0";
-                      })()}%
-                    </div>
-                  </CardContent>
-                </Card>
+                <div className="flex items-center gap-4 p-4 border rounded-lg">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage
+                      src="https://via.placeholder.com/150"
+                      alt="test-supplier"
+                    />
+                    <AvatarFallback>
+                      <User className="h-5 w-5" />
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="text-sm font-medium">Example Supplier</p>
+                    <p className="text-sm text-muted-foreground">
+                      m@example.com
+                    </p>
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-4">
@@ -505,12 +322,9 @@ export default function PurchaseDetailsSheet({
                   </div>
                   <div className="flex items-center gap-2">
                     <ImportItemsDialog
-                      items={inventoryItems?.data || []}
                       title="Add Items to Purchase"
                       onImport={handleImportItems}
-                      loading={isItemsLoading}
                     />
-                    <CreateItemDialog />
                   </div>
                 </div>
 
