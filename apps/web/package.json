@@ -18,6 +18,8 @@
     "@synq/ui": "*",
     "@tanstack/react-query": "^5.66.5",
     "@tanstack/react-table": "^8.20.6",
+    "@vercel/analytics": "^1.5.0",
+    "@vercel/speed-insights": "^1.2.0",
     "date-fns": "^4.1.0",
     "next": "15.0.3",
     "next-safe-action": "^7.10.4",
