@@ -55,6 +55,7 @@
     "cmdk": "^1.0.4",
     "date-fns": "^4.1.0",
     "embla-carousel-react": "^8.5.1",
+    "input-otp": "^1.4.2",
     "lucide-react": "^0.468.0",
     "react-day-picker": "^9.5.0",
     "react-hook-form": "^7.54.2",
@@ -142,6 +143,10 @@
     "./input": {
       "types": "./dist/components/input.d.ts",
       "default": "./dist/components/input.js"
+    },
+    "./input-otp": {
+      "types": "./dist/components/input-otp.d.ts",
+      "default": "./dist/components/input-otp.js"
     },
     "./label": {
       "types": "./dist/components/label.d.ts",
