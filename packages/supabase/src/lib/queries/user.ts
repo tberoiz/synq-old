@@ -1,6 +1,6 @@
 "use server";
 
-import { Provider, UserMetadata } from "@supabase/supabase-js";
+import { UserMetadata } from "@supabase/supabase-js";
 import { createClient } from "../client/server";
 import { redirect } from "next/navigation";
 import sharp from "sharp";
@@ -98,28 +98,6 @@ export async function verifyOTP(prevState: any, formData: FormData) {
     error: "Verification failed. Please try again.",
     success: false,
   };
-}
-
-export async function signInWithOAuth(provider: Provider) {
-  const supabase = await createClient();
-  const redirectUrl = `${window.location.origin}/api/auth/callback`;
-
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider,
-    options: {
-      redirectTo: redirectUrl,
-    },
-  });
-
-  if (error) {
-    redirect("/auth/signup");
-  }
-
-  if (data?.url) {
-    return redirect(data.url);
-  }
-
-  return redirect("/");
 }
 
 export async function signOut() {

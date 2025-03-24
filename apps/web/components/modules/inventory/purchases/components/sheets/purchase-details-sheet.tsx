@@ -12,7 +12,6 @@ import { Badge } from "@synq/ui/badge";
 import PurchaseItemsTable, {
   type PurchaseItemsTableRef,
 } from "@ui/modules/inventory/purchases/components/tables/purchase-items-table";
-import { Avatar, AvatarFallback, AvatarImage } from "@synq/ui/avatar";
 import { ImportItemsDialog } from "../dialogs/import-items-dialog";
 
 // API
@@ -30,10 +29,10 @@ import {
   X,
   Tag
 } from "lucide-react";
-
 // UTILS
 import { cn } from "@synq/ui/utils";
 import { usePurchaseDetailsSheetQueries } from "../../queries/purchases";
+import { useIsMobile } from "@synq/ui/use-mobile";
 
 interface PurchaseDetailsSheetProps {
   purchase: PurchaseDetails | null;
@@ -47,7 +46,6 @@ interface PurchaseDetailsSheetProps {
 
 export default function PurchaseDetailsSheet({
   purchase,
-  isMobile,
   open,
   onOpenChange,
 }: PurchaseDetailsSheetProps) {
@@ -58,7 +56,7 @@ export default function PurchaseDetailsSheet({
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState("");
   const tableRef = useRef<PurchaseItemsTableRef>(null);
-
+  const isMobile = useIsMobile();
   const {
     userId,
     purchaseDetails,
@@ -165,8 +163,7 @@ export default function PurchaseDetailsSheet({
       <SheetContent
         side={isMobile ? "bottom" : "right"}
         className={cn(
-          "w-full sm:h-3/4 lg:w-1/2",
-          isMobile && "h-[90vh]"
+          isMobile ? "w-full h-3/4" : "w-1/2 h-full"
         )}
       >
         <div className="flex flex-col h-full">

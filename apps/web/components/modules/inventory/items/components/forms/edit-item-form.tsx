@@ -61,7 +61,6 @@ export function EditItemForm({
       inventory_group_id: item.inventory_group_id || "",
     });
   }, [item, form]);
-
   const onSubmit = async (data: z.infer<typeof UPDATE_ITEM_SCHEMA>) => {
     try {
       if (!item.item_id) throw new Error("Item ID is required");
@@ -117,11 +116,11 @@ export function EditItemForm({
           />
 
           {/* Purchase History */}
-          {item.purchase_batches && item.purchase_batches.length > 0 && (
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-muted-foreground">
-                Purchase History
-              </Label>
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-muted-foreground">
+              Purchase History
+            </Label>
+            {item.purchase_batches?.length > 0 && (
               <div className="space-y-1">
                 {item.purchase_batches.map((batch, index) => (
                   <PurchaseBatchCard
@@ -130,8 +129,8 @@ export function EditItemForm({
                   />
                 ))}
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         <SheetFooter className="border-t bg-background p-4">

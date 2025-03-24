@@ -1,8 +1,9 @@
 import { Metadata } from "next";
-import { User, Bell } from "lucide-react";
+import { User, Bell, FolderTree } from "lucide-react";
 import { PageContainer } from "@ui/shared/layouts/server/page-container";
 import { AccountForm } from "@ui/modules/settings/components/forms/account-form";
 import { NotificationsForm } from "@ui/modules/settings/components/forms/notifications-form";
+import { CategoriesForm } from "@ui/modules/settings/components/forms/categories-form";
 import { Separator } from "@synq/ui/separator";
 
 export const metadata: Metadata = {
@@ -17,6 +18,13 @@ const settingsSections = [
     description: "Update your account information and profile.",
     content: <AccountForm />,
     icon: <User className="w-5 h-5" />,
+  },
+  {
+    key: "categories",
+    title: "Categories",
+    description: "Manage your inventory categories.",
+    content: <CategoriesForm />,
+    icon: <FolderTree className="w-5 h-5" />,
   },
   {
     key: "notifications",

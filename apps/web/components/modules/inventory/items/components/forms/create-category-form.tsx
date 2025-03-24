@@ -5,7 +5,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@synq/ui/button";
 import { Input } from "@synq/ui/input";
-import { useQuery } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useToast } from "@synq/ui/use-toast";
 import { getUserId } from "@synq/supabase/queries";
 import { createClient } from "@synq/supabase/client";
@@ -18,6 +18,7 @@ import {
   FormMessage,
 } from "@synq/ui/form";
 import { DialogClose, DialogFooter } from "@synq/ui/dialog";
+import { categoryKeys } from "@ui/modules/inventory/items/queries/keys";
 
 const categorySchema = z.object({
   name: z
@@ -33,6 +34,7 @@ export interface CreateCategoryFormProps {
 
 export function CreateCategoryForm({ onSuccess }: CreateCategoryFormProps) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const supabase = createClient();
   const { data: userId } = useQuery({
     queryKey: ["user_id"],
@@ -70,6 +72,13 @@ export function CreateCategoryForm({ onSuccess }: CreateCategoryFormProps) {
         description: "Category created successfully!",
         variant: "default",
       });
+
+      // Invalidate queries
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: categoryKeys.all }),
+        queryClient.invalidateQueries({ queryKey: ["inventory_items"] }),
+        queryClient.invalidateQueries({ queryKey: ["items_view"] }),
+      ]);
 
       if (onSuccess) onSuccess();
     } catch (error) {

@@ -17,8 +17,6 @@ import {
 } from "@synq/ui/sheet";
 import { cn } from "@synq/ui/utils";
 import { useIsMobile } from "@synq/ui/use-mobile";
-import { Button } from "@synq/ui/button";
-import { Trash2 } from "lucide-react";
 
 // Local Components
 import { EditItemForm } from "../forms/edit-item-form";
@@ -37,7 +35,6 @@ export function ItemDetailsSheet({
   itemId,
   open,
   onOpenChange,
-  onDelete,
 }: ItemDetailsSheetProps): React.ReactElement {
   // API Hooks
   const { data: item, isLoading: isLoadingItem } = useItemDetailsQuery(itemId);
@@ -50,20 +47,13 @@ export function ItemDetailsSheet({
   // Derived State
   const isLoading = isLoadingItem || isLoadingCategories;
 
-  const handleDelete = () => {
-    if (itemId?.item_id && onDelete) {
-      onDelete(itemId.item_id);
-      onOpenChange(false);
-    }
-  };
-
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side={isMobile ? "bottom" : "right"}
         className={cn(
-          "flex flex-col sm:h-1/2",
-          isMobile ? "w-full " : "w-1/2 md:w-1/4 h-1/2"
+          "flex flex-col",
+          isMobile ? "w-full h-1/2" : "w-1/4 h-full"
         )}
       >
         <SheetHeader>
@@ -93,14 +83,6 @@ export function ItemDetailsSheet({
 
         {itemId?.item_id && (
           <SheetFooter>
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-              className="w-full"
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Delete Item
-            </Button>
           </SheetFooter>
         )}
       </SheetContent>

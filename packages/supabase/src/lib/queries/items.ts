@@ -196,7 +196,13 @@ function _transformPurchaseBatches(
   }> | null,
 ): TransformedPurchaseBatch[] {
   return (
-    batches?.map((batch) => ({
+    batches?.filter(batch => 
+      batch.batch_id !== null && 
+      batch.name !== null && 
+      batch.quantity !== null && 
+      batch.unit_cost !== null && 
+      batch.created_at !== null
+    ).map((batch) => ({
       id: batch.batch_id,
       name: batch.name,
       quantity: batch.quantity,
