@@ -69,8 +69,10 @@ SelectScrollDownButton.displayName =
 
 const SelectContent = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
->(({ className, children, position = "popper", ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content> & {
+    emptyPlaceholder?: React.ReactNode;
+  }
+>(({ className, children, position = "popper", emptyPlaceholder, ...props }, ref) => (
   <SelectPrimitive.Portal>
     <SelectPrimitive.Content
       ref={ref}
@@ -91,7 +93,13 @@ const SelectContent = React.forwardRef<
             "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]",
         )}
       >
-        {children}
+        {React.Children.count(children) > 0 ? (
+          children
+        ) : (
+          <div className="py-2 text-center text-sm text-muted-foreground">
+            {emptyPlaceholder || "No items found"}
+          </div>
+        )}
       </SelectPrimitive.Viewport>
       <SelectScrollDownButton />
     </SelectPrimitive.Content>
