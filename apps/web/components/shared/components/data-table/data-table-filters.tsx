@@ -29,13 +29,13 @@ export function DataTableFilters<TData>({
   }, [debouncedValue, onSearch]);
 
   return (
-    <div className="flex items-center justify-between py-4">
-      <div className="flex items-center gap-4 flex-1">
-        <div className="relative flex-1 max-w-sm">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 py-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
+        <div className="relative w-full sm:max-w-sm">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder={searchPlaceholder}
-            className="pl-8"
+            className="pl-8 w-full"
             value={searchValue}
             onChange={(event) => {
               const value = event.target.value;
@@ -46,7 +46,7 @@ export function DataTableFilters<TData>({
         </div>
         {filterComponent}
       </div>
-      {actions && <div className="ml-4">{actions}</div>}
+      {actions && <div className="w-full sm:w-auto">{actions}</div>}
     </div>
   );
 }

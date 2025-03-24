@@ -166,7 +166,7 @@ export default function PurchaseDetailsSheet({
       <SheetContent
         side={isMobile ? "bottom" : "right"}
         className={cn(
-          "w-full sm:max-w-xl lg:max-w-2xl",
+          "sm:w-3/4 lg:w-1/2",
           isMobile && "h-[90vh]"
         )}
       >

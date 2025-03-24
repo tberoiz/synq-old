@@ -12,7 +12,6 @@ import { Button } from "@synq/ui/button";
 import {
   Archive,
   RefreshCcw,
-  Package,
   Tag,
   Hash,
   DollarSign,
@@ -29,7 +28,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@synq/ui/tooltip";
-import { Progress } from "@synq/ui/progress";
 
 export function useItemsColumns({
   onArchive,
@@ -44,7 +42,7 @@ export function useItemsColumns({
         {
           accessorKey: "item_name",
           header: () => (
-            <div className="flex items-center gap-2 text-muted-foreground">
+            <div className="flex items-center gap-2 text-muted-foreground min-w-[200px] max-w-[300px]">
               <Boxes className="h-4 w-4" />
               <span>Name</span>
             </div>
@@ -55,7 +53,7 @@ export function useItemsColumns({
             return (
               <div
                 className={cn(
-                  "flex items-center gap-2",
+                  "flex items-center gap-2 min-w-[200px] max-w-[300px]",
                   isArchived && "opacity-60"
                 )}
               >
@@ -127,7 +125,7 @@ export function useItemsColumns({
         {
           id: "remaining",
           header: () => (
-            <div className="flex items-center justify-center gap-2 text-muted-foreground">
+            <div className="flex items-center justify-center gap-2 text-muted-foreground min-w-[100px] max-w-[120px]">
               <PackageX className="h-4 w-4" />
               <span>Stock</span>
             </div>
@@ -140,7 +138,7 @@ export function useItemsColumns({
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="flex items-center justify-center gap-2 cursor-help">
+                    <div className="flex items-center justify-center gap-2 cursor-help min-w-[100px] max-w-[120px]">
                       <PackageX
                         className={cn(
                           "h-4 w-4",
@@ -185,13 +183,13 @@ export function useItemsColumns({
         {
           accessorKey: "listing_price",
           header: () => (
-            <div className="flex items-center justify-center gap-2 text-muted-foreground">
+            <div className="flex items-center justify-center gap-2 text-muted-foreground min-w-[80px] max-w-[100px]">
               <DollarSign className="h-4 w-4" />
               <span>Price</span>
             </div>
           ),
           cell: ({ row }) => (
-            <div className="text-center font-medium">
+            <div className="flex items-center justify-center min-w-[80px] max-w-[100px]">
               ${row.original.listing_price.toFixed(2)}
             </div>
           ),
@@ -199,7 +197,7 @@ export function useItemsColumns({
         {
           id: "sold",
           header: () => (
-            <div className="flex items-center justify-center gap-2 text-muted-foreground">
+            <div className="flex items-center justify-center gap-2 text-muted-foreground min-w-[80px] max-w-[100px]">
               <ShoppingCart className="h-4 w-4" />
               <span>Sold</span>
             </div>
@@ -211,7 +209,7 @@ export function useItemsColumns({
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="flex items-center justify-center gap-2 cursor-help">
+                    <div className="flex items-center justify-center gap-2 cursor-help min-w-[80px] max-w-[100px]">
                       <ShoppingCart className="h-4 w-4 text-muted-foreground" />
                       <span className="font-medium text-muted-foreground">
                         {totalSold}
@@ -229,7 +227,7 @@ export function useItemsColumns({
         {
           id: "sku",
           header: () => (
-            <div className="flex items-center justify-center gap-2 text-muted-foreground">
+            <div className="flex items-center justify-center gap-2 text-muted-foreground min-w-[100px] max-w-[120px]">
               <Hash className="h-4 w-4" />
               <span>SKU</span>
             </div>
@@ -238,9 +236,11 @@ export function useItemsColumns({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className="w-28 text-center text-primary cursor-help">
-                    {row.original.sku ?? "-"}
-                  </span>
+                  <div className="flex items-center justify-center cursor-help min-w-[100px] max-w-[120px]">
+                    <span className="text-primary truncate">
+                      {row.original.sku ?? "-"}
+                    </span>
+                  </div>
                 </TooltipTrigger>
                 <TooltipContent side="top" className="text-xs">
                   <p>Stock Keeping Unit</p>
@@ -252,13 +252,13 @@ export function useItemsColumns({
         {
           accessorKey: "category",
           header: () => (
-            <div className="flex items-center justify-center gap-2 text-muted-foreground">
+            <div className="flex items-center justify-center gap-2 text-muted-foreground min-w-[120px] max-w-[150px]">
               <FolderTree className="h-4 w-4" />
               <span>Category</span>
             </div>
           ),
           cell: ({ row }) => (
-            <div className="flex items-center justify-center gap-1.5">
+            <div className="flex items-center justify-center gap-1.5 min-w-[120px] max-w-[150px]">
               <Tag className="h-3.5 w-3.5 text-muted-foreground" />
               <span className="truncate">{row.getValue("category")}</span>
             </div>

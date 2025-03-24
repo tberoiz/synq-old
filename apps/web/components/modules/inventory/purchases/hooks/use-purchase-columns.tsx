@@ -32,7 +32,7 @@ export function usePurchaseColumns({
           header: () => <div className="w-[20%]">Name</div>,
           cell: ({ row }) => (
             <div className="flex items-center gap-2">
-              <span className="font-medium">{row.getValue("name")}</span>
+              <span className="font-medium truncate">{row.getValue("name")}</span>
             </div>
           ),
         },

@@ -1,9 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { PurchaseItemWithDetails } from "@synq/supabase/types";
+import { ItemDetails, PurchaseItemWithDetails } from "@synq/supabase/types";
 import { DataTable } from "@ui/shared/components/data-table/data-table";
 import { usePurchaseItemsColumns } from "@ui/modules/inventory/purchases/hooks/use-purchase-items-columns";
+import { ItemDetailsSheet } from "@ui/modules/inventory/items/components/sheets/item-details-sheet";
 
 interface PurchaseItemsTableProps {
   data: PurchaseItemWithDetails[];
@@ -27,9 +28,13 @@ export const PurchaseItemsTable = React.forwardRef<
     { data, onRemoveItem, onDirtyChange },
     ref,
   ) => {
+    const [selectedItem, setSelectedItem] = React.useState<
+     Pick<ItemDetails, 'item_id'> | null
+    >(null);
     const [updates, setUpdates] = React.useState<
       Map<string, { quantity: number; unit_cost: number }>
     >(new Map());
+
 
     React.useImperativeHandle(ref, () => ({
       getUpdates: () => updates,
@@ -71,7 +76,15 @@ export const PurchaseItemsTable = React.forwardRef<
           data={data}
           enableRowSelection={false}
           searchPlaceholder="Search items..."
+          onRowClick={(row) => {
+            setSelectedItem(row)
+          }}
         />
+      <ItemDetailsSheet
+        itemId={selectedItem}
+        open={!!selectedItem}
+        onOpenChange={(open: boolean) => !open && setSelectedItem(null)}
+      />
       </div>
     );
   },

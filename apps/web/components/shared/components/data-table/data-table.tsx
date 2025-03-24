@@ -187,19 +187,15 @@ export function DataTable<TData>({
     <div>
       {tableHero}
       <div className="rounded-md border">
-        <div className="relative">
+        <div className="relative overflow-x-auto">
           <Table>
             <DataTableHeader table={table} />
+            <DataTableBody
+              table={table}
+              columns={columns}
+              onRowClick={onRowClick}
+            />
           </Table>
-          <div className="max-h-[60vh] overflow-auto">
-            <Table>
-              <DataTableBody
-                table={table}
-                columns={columns}
-                onRowClick={onRowClick}
-              />
-            </Table>
-          </div>
         </div>
       </div>
       <div ref={ref} className="h-4 w-full">
