@@ -68,10 +68,8 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                         onClick={() => isMobile && setOpenMobile(false)}
                         isActive={isActive}
                         className={cn(
-                          "flex items-center justify-start gap-3 px-4 py-2 rounded-lg transition-colors h-12 w-full",
-                          isActive
-                            ? "bg-primary text-white dark:text-black"
-                            : "hover:bg-gray-100 dark:hover:bg-gray-800",
+                          "flex items-center justify-start hover:bg-primary hover:text-primary-foreground gap-3 px-4 py-2 rounded-lg transition-colors h-12 w-full",
+                          isActive && "bg-primary font-medium text-primary-foreground"
                         )}
                       >
                         <Icon className="w-6 h-6 mr-2" />
@@ -85,7 +83,6 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-
       <SidebarFooter>
         <SidebarGroup>
           <SidebarGroupContent className="px-4 pb-4 text-sm">
