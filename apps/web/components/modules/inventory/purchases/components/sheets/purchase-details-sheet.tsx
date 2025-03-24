@@ -28,13 +28,12 @@ import {
   Pencil,
   Check,
   X,
-  Tag,
-  User,
+  Tag
 } from "lucide-react";
 
 // UTILS
 import { cn } from "@synq/ui/utils";
-import { usePurchaseDetailsSheetQueries } from "../../queries/purchase-details-sheet";
+import { usePurchaseDetailsSheetQueries } from "../../queries/purchases";
 
 interface PurchaseDetailsSheetProps {
   purchase: PurchaseDetails | null;

@@ -89,7 +89,11 @@ export function useItemMutations() {
       await updateItemDetails(supabase, itemId, updates);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: itemKeys.all });
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: itemKeys.all }),
+        queryClient.invalidateQueries({ queryKey: ["purchase_details"] }),
+        queryClient.invalidateQueries({ queryKey: ["purchases"] }),
+      ]);
     },
   });
 

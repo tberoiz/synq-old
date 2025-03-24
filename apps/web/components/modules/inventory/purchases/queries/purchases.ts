@@ -13,9 +13,11 @@ import {
   getUserId,
   updatePurchaseItem,
   fetchPurchaseDetails,
+  addItemToPurchase,
+  fetchItemsView,
 } from "@synq/supabase/queries";
 import { purchaseKeys, type PurchaseFilters } from "./keys";
-import type { PurchaseTableRow, PurchaseDetails } from "@synq/supabase/types";
+import type { PurchaseTableRow, PurchaseDetails, ImportItem } from "@synq/supabase/types";
 
 export function useInfinitePurchasesQuery(
   filters: PurchaseFilters,
@@ -109,4 +111,148 @@ export function usePurchaseDetailsQuery(
       purchaseId ? fetchPurchaseDetails(supabase, purchaseId.id) : null,
     enabled: !!purchaseId,
   });
+}
+
+export function usePurchaseDetailsSheetQueries(purchaseId: string | null) {
+  const queryClient = useQueryClient();
+  const supabase = React.useMemo(() => createClient(), []);
+  const { updateItem } = usePurchaseMutations();
+
+  const { data: userId } = useQuery({
+    queryKey: ["user_id"],
+    queryFn: getUserId,
+    enabled: !!purchaseId,
+  });
+
+  const { data: purchaseDetails } = useQuery<PurchaseDetails | null>({
+    queryKey: purchaseKeys.details(purchaseId ?? ""),
+    queryFn: () => {
+      if (!purchaseId) return null;
+      return fetchPurchaseDetails(supabase, purchaseId);
+    },
+    enabled: !!purchaseId,
+  });
+
+  const { data: inventoryItems, isLoading: isItemsLoading } = useQuery({
+    queryKey: ["inventory_items"],
+    queryFn: async () => {
+      const userId = await getUserId();
+      return fetchItemsView(supabase, {
+        userId,
+        page: 10,
+        includeArchived: false,
+      });
+    },
+    enabled: !!purchaseId,
+  });
+
+  const addItemMutation = useMutation({
+    mutationFn: async (data: {
+      item_id: string;
+      quantity: number;
+      unit_cost: number;
+    }) => {
+      if (!userId || !purchaseId)
+        throw new Error("User ID and Purchase are required");
+      return addItemToPurchase(
+        supabase,
+        purchaseId,
+        data.item_id,
+        data.quantity,
+        data.unit_cost,
+        userId
+      );
+    },
+    onSuccess: () => {
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: purchaseKeys.all }),
+        queryClient.invalidateQueries({
+          queryKey: purchaseKeys.details(purchaseId ?? ""),
+        }),
+        queryClient.invalidateQueries({ queryKey: ["inventory_items"] }),
+        queryClient.invalidateQueries({ queryKey: ["items_view"] }),
+      ]);
+    },
+  });
+
+  const updateNameMutation = useMutation({
+    mutationFn: async (name: string) => {
+      if (!purchaseId) throw new Error("Purchase ID is required");
+      const { error } = await supabase
+        .from("user_purchase_batches")
+        .update({ name })
+        .eq("id", purchaseId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: purchaseKeys.details(purchaseId ?? ""),
+      });
+      queryClient.invalidateQueries({ queryKey: purchaseKeys.all });
+    },
+  });
+
+  const removeItemMutation = useMutation({
+    mutationFn: async (purchaseItemId: string) => {
+      const { error } = await supabase
+        .from("user_purchase_items")
+        .delete()
+        .eq("id", purchaseItemId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: purchaseKeys.all }),
+        queryClient.invalidateQueries({
+          queryKey: purchaseKeys.details(purchaseId ?? ""),
+        }),
+        queryClient.invalidateQueries({ queryKey: ["inventory_items"] }),
+        queryClient.invalidateQueries({ queryKey: ["items_view"] }),
+      ]);
+    },
+  });
+
+  const importItemsMutation = useMutation({
+    mutationFn: async (selectedItems: ImportItem[]) => {
+      if (!userId || !purchaseId)
+        throw new Error("User ID and Purchase are required");
+
+      await Promise.all(
+        selectedItems.map((item) =>
+          addItemToPurchase(
+            supabase,
+            purchaseId,
+            item.item_id,
+            1,
+            item.listing_price || 0,
+            userId
+          )
+        )
+      );
+    },
+    onSuccess: () => {
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: purchaseKeys.all }),
+        queryClient.invalidateQueries({
+          queryKey: purchaseKeys.details(purchaseId ?? ""),
+        }),
+        queryClient.invalidateQueries({ queryKey: ["inventory_items"] }),
+        queryClient.invalidateQueries({ queryKey: ["items_view"] }),
+      ]);
+    },
+  });
+
+  return {
+    userId,
+    purchaseDetails,
+    inventoryItems,
+    isItemsLoading,
+    addItem: addItemMutation.mutateAsync,
+    updateItem,
+    updateName: updateNameMutation.mutateAsync,
+    removeItem: removeItemMutation.mutateAsync,
+    importItems: importItemsMutation.mutateAsync,
+  };
 }

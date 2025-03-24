@@ -13,7 +13,7 @@ export function PurchaseBatchCard({ batch }: PurchaseBatchCardProps) {
     <div className="flex items-center gap-2 p-2 rounded-md bg-muted/50">
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-2">
-          <h4 className="text-sm font-medium truncate">Q1 2024 Audio Batch</h4>
+          <h4 className="text-sm font-medium truncate">{batch.name}</h4>
           <Badge variant="outline" className="text-xs">
             <time dateTime={batch.created_at}>
               {format(new Date(batch.created_at), "MMM dd, yyyy")}
@@ -30,4 +30,4 @@ export function PurchaseBatchCard({ batch }: PurchaseBatchCardProps) {
       </div>
     </div>
   );
-} 
+}

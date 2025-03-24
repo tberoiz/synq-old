@@ -206,7 +206,7 @@ export function usePurchaseItemsColumns({
         },
         {
           id: "actions",
-          header: "Actions",
+          header: "",
           cell: ({ row }) => (
             <div className="text-right">
               <Button
