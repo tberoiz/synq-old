@@ -18,6 +18,13 @@
       "cache": false,
       "persistent": true
     },
+    "@synq/ui:dev": {
+      "persistent": true
+    },
+    "web:dev": {
+      "dependsOn": ["@synq/ui:dev"],
+      "persistent": true
+    },
     "clean": {
       "outputs": [
         ".next/**",

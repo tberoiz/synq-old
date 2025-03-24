@@ -1,7 +1,7 @@
 {
-  "name": "electron-desktop",
+  "name": "synq-desktop",
   "version": "1.0.0",
-  "description": "Electron desktop wrapper for Next.js web app",
+  "description": "Synq desktop app",
   "author": "Telmo Beroiz",
   "license": "MIT",
   "main": "main.js",
