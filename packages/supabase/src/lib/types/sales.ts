@@ -1,5 +1,4 @@
 import { z } from "zod";
-import type { Database } from "./database.types";
 
 export const SaleStatus = {
   LISTED: "listed",
@@ -50,6 +49,11 @@ export const updateSaleSchema = createSaleSchema.partial().extend({
 export type CreateSaleInput = z.infer<typeof createSaleSchema>;
 export type UpdateSaleInput = z.infer<typeof updateSaleSchema>;
 
+/**
+ * @interface SaleItem
+ * @description Represents a sale item with its details.
+ * @table: vw_sale_items_ui_table
+ */
 export interface SaleItem {
   id: string;
   item_id: string;
@@ -64,32 +68,16 @@ export interface SaleItem {
   is_archived: boolean;
 }
 
-export type SaleView = Database["public"]["Views"]["vw_sales_ui_table"]["Row"];
-
-export interface Sale
-  extends Omit<
-    SaleView,
-    | "items"
-    | "id"
-    | "user_id"
-    | "status"
-    | "platform"
-    | "sale_date"
-    | "shipping_cost"
-    | "tax_amount"
-    | "platform_fees"
-    | "total_items"
-    | "total_quantity"
-    | "total_cogs"
-    | "total_revenue"
-    | "net_profit"
-    | "created_at"
-    | "updated_at"
-  > {
+/**
+ * @interface SaleTableRow
+ * @description Base type for the sales table.
+ * @table: vw_sales_ui_table
+ */
+export interface SaleTableRow {
   id: string;
   user_id: string;
-  status: "listed" | "completed" | "cancelled";
-  platform: string;
+  status: SaleStatus;
+  platform: SalePlatform;
   sale_date: string;
   shipping_cost: number;
   tax_amount: number;
@@ -101,5 +89,16 @@ export interface Sale
   net_profit: number;
   created_at: string;
   updated_at: string;
+}
+
+/**
+ * @interface SaleDetails
+ * @description Extended type for the sales details sheet.
+ * @table: vw_sales_ui_table
+ */
+export interface SaleDetails extends SaleTableRow {
   items: SaleItem[];
 }
+
+// For backward compatibility
+export type Sale = SaleDetails;

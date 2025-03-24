@@ -1,15 +1,30 @@
 import { createClient } from "@synq/supabase/client";
-import type { Sale } from "@synq/supabase/types";
+import type { SaleTableRow, SaleDetails } from "@synq/supabase/types";
+import { PaginatedResponse } from "../types/actions";
 
+// Constants
+const DEFAULT_ITEMS_PER_PAGE = 10;
+
+/**
+ * Fetches a paginated list of sales from the `vw_sales_ui_table` view.
+ * @param userId - The ID of the user whose sales to fetch.
+ * @param options - An object containing pagination and filter options.
+ * @returns {Promise<PaginatedResponse<SaleTableRow>>} - A paginated response containing the sales and total count.
+ */
 export async function getSales(
   userId: string,
   options?: {
-    limit?: number;
-    offset?: number;
+    page?: number;
+    pageSize?: number;
     status?: "listed" | "completed" | "cancelled";
   },
-): Promise<Sale[]> {
+): Promise<PaginatedResponse<SaleTableRow>> {
   const supabase = createClient();
+  const pageSize = options?.pageSize || DEFAULT_ITEMS_PER_PAGE;
+  const page = options?.page || 1;
+  const start = (page - 1) * pageSize;
+  const end = start + pageSize - 1;
+
   let query = supabase
     .from("vw_sales_ui_table")
     .select("*")
@@ -20,15 +35,25 @@ export async function getSales(
     query = query.eq("status", options.status);
   }
 
-  if (options?.limit !== undefined && options?.offset !== undefined) {
-    query = query.range(options.offset, options.offset + options.limit - 1);
-  }
+  // Add pagination
+  query = query.range(start, end);
 
-  const { data, error } = await query;
+  const { data, error, count } = await query;
   if (error) throw error;
-  return data as Sale[];
+
+  return { 
+    data: data as SaleTableRow[], 
+    count: count ?? 0 
+  };
 }
 
+/**
+ * Creates a new sale in the `user_sales` table and its associated items in `user_sale_items`.
+ * @param userId - The ID of the user creating the sale.
+ * @param sale - The sale details to create.
+ * @param items - Array of items to associate with the sale.
+ * @returns {Promise<SaleDetails>} - The created sale.
+ */
 export async function createSale(
   userId: string,
   sale: {
@@ -45,7 +70,7 @@ export async function createSale(
     quantity: number;
     salePrice: number;
   }>,
-): Promise<Sale> {
+): Promise<SaleDetails> {
   const supabase = createClient();
 
   const { data: newSale, error: saleError } = await supabase
@@ -83,9 +108,16 @@ export async function createSale(
     throw itemsError;
   }
 
-  return newSale as Sale;
+  return newSale as SaleDetails;
 }
 
+/**
+ * Updates an existing sale in the `user_sales` table.
+ * @param userId - The ID of the user who owns the sale.
+ * @param saleId - The ID of the sale to update.
+ * @param updates - The fields to update on the sale.
+ * @returns {Promise<SaleDetails>} - The updated sale.
+ */
 export async function updateSale(
   userId: string,
   saleId: string,
@@ -103,7 +135,7 @@ export async function updateSale(
       salePrice: number;
     }>;
   },
-): Promise<Sale> {
+): Promise<SaleDetails> {
   const supabase = createClient();
 
   // Verify ownership
@@ -157,9 +189,15 @@ export async function updateSale(
     if (itemsError) throw itemsError;
   }
 
-  return updatedSale as Sale;
+  return updatedSale as SaleDetails;
 }
 
+/**
+ * Deletes a sale from the `user_sales` table.
+ * @param userId - The ID of the user who owns the sale.
+ * @param saleId - The ID of the sale to delete.
+ * @returns {Promise<void>}
+ */
 export async function deleteSale(
   userId: string,
   saleId: string,
@@ -184,4 +222,23 @@ export async function deleteSale(
     .eq("id", saleId);
 
   if (deleteError) throw deleteError;
+}
+
+/**
+ * Fetches a single sale by ID from the `vw_sales_ui_table` view.
+ * @param userId - The ID of the user who owns the sale.
+ * @param saleId - The ID of the sale to fetch.
+ * @returns {Promise<SaleDetails>} - The sale details.
+ */
+export async function getSale(userId: string, saleId: string): Promise<SaleDetails> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("vw_sales_ui_table")
+    .select("*")
+    .eq("id", saleId)
+    .eq("user_id", userId)
+    .single();
+
+  if (error) throw error;
+  return data as SaleDetails;
 }

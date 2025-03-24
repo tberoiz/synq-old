@@ -15,43 +15,40 @@ import {
   SheetFooter,
   SheetContent,
 } from "@synq/ui/sheet";
-import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@synq/ui/use-toast";
-import React, { useState } from "react";
+import React from "react";
 import { cn } from "@synq/ui/utils";
 import { Badge } from "@synq/ui/badge";
 import { format } from "date-fns";
-import { Sale } from "@synq/supabase/types";
 import { Button } from "@synq/ui/button";
 import { SaleItemsTable } from "./sale-items-table";
-import { updateSale, getUserId } from "@synq/supabase/queries";
+import { useSaleDetailsQuery, useSaleMutations } from "../../queries/sales";
+import { useIsMobile } from "@synq/ui/use-mobile";
 
 interface SaleDetailsSheetProps {
-  sale: Sale | null;
-  isMobile?: boolean;
+  saleId: string | null;
   onOpenChange?: (open: boolean) => void;
 }
 
 export default function SaleDetailsSheet({
-  sale,
-  isMobile,
+  saleId,
   onOpenChange,
 }: SaleDetailsSheetProps) {
-  const queryClient = useQueryClient();
   const { toast } = useToast();
-  const [isUpdating, setIsUpdating] = useState(false);
+  const isMobile = useIsMobile();
+  const { data: sale, isLoading } = useSaleDetailsQuery(saleId);
+  const { update } = useSaleMutations();
 
   const handleStatusUpdate = async () => {
     if (!sale) return;
 
     try {
-      setIsUpdating(true);
-      await updateSale(await getUserId(), sale.id, {
-        status: "completed",
+      await update.mutate({
+        saleId: sale.id,
+        updates: {
+          status: "completed",
+        },
       });
-
-      await queryClient.invalidateQueries({ queryKey: ["sales"] });
-      await queryClient.invalidateQueries({ queryKey: ["user_inv_items"] });
 
       toast({
         title: "Success",
@@ -65,12 +62,11 @@ export default function SaleDetailsSheet({
         title: "Error",
         description: "Failed to update sale status",
       });
-    } finally {
-      setIsUpdating(false);
     }
   };
 
-  // Early return if no sale
+  if (!saleId || isLoading) return null;
+
   if (!sale) return null;
 
   return (
@@ -78,7 +74,7 @@ export default function SaleDetailsSheet({
       side={isMobile ? "bottom" : "right"}
       className={cn(
         "w-full sm:max-w-xl flex flex-col",
-        isMobile && "h-[90vh] mt-auto",
+        isMobile && "h-3/4 w-full",
       )}
     >
       <div className="flex h-full flex-col">
@@ -100,10 +96,9 @@ export default function SaleDetailsSheet({
                   size="sm"
                   className="bg-green-50 text-green-700 hover:bg-green-100 dark:bg-green-950/20 dark:text-green-300 dark:hover:bg-green-900/20"
                   onClick={handleStatusUpdate}
-                  disabled={isUpdating}
                 >
                   <CheckCircle2Icon className="mr-2 h-4 w-4" />
-                  {isUpdating ? "Updating..." : "Mark as Completed"}
+                  Mark as Completed
                 </Button>
               )}
             </SheetTitle>

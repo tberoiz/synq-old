@@ -5,8 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getUserId } from "@synq/supabase/queries";
 import { getSales } from "@synq/supabase/queries";
 import { PageContainer } from "@ui/shared/layouts/server/page-container";
-import { PageHeader } from "@ui/shared/layouts/server/page-header";
-import { SalesTransactionsTable } from "@ui/modules/sales/components/tables/sales-transactions-table";
+import { SalesTable } from "@ui/modules/sales/components/tables/sales-table";
 
 export default function SalesPage() {
   const { data: sales } = useQuery({
@@ -19,8 +18,7 @@ export default function SalesPage() {
 
   return (
     <PageContainer>
-      <PageHeader title="Sales" />
-      <SalesTransactionsTable data={sales || []} />
+      <SalesTable initialData={sales?.data || []} />
     </PageContainer>
   );
 }
