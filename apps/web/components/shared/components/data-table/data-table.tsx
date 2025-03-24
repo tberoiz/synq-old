@@ -1,3 +1,11 @@
+// Components
+import { Table } from "@synq/ui/table";
+import { CircularSpinner } from "@ui/shared/components/spinners/circular-spinner";
+import { DataTableFilters } from "./data-table-filters";
+import { DataTableHeader } from "./data-table-header";
+import { DataTableBody } from "./data-table-body";
+
+// API and third-party libraries
 import * as React from "react";
 import {
   type ColumnDef,
@@ -9,13 +17,10 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { DataTableFilters } from "./data-table-filters";
-import { DataTableHeader } from "./data-table-header";
-import { DataTableBody } from "./data-table-body";
-import { Table } from "@synq/ui/table";
-import isEqual from "fast-deep-equal";
 import { useInView } from "react-intersection-observer";
-import { CircularSpinner } from "@ui/shared/components/spinners/circular-spinner";
+
+// Internal utilities
+import isEqual from "fast-deep-equal";
 
 interface DataTableProps<TData> {
   columns: ColumnDef<TData>[];

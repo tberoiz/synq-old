@@ -166,7 +166,7 @@ export default function PurchaseDetailsSheet({
       <SheetContent
         side={isMobile ? "bottom" : "right"}
         className={cn(
-          "sm:w-3/4 lg:w-1/2",
+          "w-full sm:h-3/4 lg:w-1/2",
           isMobile && "h-[90vh]"
         )}
       >
@@ -290,28 +290,6 @@ export default function PurchaseDetailsSheet({
                       ) || 0) - (details.total_cost || 0)
                     ).toFixed(2)}
                   </p>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold mb-4">Suppliers</h3>
-
-                <div className="flex items-center gap-4 p-4 border rounded-lg">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage
-                      src="https://via.placeholder.com/150"
-                      alt="test-supplier"
-                    />
-                    <AvatarFallback>
-                      <User className="h-5 w-5" />
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="text-sm font-medium">Example Supplier</p>
-                    <p className="text-sm text-muted-foreground">
-                      m@example.com
-                    </p>
-                  </div>
                 </div>
               </div>
 

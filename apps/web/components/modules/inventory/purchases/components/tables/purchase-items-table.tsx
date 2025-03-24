@@ -1,7 +1,12 @@
 "use client";
 
+// React core imports
 import * as React from "react";
+
+// Types
 import { ItemDetails, PurchaseItemWithDetails } from "@synq/supabase/types";
+
+// Components
 import { DataTable } from "@ui/shared/components/data-table/data-table";
 import { usePurchaseItemsColumns } from "@ui/modules/inventory/purchases/hooks/use-purchase-items-columns";
 import { ItemDetailsSheet } from "@ui/modules/inventory/items/components/sheets/item-details-sheet";

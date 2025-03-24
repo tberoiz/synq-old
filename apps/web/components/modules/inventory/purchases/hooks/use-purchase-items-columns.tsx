@@ -1,10 +1,17 @@
+// React core imports
 import { useMemo, useState, useEffect, useRef, memo } from "react";
+
+// Third-party library imports
 import { type ColumnDef } from "@tanstack/react-table";
+import { Trash2 } from "lucide-react";
+
+// Types
+import { PurchaseItemWithDetails } from "@synq/supabase/types";
+
+// Components
 import { Input } from "@synq/ui/input";
 import { Button } from "@synq/ui/button";
-import { Trash2 } from "lucide-react";
 import { Badge } from "@synq/ui/badge";
-import { PurchaseItemWithDetails } from "@synq/supabase/types";
 
 // Add numeric validation constants
 const MAX_NUMERIC_VALUE = 99999999.99; // For numeric(10,2) columns
