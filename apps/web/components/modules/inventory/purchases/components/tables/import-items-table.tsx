@@ -1,14 +1,23 @@
 "use client";
 
+// React
 import { useState, useMemo, useCallback } from "react";
+
+// Types
 import { ImportItemWithDetails } from "@synq/supabase/types";
+import { type ColumnDef } from "@tanstack/react-table";
+
+// Third-party
+import { useDebounce } from "use-debounce";
+
+// UI Components
 import { Input } from "@synq/ui/input";
 import { DataTable } from "@ui/shared/components/data-table/data-table";
-import { useDebounce } from "use-debounce";
-import { useItemsColumns } from "@ui/modules/inventory/items/hooks/use-items-columns";
-import { type ColumnDef } from "@tanstack/react-table";
-import { useItems } from "@ui/modules/inventory/items/hooks/use-items";
+
+// Local Components
 import { CreateItemDialog } from "@ui/modules/inventory/items/components/dialogs/create-item-dialog";
+import { useItemsColumns } from "@ui/modules/inventory/items/hooks/use-items-columns";
+import { useItems } from "@ui/modules/inventory/items/hooks/use-items";
 
 interface ImportItemsTableProps {
   onSelectionChange: (items: ImportItemWithDetails[]) => void;
@@ -66,8 +75,10 @@ export default function ImportItemsTable({
 
   // Get the base columns from useItemsColumns
   const baseColumns = useItemsColumns({
-    onArchive: () => {}, // No-op since we don't need archive functionality
-    onRestore: () => {}, // No-op since we don't need restore functionality
+    onDelete: () => {}, // No-op since we don't need delete functionality
+    selectedItems: new Set(),
+    onSelectItem: () => {}, // No-op since we handle selection separately
+    onSelectAll: () => {}, // No-op since we handle selection separately
   });
 
   // Filter and modify columns to only show what we need

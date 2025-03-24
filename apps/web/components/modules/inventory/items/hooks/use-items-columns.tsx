@@ -1,7 +1,7 @@
 "use client";
 
 // Core
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 
 // Types
 import { ItemTableRow } from "@synq/supabase/types";
@@ -9,15 +9,14 @@ import { type ColumnDef } from "@tanstack/react-table";
 
 // Components
 import { Button } from "@synq/ui/button";
+import { Checkbox } from "@synq/ui/checkbox";
 import {
-  Archive,
-  RefreshCcw,
+  Trash2,
   Tag,
   Hash,
   DollarSign,
   FolderTree,
   Boxes,
-  Archive as ArchiveIcon,
   ShoppingCart,
   PackageX,
 } from "lucide-react";
@@ -29,16 +28,54 @@ import {
   TooltipTrigger,
 } from "@synq/ui/tooltip";
 
-export function useItemsColumns({
-  onArchive,
-  onRestore,
-}: {
-  onArchive: (item: ItemTableRow) => void;
-  onRestore: (item: ItemTableRow) => void;
-}) {
+interface UseItemsColumnsProps {
+  onDelete: (item: ItemTableRow) => void;
+  selectedItems: Set<string>;
+  onSelectItem: (itemId: string) => void;
+  onSelectAll: () => void;
+}
+
+export function useItemsColumns({ 
+  onDelete, 
+  selectedItems, 
+  onSelectItem, 
+  onSelectAll 
+}: UseItemsColumnsProps) {
+  const handleDelete = useCallback(
+    (item: ItemTableRow) => {
+      onDelete(item);
+    },
+    [onDelete]
+  );
+
   return useMemo(
     () =>
       [
+        {
+          id: "select",
+          header: ({ table }) => (
+            <Checkbox
+              checked={table.getIsAllPageRowsSelected()}
+              onCheckedChange={(value) => {
+                table.toggleAllPageRowsSelected(!!value);
+                onSelectAll();
+              }}
+              aria-label="Select all"
+            />
+          ),
+          cell: ({ row }) => (
+            <Checkbox
+              checked={row.getIsSelected()}
+              onCheckedChange={(value) => {
+                row.toggleSelected(!!value);
+                onSelectItem(row.original.item_id);
+              }}
+              aria-label="Select row"
+            />
+          ),
+          enableSorting: false,
+          enableHiding: false,
+        },
         {
           accessorKey: "item_name",
           header: () => (
@@ -48,75 +85,12 @@ export function useItemsColumns({
             </div>
           ),
           cell: ({ row }) => {
-            const isArchived = row.original.is_archived;
-
             return (
-              <div
-                className={cn(
-                  "flex items-center gap-2 min-w-[200px] max-w-[300px]",
-                  isArchived && "opacity-60"
-                )}
-              >
-                {isArchived ? (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            onRestore(row.original);
-                          }}
-                        >
-                          <RefreshCcw className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent side="top" className="text-xs">
-                        <p>Restore Item</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                ) : (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            onArchive(row.original);
-                          }}
-                        >
-                          <Archive className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent side="top" className="text-xs">
-                        <p>Archive Item</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                )}
+              <div className="flex items-center gap-2 min-w-[200px] max-w-[300px]">
                 <div className="flex items-center gap-2">
-                  <span
-                    className={cn(
-                      "font-medium",
-                      isArchived && "text-muted-foreground"
-                    )}
-                  >
+                  <span className="font-medium">
                     {row.getValue("item_name")}
                   </span>
-                  {isArchived && (
-                    <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-muted/50 text-muted-foreground text-xs font-medium">
-                      <ArchiveIcon className="h-3 w-3" />
-                      <span>Archived</span>
-                    </div>
-                  )}
                 </div>
               </div>
             );
@@ -149,7 +123,7 @@ export function useItemsColumns({
                       />
                       {remaining === 0 ? (
                         <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-destructive/10 text-destructive text-xs font-medium">
-                          <span>Out of Stock</span>
+                          <span>No stock</span>
                         </div>
                       ) : (
                         <div className="flex items-center gap-1">
@@ -264,7 +238,35 @@ export function useItemsColumns({
             </div>
           ),
         },
+        {
+          id: "actions",
+          cell: ({ row }) => {
+            return (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleDelete(row.original);
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Delete item</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            );
+          },
+        },
       ] as ColumnDef<ItemTableRow>[],
-    [onArchive, onRestore]
+    [handleDelete, selectedItems, onSelectItem, onSelectAll]
   );
 }

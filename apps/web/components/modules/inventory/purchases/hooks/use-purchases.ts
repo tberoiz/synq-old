@@ -1,39 +1,25 @@
 import React from 'react';
-import { useInfinitePurchasesQuery, usePurchaseMutations } from '../queries/purchases';
+import { useInfinitePurchasesQuery, usePurchaseMutations } from '@ui/modules/inventory/purchases/queries/purchases';
 import type { PurchaseTableRow } from '@synq/supabase/types';
-
-interface PurchaseFilters {
-  searchTerm: string;
-}
+import type { PurchaseFilters } from '@ui/modules/inventory/purchases/queries/keys';
 
 export function usePurchases(initialData?: PurchaseTableRow[]) {
   const [filters, setFilters] = React.useState<PurchaseFilters>({
+    includeArchived: false,
     searchTerm: '',
   });
 
   const infiniteQuery = useInfinitePurchasesQuery(filters, initialData);
   const mutations = usePurchaseMutations();
 
-  const allPurchases = React.useMemo(() => {
-    const purchases = infiniteQuery.data?.pages.flatMap((page) => page.data) ?? [];
-    const uniquePurchases = new Map<string, PurchaseTableRow>();
-    purchases.forEach((purchase) => {
-      if (purchase.id) {
-        uniquePurchases.set(purchase.id, purchase);
-      }
-    });
-    return Array.from(uniquePurchases.values());
+  const purchases = React.useMemo(() => {
+    return infiniteQuery.data?.pages.flatMap((page) => page.data) ?? [];
   }, [infiniteQuery.data]);
 
   return {
-    purchases: allPurchases,
-    filters,
+    purchases,
     setFilters,
     mutations,
-    infiniteQuery: {
-      fetchNextPage: infiniteQuery.fetchNextPage,
-      hasNextPage: infiniteQuery.hasNextPage,
-      isFetchingNextPage: infiniteQuery.isFetchingNextPage,
-    },
+    infiniteQuery,
   };
 }

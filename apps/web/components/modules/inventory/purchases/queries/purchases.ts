@@ -8,10 +8,7 @@ import {
 import { createClient } from "@synq/supabase/client";
 import {
   fetchPurchases,
-  archivePurchase,
-  restorePurchase,
   getUserId,
-  updatePurchaseItem,
   fetchPurchaseDetails,
   addItemToPurchase,
   fetchItemsView,
@@ -55,18 +52,10 @@ export function usePurchaseMutations() {
   const queryClient = useQueryClient();
   const supabase = React.useMemo(() => createClient(), []);
 
-  const archiveMutation = useMutation({
+  const deleteMutation = useMutation({
     mutationFn: async (purchaseId: string) => {
-      await archivePurchase(supabase, purchaseId);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: purchaseKeys.all });
-    },
-  });
-
-  const restoreMutation = useMutation({
-    mutationFn: async (purchaseId: string) => {
-      await restorePurchase(supabase, purchaseId);
+      const { error } = await supabase.rpc('delete_purchase_batch', { batch_id_param: purchaseId });
+      if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: purchaseKeys.all });
@@ -83,10 +72,16 @@ export function usePurchaseMutations() {
       quantity: number;
       unit_cost: number;
     }) => {
-      await updatePurchaseItem(supabase, id, {
-        quantity,
-        unit_cost,
-      });
+      const { error } = await supabase
+        .from("user_purchase_items")
+        .update({
+          quantity,
+          unit_cost,
+          remaining_quantity: quantity,
+        })
+        .eq("id", id);
+
+      if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: purchaseKeys.all });
@@ -94,8 +89,7 @@ export function usePurchaseMutations() {
   });
 
   return {
-    archive: archiveMutation.mutateAsync,
-    restore: restoreMutation.mutateAsync,
+    delete: deleteMutation.mutateAsync,
     updateItem: updateItemMutation.mutateAsync,
   };
 }

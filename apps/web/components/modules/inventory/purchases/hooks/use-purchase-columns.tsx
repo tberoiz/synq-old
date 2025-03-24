@@ -1,3 +1,5 @@
+"use client";
+
 // Components
 import { Button } from "@synq/ui/button";
 import { Badge } from "@synq/ui/badge";
@@ -7,11 +9,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@synq/ui/tooltip";
+import { Checkbox } from "@synq/ui/checkbox";
 
 // API and third-party libraries
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
-import { Archive, RefreshCcw, Package, Calendar, DollarSign, TrendingUp, LineChart, Tag } from "lucide-react";
+import { Trash2, Package, Calendar, DollarSign, TrendingUp, LineChart, Tag } from "lucide-react";
 import { format } from "date-fns";
 
 // Internal utilities
@@ -19,19 +22,52 @@ import { cn } from "@synq/ui/utils";
 import { type PurchaseTableRow } from "@synq/supabase/types";
 
 interface UsePurchaseColumnsProps {
-  onViewDetails: (purchase: PurchaseTableRow) => void;
-  onArchive: (purchase: PurchaseTableRow) => void;
-  onRestore: (purchase: PurchaseTableRow) => void;
+  onViewDetails?: (purchase: PurchaseTableRow) => void;
+  onDelete: (purchase: PurchaseTableRow | string) => void;
+  selectedPurchases: Set<string>;
+  onSelectPurchase: (purchaseId: string) => void;
+  onSelectAll: () => void;
 }
 
 export function usePurchaseColumns({
   onViewDetails,
-  onArchive,
-  onRestore,
+  onDelete,
+  selectedPurchases,
+  onSelectPurchase,
+  onSelectAll,
 }: UsePurchaseColumnsProps) {
+  const handleDelete = useCallback((purchase: PurchaseTableRow | string) => {
+    onDelete(purchase);
+  }, [onDelete]);
+
   return useMemo(
     () =>
       [
+        {
+          id: "select",
+          header: ({ table }) => (
+            <Checkbox
+              checked={table.getIsAllPageRowsSelected()}
+              onCheckedChange={(value) => {
+                table.toggleAllPageRowsSelected(!!value);
+                onSelectAll();
+              }}
+              aria-label="Select all"
+            />
+          ),
+          cell: ({ row }) => (
+            <Checkbox
+              checked={row.getIsSelected()}
+              onCheckedChange={(value) => {
+                row.toggleSelected(!!value);
+                onSelectPurchase(row.original.id);
+              }}
+              aria-label="Select row"
+            />
+          ),
+          enableSorting: false,
+          enableHiding: false,
+        },
         {
           accessorKey: "name",
           header: () => (
@@ -42,71 +78,16 @@ export function usePurchaseColumns({
           ),
           cell: ({ row }) => {
             const purchase = row.original;
-            const isArchived = purchase.status === "archived";
 
             return (
               <div className="flex items-center gap-2 min-w-[200px] max-w-[300px]">
-                {isArchived ? (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            onRestore(purchase);
-                          }}
-                        >
-                          <RefreshCcw className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent side="top" className="text-xs">
-                        <p>Restore Purchase</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                ) : (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            onArchive(purchase);
-                          }}
-                        >
-                          <Archive className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent side="top" className="text-xs">
-                        <p>Archive Purchase</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                )}
                 <div className="flex items-center gap-2">
                   <span 
-                    className={cn(
-                      "font-medium truncate",
-                      isArchived && "text-muted-foreground"
-                    )}
-                    onClick={() => onViewDetails(purchase)}
+                    className="font-medium truncate"
+                    onClick={() => onViewDetails?.(purchase)}
                   >
                     {row.getValue("name")}
                   </span>
-                  {isArchived && (
-                    <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-muted/50 text-muted-foreground text-xs font-medium">
-                      <Archive className="h-3 w-3" />
-                      <span>Archived</span>
-                    </div>
-                  )}
                 </div>
               </div>
             );
@@ -178,7 +159,35 @@ export function usePurchaseColumns({
             </div>
           ),
         },
+        {
+          id: "actions",
+          cell: ({ row }) => {
+            return (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleDelete(row.original);
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Delete purchase</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            );
+          },
+        },
       ] as ColumnDef<PurchaseTableRow>[],
-    [onViewDetails, onArchive, onRestore],
+    [onViewDetails, onDelete, onSelectPurchase, onSelectAll]
   );
 }

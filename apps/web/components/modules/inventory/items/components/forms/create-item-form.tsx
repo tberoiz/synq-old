@@ -37,6 +37,7 @@ import { createClient } from "@synq/supabase/client";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { CreateCategoryForm } from "./create-category-form";
+import { itemKeys, categoryKeys } from "@ui/modules/inventory/items/queries/keys";
 
 const QUERY_KEYS = {
   CATEGORIES: "user_categories",
@@ -87,7 +88,7 @@ export const CreateItemForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   });
 
   const { data: categories, isLoading: isCategoriesLoading } = useQuery({
-    queryKey: [QUERY_KEYS.CATEGORIES],
+    queryKey: categoryKeys.all,
     queryFn: () => fetchCategories(supabase),
   });
 
@@ -111,18 +112,13 @@ export const CreateItemForm = ({ onSuccess }: { onSuccess?: () => void }) => {
         userId,
       });
 
-      await queryClient.invalidateQueries({
-        predicate: (query) => {
-          const queryKey = query.queryKey[0];
-          return [
-            QUERY_KEYS.ITEMS,
-            QUERY_KEYS.ITEMS_VIEW,
-            QUERY_KEYS.CATEGORIES,
-            QUERY_KEYS.PURCHASES,
-            QUERY_KEYS.PURCHASE_ITEMS,
-          ].includes(queryKey as (typeof QUERY_KEYS)[keyof typeof QUERY_KEYS]);
-        },
-      });
+      // Invalidate all relevant queries
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: itemKeys.all }),
+        queryClient.invalidateQueries({ queryKey: categoryKeys.all }),
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PURCHASES] }),
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PURCHASE_ITEMS] }),
+      ]);
 
       form.reset();
 

@@ -8,8 +8,6 @@ import {
 import { createClient } from "@synq/supabase/client";
 import {
   fetchItemsView,
-  archiveItem,
-  restoreItem,
   getUserId,
   fetchItemDetails,
   fetchCategories,
@@ -35,7 +33,6 @@ export function useInfiniteItemsQuery(
       const response = await fetchItemsView(supabase, {
         userId,
         page: pageParam,
-        includeArchived: filters.includeArchived ?? true,
         searchTerm: filters.searchTerm,
         categoryId: filters.categoryId,
       });
@@ -60,18 +57,10 @@ export function useItemMutations() {
   const queryClient = useQueryClient();
   const supabase = React.useMemo(() => createClient(), []);
 
-  const archiveMutation = useMutation({
+  const deleteMutation = useMutation({
     mutationFn: async (itemId: string) => {
-      await archiveItem(supabase, itemId);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: itemKeys.all });
-    },
-  });
-
-  const restoreMutation = useMutation({
-    mutationFn: async (itemId: string) => {
-      await restoreItem(supabase, itemId);
+      const { error } = await supabase.rpc('delete_item', { item_id_param: itemId });
+      if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: itemKeys.all });
@@ -102,8 +91,7 @@ export function useItemMutations() {
   });
 
   return {
-    archive: archiveMutation.mutateAsync,
-    restore: restoreMutation.mutateAsync,
+    delete: deleteMutation.mutateAsync,
     update: {
       mutate: updateMutation.mutateAsync,
       isPending: updateMutation.isPending,
