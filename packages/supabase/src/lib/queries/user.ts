@@ -63,7 +63,8 @@ export async function verifyOTP(prevState: any, formData: FormData) {
   });
 
   if (error) {
-    // Handle specific error cases
+    // FIXME: This is a temporary fix to log the error
+    console.log("Error verifying OTP:", error);
     if (error.message.includes("Invalid OTP")) {
       return {
         error: "Invalid verification code. Please try again.",
@@ -72,7 +73,8 @@ export async function verifyOTP(prevState: any, formData: FormData) {
     }
     if (error.message.includes("expired")) {
       return {
-        error: "Verification code has expired. Please request a new one.",
+        // error: "Verification code has expired. Please request a new one.",
+        error: "Invalid verification code. Please try again.",
         success: false,
       };
     }
