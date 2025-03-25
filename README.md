@@ -4,16 +4,9 @@
 <p align="center">| <a href="https://trysynq.com">Demo</a> | <a href="https://trysynq/docs">Documentation</a> |
 <br />
 
-Synq is a personal project developed to help individual online sellers manage their inventory and sales more efficiently. Born from the need to move beyond spreadsheet-based tracking, this tool aims to provide a simple yet powerful solution for small-scale e-commerce operations.
+Synq is a modern inventory and sales management system designed for individual online sellers. Built for simplicity and efficiency, it helps you track your inventory, manage sales across different platforms, and gain insights into your business performance.
 
   <img src="./apps/web/public/brand/synq-eyecatcher.png" alt="Synq Logo" width="100%" height="100%"  />
-
-## Project Goals
-
-- 🎓 **Learning Experience**: A hands-on project to enhance full-stack development skills
-- 🛍️ **Practical Solution**: Help individual sellers track inventory and sales without complex enterprise software
-- 💡 **Technical Growth**: Implement modern web technologies and best practices
-- 📊 **Data Management**: Create an intuitive system for managing product data and sales records
 
 ## Features
 
@@ -67,7 +60,8 @@ synq/
 
 - Node.js 18.17 or later
 - Yarn 1.22.19 or later
-- Supabase account (free tier is sufficient)
+- Docker Desktop installed and running
+- Supabase CLI installed (see [official documentation](https://supabase.com/docs/guides/cli) for installation methods)
 
 ### Installation
 
@@ -82,27 +76,62 @@ synq/
    yarn install
    ```
 
-3. Set up environment variables:
+3. Start Local Supabase:
+   ```bash
+   cd infra && supabase start
+   ```
+   This will start the local Supabase instance and output your API credentials.
+
+4. Set up environment variables:
    ```bash
    cp apps/web/.env.example apps/web/.env.local
    ```
-   Fill in your Supabase credentials in `apps/web/.env.local`
+   Edit `apps/web/.env.local` with the values from the Supabase start output:
+   - `NEXT_PUBLIC_SUPABASE_URL`: http://localhost:54321
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your anon key from the Supabase start output
 
-4. Start the development server:
+5. Reset the database (if needed):
+   ```bash
+   cd infra && supabase db reset
+   ```
+   This will run migrations and seed the database with test data.
+
+6. Start the development server:
    ```bash
    yarn dev
    ```
 
-The application will be available at `http://localhost:3000`
+The application will be available at:
+- Web Application: http://localhost:3000
+- Supabase Dashboard: http://localhost:54323
+- Auth Emails: http://localhost:54324
+### Development Scripts
 
-## Development
-
-- `yarn dev` - Start development server
+- `yarn dev` - Start development server with Turbopack
 - `yarn build` - Build the application
 - `yarn start` - Start production server
 - `yarn lint` - Run ESLint
 - `yarn type-check` - Run TypeScript type checking
 - `yarn format` - Format code with Prettier
+
+### Troubleshooting
+
+If you encounter issues:
+
+1. Ensure Docker Desktop is running
+2. Check Supabase status:
+   ```bash
+   cd infra && supabase status
+   ```
+3. Restart Supabase if needed:
+   ```bash
+   cd infra && supabase start
+   ```
+4. Reset the database:
+   ```bash
+   cd infra && supabase db reset
+   ```
+5. Verify your environment variables in `.env.local`
 
 ## Contributing
 
