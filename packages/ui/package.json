@@ -57,7 +57,7 @@
     "embla-carousel-react": "^8.5.1",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.468.0",
-    "react-day-picker": "^9.5.0",
+    "react-day-picker": "8.10.1",
     "react-hook-form": "^7.54.2",
     "recharts": "^2.15.0",
     "vaul": "^1.1.2",
@@ -102,6 +102,10 @@
     "./card": {
       "types": "./dist/components/card.d.ts",
       "default": "./dist/components/card.js"
+    },
+    "./calendar": {
+      "types": "./dist/components/calendar.d.ts",
+      "default": "./dist/components/calendar.js"
     },
     "./carousel": {
       "types": "./dist/components/carousel.d.ts",
