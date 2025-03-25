@@ -1,9 +1,6 @@
 "use client";
 
 import {
-  DollarSign,
-  Box,
-  TrendingUp,
   ShoppingCart,
   CheckCircle2Icon,
   ClockIcon,
@@ -16,7 +13,7 @@ import {
   SheetContent,
 } from "@synq/ui/sheet";
 import { useToast } from "@synq/ui/use-toast";
-import React from "react";
+import React, { useState } from "react";
 import { cn } from "@synq/ui/utils";
 import { Badge } from "@synq/ui/badge";
 import { format } from "date-fns";
@@ -24,6 +21,8 @@ import { Button } from "@synq/ui/button";
 import { SaleItemsTable } from "./sale-items-table";
 import { useSaleDetailsQuery, useSaleMutations } from "../../queries/sales";
 import { useIsMobile } from "@synq/ui/use-mobile";
+import { EditSaleForm } from "../forms/edit-sale-form";
+import { type UpdateSaleFormData } from "../forms/edit-sale-form";
 
 interface SaleDetailsSheetProps {
   saleId: string | null;
@@ -38,35 +37,38 @@ export default function SaleDetailsSheet({
   const isMobile = useIsMobile();
   const { data: sale, isLoading } = useSaleDetailsQuery(saleId);
   const { update } = useSaleMutations();
+  const [isFormDirty, setIsFormDirty] = useState(false);
 
-  const handleStatusUpdate = async () => {
+  const handleSubmit = async (data: UpdateSaleFormData) => {
     if (!sale) return;
 
     try {
       await update.mutate({
         saleId: sale.id,
         updates: {
-          status: "completed",
+          status: data.status,
+          platform: data.platform,
+          saleDate: data.sale_date,
+          shippingCost: data.shipping_cost,
+          taxAmount: data.tax_amount,
+          platformFees: data.platform_fees,
+          notes: data.notes,
         },
       });
-
       toast({
         title: "Success",
-        description: "Sale marked as completed",
+        description: "Sale updated successfully",
       });
-
-      if (onOpenChange) onOpenChange(false);
+      setIsFormDirty(false);
     } catch (error) {
-      console.error("Error updating sale status:", error);
       toast({
         title: "Error",
-        description: "Failed to update sale status",
+        description: error instanceof Error ? error.message : "Failed to update sale",
       });
     }
   };
 
   if (!saleId || isLoading) return null;
-
   if (!sale) return null;
 
   return (
@@ -90,51 +92,8 @@ export default function SaleDetailsSheet({
                   </SheetDescription>
                 </div>
               </div>
-              {sale.status === "listed" && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="bg-green-50 text-green-700 hover:bg-green-100 dark:bg-green-950/20 dark:text-green-300 dark:hover:bg-green-900/20"
-                  onClick={handleStatusUpdate}
-                >
-                  <CheckCircle2Icon className="mr-2 h-4 w-4" />
-                  Mark as Completed
-                </Button>
-              )}
             </SheetTitle>
           </SheetHeader>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 py-4">
-            <div className="p-4 border rounded-lg bg-orange-50">
-              <div className="flex items-center gap-2">
-                <Box className="h-5 w-5 text-orange-600" />
-                <p className="text-sm text-orange-600">Total Items</p>
-              </div>
-              <p className="text-lg font-semibold text-orange-900">
-                {sale.total_items}
-              </p>
-            </div>
-
-            <div className="p-4 border rounded-lg bg-indigo-50">
-              <div className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5 text-indigo-600" />
-                <p className="text-sm text-indigo-600">Total Revenue</p>
-              </div>
-              <p className="text-lg font-semibold text-indigo-900">
-                ${sale.total_revenue.toFixed(2)}
-              </p>
-            </div>
-
-            <div className="p-4 border rounded-lg bg-emerald-50">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-emerald-600" />
-                <p className="text-sm text-emerald-600">Total Profit</p>
-              </div>
-              <p className="text-lg font-semibold text-emerald-900">
-                ${sale.net_profit.toFixed(2)}
-              </p>
-            </div>
-          </div>
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -164,16 +123,32 @@ export default function SaleDetailsSheet({
             </div>
             <SaleItemsTable items={sale.items} />
           </div>
+
+          <EditSaleForm
+            sale={sale}
+            onSubmit={handleSubmit}
+            onFormStateChange={setIsFormDirty}
+          />
         </div>
 
         <SheetFooter className="border-t bg-background p-4">
-          <div className="w-full">
+          <div className="w-full space-y-4">
             <div className="flex items-center justify-center h-10">
               <p className="text-sm text-muted-foreground">
                 Sale {sale.status === "completed" ? "completed" : "created"} on{" "}
                 {format(new Date(sale.sale_date), "MMM dd, yyyy")}
               </p>
             </div>
+            {isFormDirty && (
+              <Button
+                type="submit"
+                form="edit-sale-form"
+                disabled={update.isPending}
+                className="w-full"
+              >
+                {update.isPending ? "Saving..." : "Save Changes"}
+              </Button>
+            )}
           </div>
         </SheetFooter>
       </div>

@@ -80,6 +80,8 @@ export interface SaleTableRow {
   platform: SalePlatform;
   sale_date: string;
   shipping_cost: number;
+  tax_rate: number;
+  tax_type: "percentage" | "fixed";
   tax_amount: number;
   platform_fees: number;
   total_items: number;
@@ -98,6 +100,7 @@ export interface SaleTableRow {
  */
 export interface SaleDetails extends SaleTableRow {
   items: SaleItem[];
+  notes: string | null;
 }
 
 // For backward compatibility

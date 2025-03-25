@@ -1,4 +1,4 @@
-import { Sale } from "@synq/supabase/types";
+import { Sale, CreateSaleInput } from "@synq/supabase/types";
 import { ColumnDef } from "@tanstack/react-table";
 import { useMemo } from "react";
 import { Boxes, Hash, DollarSign, ShoppingCart } from "lucide-react";
@@ -9,8 +9,10 @@ import {
   TooltipTrigger,
 } from "@synq/ui/tooltip";
 
+type SaleItemType = Sale["items"][0] | CreateSaleInput["items"][0];
+
 interface UseSalesColumnProps {
-  onDelete: (sale: Sale["items"][0]) => void;
+  onDelete: (sale: SaleItemType) => void;
   selectedSales: Set<string>;
   onSelectSale: (saleId: string) => void;
   onSelectAll: () => void;
@@ -21,7 +23,7 @@ export function useSaleItemsColumns({
   selectedSales,
   onSelectSale,
   onSelectAll
-}: UseSalesColumnProps): ColumnDef<Sale["items"][0]>[] {
+}: UseSalesColumnProps): ColumnDef<SaleItemType>[] {
   return useMemo(() => [
     {
       accessorKey: "name",
@@ -31,13 +33,19 @@ export function useSaleItemsColumns({
           <span>Item</span>
         </div>
       ),
-      cell: ({ row }) => (
-        <div className="flex items-center gap-2 min-w-[200px] max-w-[300px]">
-          <div className="flex items-center gap-2">
-            <span className="font-medium">{row.original.name}</span>
-          </div>
-        </div>
-      ),
+      cell: ({ row }) => {
+        const item = row.original;
+        if ("name" in item) {
+          return (
+            <div className="flex items-center gap-2 min-w-[200px] max-w-[300px]">
+              <div className="flex items-center gap-2">
+                <span className="font-medium">{item.name}</span>
+              </div>
+            </div>
+          );
+        }
+        return null;
+      },
     },
     {
       accessorKey: "sku",
@@ -47,20 +55,26 @@ export function useSaleItemsColumns({
           <span>SKU</span>
         </div>
       ),
-      cell: ({ row }) => (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="flex items-center justify-center cursor-help min-w-[100px] max-w-[120px]">
-                <span className="text-primary truncate">{row.original.sku || "-"}</span>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent side="top" className="text-xs">
-              <p>Stock Keeping Unit</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      ),
+      cell: ({ row }) => {
+        const item = row.original;
+        if ("sku" in item) {
+          return (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center justify-center cursor-help min-w-[100px] max-w-[120px]">
+                    <span className="text-primary truncate">{item.sku || "-"}</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="text-xs">
+                  <p>Stock Keeping Unit</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          );
+        }
+        return null;
+      },
     },
     {
       accessorKey: "quantity",
@@ -84,11 +98,15 @@ export function useSaleItemsColumns({
           <span>Unit Price</span>
         </div>
       ),
-      cell: ({ row }) => (
-        <div className="flex items-center justify-center min-w-[80px] max-w-[100px]">
-          ${row.original.unit_price.toFixed(2)}
-        </div>
-      ),
+      cell: ({ row }) => {
+        const item = row.original;
+        const price = "unit_price" in item ? item.unit_price : item.salePrice;
+        return (
+          <div className="flex items-center justify-center min-w-[80px] max-w-[100px]">
+            ${price.toFixed(2)}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "total_price",
@@ -98,11 +116,21 @@ export function useSaleItemsColumns({
           <span>Total Price</span>
         </div>
       ),
-      cell: ({ row }) => (
-        <div className="flex items-center justify-center min-w-[80px] max-w-[100px]">
-          ${row.original.total_price.toFixed(2)}
-        </div>
-      ),
+      cell: ({ row }) => {
+        const item = row.original;
+        if ("total_price" in item) {
+          return (
+            <div className="flex items-center justify-center min-w-[80px] max-w-[100px]">
+              ${item.total_price.toFixed(2)}
+            </div>
+          );
+        }
+        return (
+          <div className="flex items-center justify-center min-w-[80px] max-w-[100px]">
+            ${(item.quantity * item.salePrice).toFixed(2)}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "total_cost",
@@ -112,11 +140,17 @@ export function useSaleItemsColumns({
           <span>COGS</span>
         </div>
       ),
-      cell: ({ row }) => (
-        <div className="flex items-center justify-center min-w-[80px] max-w-[100px]">
-          ${row.original.total_cost.toFixed(2)}
-        </div>
-      ),
+      cell: ({ row }) => {
+        const item = row.original;
+        if ("total_cost" in item) {
+          return (
+            <div className="flex items-center justify-center min-w-[80px] max-w-[100px]">
+              ${item.total_cost.toFixed(2)}
+            </div>
+          );
+        }
+        return null;
+      },
     },
     {
       accessorKey: "profit",
@@ -126,11 +160,17 @@ export function useSaleItemsColumns({
           <span>Profit</span>
         </div>
       ),
-      cell: ({ row }) => (
-        <div className="flex items-center justify-center min-w-[80px] max-w-[100px]">
-          ${row.original.profit.toFixed(2)}
-        </div>
-      ),
+      cell: ({ row }) => {
+        const item = row.original;
+        if ("profit" in item) {
+          return (
+            <div className="flex items-center justify-center min-w-[80px] max-w-[100px]">
+              ${item.profit.toFixed(2)}
+            </div>
+          );
+        }
+        return null;
+      },
     },
   ],
   [onDelete, selectedSales, onSelectSale, onSelectAll]);

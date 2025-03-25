@@ -1,7 +1,16 @@
-import React from "react";
-import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
-import { createClient } from "@synq/supabase/client";
-import { getSale, updateSale, deleteSale, getUserId, getSales } from "@synq/supabase/queries";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+} from "@tanstack/react-query";
+import {
+  getSale,
+  updateSale,
+  deleteSale,
+  getUserId,
+  getSales,
+} from "@synq/supabase/queries";
 import { saleKeys } from "./keys";
 
 /**
@@ -12,8 +21,6 @@ import { saleKeys } from "./keys";
 export function useSalesInfiniteQuery(options?: {
   status?: "listed" | "completed" | "cancelled";
 }) {
-  const supabase = React.useMemo(() => createClient(), []);
-
   return useInfiniteQuery({
     queryKey: [...saleKeys.all, options],
     queryFn: async ({ pageParam = 1 }) => {
@@ -40,8 +47,6 @@ export function useSalesInfiniteQuery(options?: {
  * @returns {Object} - The query result containing the sale details.
  */
 export function useSaleDetailsQuery(saleId: string | null) {
-  const supabase = React.useMemo(() => createClient(), []);
-
   return useQuery({
     queryKey: saleKeys.detail(saleId ?? ""),
     queryFn: async () => {
@@ -59,7 +64,6 @@ export function useSaleDetailsQuery(saleId: string | null) {
  */
 export function useSaleMutations() {
   const queryClient = useQueryClient();
-  const supabase = React.useMemo(() => createClient(), []);
 
   const updateMutation = useMutation({
     mutationFn: async ({
@@ -75,6 +79,11 @@ export function useSaleMutations() {
         taxAmount?: number;
         platformFees?: number;
         notes?: string | null;
+        items?: Array<{
+          purchaseItemId: string;
+          quantity: number;
+          salePrice: number;
+        }>;
       };
     }) => {
       const userId = await getUserId();
@@ -128,4 +137,4 @@ export function useSaleMutations() {
       isPending: bulkDeleteMutation.isPending,
     },
   };
-} 
+}
