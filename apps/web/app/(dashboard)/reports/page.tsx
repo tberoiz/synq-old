@@ -5,7 +5,6 @@ import { Input } from "@synq/ui/input";
 import { PageContainer } from "@ui/shared/layouts/server/page-container";
 import { startOfMonth, endOfMonth, format } from "date-fns";
 import { DownloadPLReportButton } from "@ui/modules/reports/components/DownloadPLReportButton";
-import { GenerateReportButton } from "@ui/modules/reports/components/GenerateReportButton";
 
 export default function PnLReportsPage() {
   const [startDate, setStartDate] = useState<Date>(startOfMonth(new Date()));
@@ -32,7 +31,6 @@ export default function PnLReportsPage() {
           className="w-[140px]"
         />
       </div>
-      <GenerateReportButton startDate={startDate} endDate={endDate} />
       <DownloadPLReportButton startDate={startDate} endDate={endDate} />
     </div>
   );
