@@ -10,8 +10,10 @@ import {
   deleteSale,
   getUserId,
   getSales,
+  createSale,
 } from "@synq/supabase/queries";
 import { saleKeys } from "./keys";
+import { type CreateSaleInput } from "@synq/supabase/types";
 
 /**
  * Hook for fetching paginated sales data with infinite scrolling support.
@@ -137,4 +139,36 @@ export function useSaleMutations() {
       isPending: bulkDeleteMutation.isPending,
     },
   };
+}
+
+/**
+ * Hook for creating a new sale.
+ * @returns {Object} - Object containing the create mutation function and its state.
+ */
+export function useCreateSaleMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: CreateSaleInput) => {
+      const userId = await getUserId();
+      if (!userId) throw new Error("User ID not found");
+
+      return await createSale(
+        userId,
+        {
+          status: data.status,
+          platform: data.platform,
+          saleDate: data.saleDate || new Date(),
+        },
+        data.items.map((item) => ({
+          purchaseItemId: item.purchaseItemId,
+          quantity: item.quantity,
+          salePrice: item.salePrice,
+        }))
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: saleKeys.all });
+    },
+  });
 }

@@ -248,7 +248,6 @@ export function SaleItemsTable() {
             <TableHeader>
               <TableRow>
                 <TableHead>Item</TableHead>
-                <TableHead>SKU</TableHead>
                 <TableHead className="text-right">Quantity</TableHead>
                 <TableHead className="text-right">Sale Price</TableHead>
                 <TableHead className="w-[50px]"></TableHead>
