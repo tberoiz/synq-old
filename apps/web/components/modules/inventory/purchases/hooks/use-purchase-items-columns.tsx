@@ -158,7 +158,7 @@ export function usePurchaseItemsColumns({
           header: "Item",
           cell: ({ row }) => (
             <div className="space-y-1">
-              <div className="text-lg font-medium flex items-center gap-2">
+              <div className="text-sm font-medium flex items-center gap-2">
                 <p className="truncate">{row.original.name}</p>
                 {row.original.is_archived && (
                   <Badge variant="outline" className="text-xs">

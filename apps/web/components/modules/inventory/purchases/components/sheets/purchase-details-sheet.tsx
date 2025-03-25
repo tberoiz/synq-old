@@ -163,7 +163,7 @@ export default function PurchaseDetailsSheet({
       <SheetContent
         side={isMobile ? "bottom" : "right"}
         className={cn(
-          isMobile ? "w-full h-3/4" : "w-1/2 h-full"
+          isMobile ? "w-full h-5/6" : "w-3/5 h-full"
         )}
       >
         <div className="flex flex-col h-full">

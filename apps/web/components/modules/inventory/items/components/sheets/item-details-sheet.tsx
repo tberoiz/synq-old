@@ -53,7 +53,7 @@ export function ItemDetailsSheet({
         side={isMobile ? "bottom" : "right"}
         className={cn(
           "flex flex-col",
-          isMobile ? "w-full h-1/2" : "w-1/4 h-full"
+          isMobile ? "w-full h-2/3" : "w-1/4 h-full"
         )}
       >
         <SheetHeader>
