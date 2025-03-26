@@ -20,6 +20,5 @@ async function getPurchases() {
 
 export default async function PurchasesDataTable() {
   const purchases = await getPurchases();
-
   return <PurchasesTableClient purchases={purchases} />;
 }

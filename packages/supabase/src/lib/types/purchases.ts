@@ -71,6 +71,7 @@ export interface ImportItem {
   sku: string | null;
   category: string | null;
   listing_price: number;
+  default_cogs: number;
   is_archived: boolean;
   total_quantity: number;
 }

@@ -220,7 +220,7 @@ export function usePurchaseDetailsSheetQueries(purchaseId: string | null) {
             purchaseId,
             item.item_id,
             1,
-            item.listing_price || 0,
+            item.default_cogs || 0,
             userId
           )
         )

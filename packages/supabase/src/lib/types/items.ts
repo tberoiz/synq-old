@@ -12,6 +12,7 @@ export interface ItemTableRow {
   sku: string | null;
   category: string;
   listing_price: number;
+  default_cogs: number;
   is_archived: boolean;
   remaining_quantity: number;
 }
@@ -22,7 +23,6 @@ export interface ItemTableRow {
  * @table: vw_items_ui_table
  */
 export interface ItemDetails extends ItemTableRow {
-  default_cogs: number;
   inventory_group_id: string;
   purchase_batches: TransformedPurchaseBatch[];
 }

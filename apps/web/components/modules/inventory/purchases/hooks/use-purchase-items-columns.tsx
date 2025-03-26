@@ -3,7 +3,7 @@ import { useMemo, useState, useEffect, useRef, memo } from "react";
 
 // Third-party library imports
 import { type ColumnDef } from "@tanstack/react-table";
-import { Trash2 } from "lucide-react";
+import { Eye, FolderMinus } from "lucide-react";
 
 // Types
 import { PurchaseItemWithDetails } from "@synq/supabase/types";
@@ -11,7 +11,7 @@ import { PurchaseItemWithDetails } from "@synq/supabase/types";
 // Components
 import { Input } from "@synq/ui/input";
 import { Button } from "@synq/ui/button";
-import { Badge } from "@synq/ui/badge";
+import { ItemDetailsSheet } from "../../items/components/sheets/item-details-sheet";
 
 // Add numeric validation constants
 const MAX_NUMERIC_VALUE = 99999999.99; // For numeric(10,2) columns
@@ -22,6 +22,8 @@ interface UsePurchasesColumnsProps {
   updates: Map<string, { quantity: number; unit_cost: number }>;
   onQuantityChange: (id: string, value: number) => void;
   onUnitCostChange: (id: string, value: number) => void;
+  showDetailIcon?: boolean;
+  onViewItem?: (itemId: string) => void;
 }
 
 interface QuantityCellProps {
@@ -149,78 +151,91 @@ export function usePurchaseItemsColumns({
   updates,
   onQuantityChange,
   onUnitCostChange,
+  showDetailIcon,
+  onViewItem,
 }: UsePurchasesColumnsProps) {
-  return useMemo(
-    () =>
-      [
-        {
-          accessorKey: "name",
-          header: "Item",
-          cell: ({ row }) => (
-            <div className="space-y-1">
-              <div className="text-sm font-medium flex items-center gap-2">
-                <p className="truncate">{row.original.name}</p>
-                {row.original.is_archived && (
-                  <Badge variant="outline" className="text-xs">
-                    archived
-                  </Badge>
+  return useMemo<ColumnDef<PurchaseItemWithDetails>[]>(() => {
+    const columns: ColumnDef<PurchaseItemWithDetails>[] = [
+      {
+        accessorKey: "name",
+        header: "Item",
+        cell: ({ row }) => {
+          const item = row.original;
+          const displayName = item.name || "Unknown";
+          
+          return (
+            <div className="flex items-center gap-2">
+                <ItemDetailsSheet 
+                  trigger={
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="ml-2 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <Eye className="text-primary/70" />
+                    </Button>
+                  }
+                  itemId={item.item_id ? { item_id: item.item_id } : null} />
+              <div className="flex flex-col">
+                <div className="font-medium mb-0.5">{displayName}</div>
+                {item.sku && (
+                  <div className="text-xs text-muted-foreground">SKU: {item.sku}</div>
                 )}
               </div>
-              <div className="text-xs text-muted-foreground">
-                sku: {row?.original?.sku || "-"}
-              </div>
             </div>
-          ),
+          );
         },
-        {
-          accessorKey: "quantity",
-          header: "Quantity",
-          cell: ({ row }) => {
-            const update = updates.get(row.original.id);
-            const quantity = update?.quantity ?? row.original.quantity;
+      },
+      {
+        accessorKey: "quantity",
+        header: "Quantity",
+        cell: ({ row }) => {
+          const update = updates.get(row.original.id);
+          const quantity = update?.quantity ?? row.original.quantity;
 
-            return (
-              <QuantityCell
-                id={row.original.id}
-                initialQuantity={quantity}
-                onQuantityChange={onQuantityChange}
-              />
-            );
-          },
+          return (
+            <QuantityCell
+              id={row.original.id}
+              initialQuantity={quantity}
+              onQuantityChange={onQuantityChange}
+            />
+          );
         },
-        {
-          accessorKey: "unit_cost",
-          header: "Unit Cost",
-          cell: ({ row }) => {
-            const update = updates.get(row.original.id);
-            const unitCost = update?.unit_cost ?? row.original.unit_cost;
+      },
+      {
+        accessorKey: "unit_cost",
+        header: "Unit Cost",
+        cell: ({ row }) => {
+          const update = updates.get(row.original.id);
+          const unitCost = update?.unit_cost ?? row.original.unit_cost;
 
-            return (
-              <UnitCostCell
-                id={row.original.id}
-                initialUnitCost={unitCost}
-                onUnitCostChange={onUnitCostChange}
-              />
-            );
-          },
+          return (
+            <UnitCostCell
+              id={row.original.id}
+              initialUnitCost={unitCost}
+              onUnitCostChange={onUnitCostChange}
+            />
+          );
         },
-        {
-          id: "actions",
-          header: "",
-          cell: ({ row }) => (
-            <div className="text-right">
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() => onRemoveItem(row.original.id)}
-              >
-                <Trash2 className="h-4 w-4 text-destructive" />
-              </Button>
-            </div>
-          ),
-        },
-      ] as ColumnDef<PurchaseItemWithDetails>[],
-    [updates, onRemoveItem, onQuantityChange, onUnitCostChange]
-  );
+      },
+      {
+        id: "actions",
+        header: "",
+        cell: ({ row }) => (
+          <div className="text-right">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={(e) => {e.preventDefault(); e.stopPropagation(); onRemoveItem(row.original.id)}}
+            >
+              <FolderMinus className="h-4 w-4 text-destructive" />
+            </Button>
+          </div>
+        ),
+      },
+    ];
+
+    return columns;
+  }, [updates, onRemoveItem, onQuantityChange, onUnitCostChange, showDetailIcon, onViewItem]);
 }

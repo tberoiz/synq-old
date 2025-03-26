@@ -1,6 +1,5 @@
 "use client";
 
-import { useCallback } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
 import { CheckSquare } from "lucide-react";
 import { ImportItemWithDetails } from "@synq/supabase/types";
@@ -56,15 +55,6 @@ export function useImportItemsColumns({
       cell: ({ row }) => (
         <div className="text-muted-foreground">
           {row.original.category || "-"}
-        </div>
-      ),
-    },
-    {
-      accessorKey: "listing_price",
-      header: "Price",
-      cell: ({ row }) => (
-        <div className="font-medium">
-          ${(row.original.listing_price || 0).toFixed(2)}
         </div>
       ),
     },

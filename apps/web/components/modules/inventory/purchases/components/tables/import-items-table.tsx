@@ -111,7 +111,7 @@ export default function ImportItemsTable({
     const neededColumns = baseColumns.filter((col) => {
       const key = (col as { accessorKey?: string }).accessorKey;
       return (
-        key === "item_name" || key === "category" || key === "listing_price"
+        key === "item_name" || key === "category" 
       );
     });
 

@@ -35,7 +35,7 @@ export async function fetchItemsView(
     // Build the query
     let query = supabase
       .from("vw_items_ui_table")
-      .select("item_id, item_name, sku, category, listing_price, is_archived, total_quantity, total_sold")
+      .select("item_id, item_name, sku, category, listing_price, default_cogs, is_archived, total_quantity, total_sold")
       .eq("user_id", params.userId);
 
     // Add archived filter if specified

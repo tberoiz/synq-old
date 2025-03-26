@@ -82,7 +82,7 @@ export function usePurchaseColumns({
             return (
               <div className="flex items-center gap-2 min-w-[200px] max-w-[300px]">
                 <div className="flex items-center gap-2">
-                  <span 
+                  <span
                     className="font-medium truncate"
                     onClick={() => onViewDetails?.(purchase)}
                   >
@@ -149,9 +149,9 @@ export function usePurchaseColumns({
                 variant="secondary"
                 className={cn(
                   row.original.status === "active" &&
-                    "bg-green-50 text-green-700 hover:bg-green-50 dark:bg-green-950/20 dark:text-green-300",
+                  "bg-green-50 text-green-700 hover:bg-green-50 dark:bg-green-950/20 dark:text-green-300",
                   row.original.status === "archived" &&
-                    "bg-red-50 text-red-700 hover:bg-red-50 dark:bg-red-950/20 dark:text-red-300",
+                  "bg-red-50 text-red-700 hover:bg-red-50 dark:bg-red-950/20 dark:text-red-300",
                 )}
               >
                 {row.original.status === "archived" ? "Archived" : "Active"}
