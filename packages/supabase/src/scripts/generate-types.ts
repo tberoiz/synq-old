@@ -5,7 +5,7 @@ import { join } from "path";
 import { config } from "dotenv";
 
 // Load environment variables from apps/web/.env
-config({ path: join(__dirname, "../../../../apps/web/.env") });
+config({ path: join(__dirname, "../../../../apps/web/.env.local") });
 
 // Paths
 const OUTPUT_FILE = join(__dirname, "../lib/types/database.types.ts");

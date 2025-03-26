@@ -8,4 +8,5 @@ export * from "./database.types";
 export * from "./inventory";
 export * from "./items";
 export * from "./purchases";
+export * from "./reports";
 export * from "./sales";

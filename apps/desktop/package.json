@@ -6,7 +6,6 @@
   "license": "MIT",
   "main": "main.js",
   "scripts": {
-    "dev": "concurrently \"cd ../web && yarn dev\" \"wait-on http://localhost:3000 && electron .\"",
     "start": "electron .",
     "package": "electron-builder --dir",
     "make": "electron-builder"
