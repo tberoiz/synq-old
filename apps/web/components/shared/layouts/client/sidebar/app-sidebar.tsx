@@ -88,7 +88,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroupContent className="px-4 pb-4 text-sm">
             <div className="border-t border-gray-200 pt-4">
               <Link
-                href="https://docs.synqtcg.com"
+                href="https://trysynq.com"
                 target="_blank"
                 className="hover:text-gray-900"
               >
