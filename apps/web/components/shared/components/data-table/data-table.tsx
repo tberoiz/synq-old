@@ -38,6 +38,7 @@ interface DataTableProps<TData> {
   onLoadMore?: () => void;
   onSearch?: (term: string) => void;
   filterComponent?: React.ReactNode;
+  isLoading?: boolean;
 }
 
 function useTableState() {
@@ -65,6 +66,7 @@ export function DataTable<TData>({
   onLoadMore,
   onSearch,
   filterComponent,
+  isLoading,
 }: DataTableProps<TData>) {
   const {
     sorting: [sorting, setSorting],
@@ -199,6 +201,7 @@ export function DataTable<TData>({
               table={table}
               columns={columns}
               onRowClick={onRowClick}
+              isLoading={isLoading}
             />
           </Table>
         </div>

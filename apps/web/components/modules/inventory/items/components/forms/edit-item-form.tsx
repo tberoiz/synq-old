@@ -37,7 +37,7 @@ export const EditItemForm = React.forwardRef<HTMLFormElement, EditItemFormProps>
     const { toast } = useToast();
     const { update } = useItemMutations();
 
-    const form = useForm({
+    const form = useForm<z.infer<typeof UPDATE_ITEM_SCHEMA>>({
       resolver: zodResolver(UPDATE_ITEM_SCHEMA),
       defaultValues: {
         name: item.item_name || "",
@@ -48,7 +48,6 @@ export const EditItemForm = React.forwardRef<HTMLFormElement, EditItemFormProps>
       },
     });
 
-    // Reset form when item changes
     useEffect(() => {
       form.reset({
         name: item.item_name || "",
@@ -57,41 +56,35 @@ export const EditItemForm = React.forwardRef<HTMLFormElement, EditItemFormProps>
         default_cogs: item.default_cogs || 0,
         inventory_group_id: item.inventory_group_id || "",
       });
-      // Reset dirty state when item changes
       onDirtyChange?.(false);
     }, [item, form, onDirtyChange]);
 
-    // Watch for form changes
     useEffect(() => {
       const subscription = form.watch(() => {
-        const isDirty = Object.keys(form.formState.dirtyFields).length > 0;
-        onDirtyChange?.(isDirty);
+        onDirtyChange?.(form.formState.isDirty);
       });
       return () => subscription.unsubscribe();
     }, [form, onDirtyChange]);
 
-    const onSubmit = async (data: z.infer<typeof UPDATE_ITEM_SCHEMA>) => {
-      try {
-        if (!item.item_id) throw new Error("Item ID is required");
-        await update.mutate({ itemId: { item_id: item.item_id }, updates: data });
-        toast({ title: "Success", description: "Item updated!" });
-        // Reset form state after successful save
-        form.reset({
-          name: data.name,
-          sku: data.sku || "",
-          listing_price: data.listing_price,
-          default_cogs: data.default_cogs,
-          inventory_group_id: data.inventory_group_id,
-        });
-        onDirtyChange?.(false);
-        onSuccess?.();
-      } catch (error) {
-        toast({
-          title: "Error",
-          description:
-            error instanceof Error ? error.message : "Failed to update item",
-        });
-      }
+    const onSubmit = (data: z.infer<typeof UPDATE_ITEM_SCHEMA>) => {
+      update.mutate(
+        { itemId: { item_id: item.item_id! }, updates: data },
+        {
+          onSuccess: () => {
+            toast({ title: "Success", description: "Item updated!" });
+            form.reset(data);
+            onDirtyChange?.(false);
+            onSuccess?.();
+          },
+          onError: (error) => {
+            toast({
+              title: "Error",
+              description: error.message || "Failed to update item",
+              variant: "destructive"
+            });
+          }
+        }
+      );
     };
 
     return (
@@ -99,58 +92,63 @@ export const EditItemForm = React.forwardRef<HTMLFormElement, EditItemFormProps>
         <form
           ref={ref}
           onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col h-full"
+          className="h-full space-y-6 p-6"
+          autoFocus={false}
         >
-          <div className="flex-1 overflow-y-auto space-y-6 p-6">
-            {/* Item Name */}
-            <TextInput control={form.control} name="name" label="Item Name" />
+          <TextInput 
+            control={form.control} 
+            name="name" 
+            label="Item Name" 
+            placeholder="Enter item name"
+          />
 
-            {/* COGS and SKU */}
-            <div className="grid grid-cols-2 gap-4">
-              <NumberInput
-                control={form.control}
-                name="default_cogs"
-                label="Default COGS"
-              />
-              <TextInput
-                control={form.control}
-                name="sku"
-                label="SKU"
-              />
-            </div>
-
-            {/* Listing Price */}
+          <div className="grid grid-cols-2 gap-6">
             <NumberInput
               control={form.control}
-              name="listing_price"
-              label="Listing Price"
+              name="default_cogs"
+              label="Default COGS"
+              placeholder="Enter cost of goods sold"
+              step={0.01}
+              min={0}
             />
-
-            {/* Category */}
-            <SelectInput
+            <TextInput
               control={form.control}
-              name="inventory_group_id"
-              label="Inventory Group"
-              options={categories}
-              placeholder="Select group"
+              name="sku"
+              label="SKU (optional)"
+              placeholder="Enter SKU (e.g. ABC123, 112341)"
             />
+          </div>
 
-            {/* Purchase History */}
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-muted-foreground">
-                Purchase History
-              </Label>
-              {item.purchase_batches?.length > 0 && (
-                <div className="space-y-1">
-                  {item.purchase_batches.map((batch, index) => (
-                    <PurchaseBatchCard
-                      key={`${batch.id}-${index}-${batch.created_at}`}
-                      batch={batch}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
+          <NumberInput
+            control={form.control}
+            name="listing_price"
+            label="Listing Price"
+            placeholder="Enter listing price"
+          />
+
+          <SelectInput
+            control={form.control}
+            name="inventory_group_id"
+            label="Inventory Group"
+            options={categories}
+            placeholder="Select group"
+          />
+
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-muted-foreground">
+              Purchase History
+            </Label>
+            {item.purchase_batches?.length > 0 && (
+              <div className="space-y-1">
+                {item.purchase_batches.map((batch, index) => (
+ 
+                <PurchaseBatchCard
+                    key={`${batch.id}-${index}-${batch.created_at}`}
+                    batch={batch}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </form>
       </Form>

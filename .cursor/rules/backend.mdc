@@ -1,0 +1,20 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Your rule content
+- The project uses supabase as backend, auth and db.
+- The supabase related code is located in root/packages/supabase
+- The structure of the packages is the following, strictly work on this structure:
+    - src/lib/client/ (uses supabase ssr, client are accesible from these files)
+        - client.ts
+        - server.ts
+    - src/lib/config (configs, buckets and db names are located here)
+    - src/lib/queries (all queries are located here)
+    - src/lib/types (all types and interfaces for the front-end type safty are located here)
+    - src/lib/utils (there is an error manager for now)
+- Always implement best practices for query performance, optimization, and data fetching speed.
+
+- src/infra/supabse: this directory contains supabase for local development. all tables are defined inside migrations file and seeded for local development inside seed file.

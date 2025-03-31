@@ -1,8 +1,9 @@
 "use client";
 
+// REACT
 import * as React from "react";
-import { type CreateSaleInput } from "@synq/supabase/types";
-import { useToast } from "@synq/ui/use-toast";
+
+// UI COMPONENTS
 import { Button } from "@synq/ui/button";
 import {
   Dialog,
@@ -14,37 +15,21 @@ import {
   DialogTrigger,
 } from "@synq/ui/dialog";
 import { PlusIcon, ShoppingCart } from "lucide-react";
+
+// SHARED COMPONENTS
+import { CircularSpinner } from "@ui/shared/components/spinners/circular-spinner";
 import { CreateSaleForm } from "../forms/create-sale-form";
+
+// API
 import { useCreateSaleMutation } from "../../queries/sales";
 
 export function CreateSaleDialog() {
   const [open, setOpen] = React.useState(false);
-  const { toast } = useToast();
-  const { mutate: handleSubmit, isPending } = useCreateSaleMutation();
+  const { isPending } = useCreateSaleMutation();
+  const formRef = React.useRef<HTMLFormElement>(null);
 
-  const onSubmit = async (data: CreateSaleInput) => {
-    return new Promise<void>((resolve) => {
-      handleSubmit(data, {
-        onSuccess: () => {
-          toast({
-            title: "Sale created",
-            description: "Your sale has been created successfully.",
-          });
-          setOpen(false);
-          resolve();
-        },
-        onError: (error: Error) => {
-          console.error("Mutation error:", error);
-          toast({
-            title: "Error",
-            description:
-              error.message || "Something went wrong. Please try again.",
-            variant: "destructive",
-          });
-          resolve();
-        },
-      });
-    });
+  const handleSubmit = () => {
+    formRef.current?.requestSubmit();
   };
 
   return (
@@ -74,18 +59,31 @@ export function CreateSaleDialog() {
           </DialogDescription>
         </DialogHeader>
 
-        <CreateSaleForm onSubmit={onSubmit} isPending={isPending} />
+        <CreateSaleForm onSuccess={() => setOpen(false)} formRef={formRef} />
 
         <DialogFooter className="mt-4 gap-2">
           <Button
             type="button"
             variant="outline"
             onClick={() => setOpen(false)}
+            disabled={isPending}
           >
             Cancel
           </Button>
-          <Button type="submit" form="create-sale-form" disabled={isPending}>
-            {isPending ? "Creating..." : "Create Sale"}
+          <Button
+            type="button"
+            onClick={handleSubmit}
+            disabled={isPending}
+            className="min-w-[120px]"
+          >
+            {isPending ? (
+              <>
+                <CircularSpinner size="sm" className="mr-2" />
+                Creating...
+              </>
+            ) : (
+              "Create Sale"
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

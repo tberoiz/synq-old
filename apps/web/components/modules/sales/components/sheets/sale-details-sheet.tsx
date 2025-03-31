@@ -1,10 +1,13 @@
 "use client";
 
-import {
-  ShoppingCart,
-  CheckCircle2Icon,
-  ClockIcon,
-} from "lucide-react";
+// REACT
+import React, { useState, useRef, useCallback } from "react";
+
+// TYPES
+import { type SaleItemsTableRef } from "../tables/sale-items-table";
+import { type UpdateSaleFormData } from "../forms/edit-sale-form";
+
+// UI COMPONENTS
 import {
   SheetHeader,
   SheetTitle,
@@ -13,16 +16,22 @@ import {
   SheetContent,
 } from "@synq/ui/sheet";
 import { useToast } from "@synq/ui/use-toast";
-import React, { useState } from "react";
-import { cn } from "@synq/ui/utils";
-import { Badge } from "@synq/ui/badge";
-import { format } from "date-fns";
 import { Button } from "@synq/ui/button";
-import { SaleItemsTable } from "./sale-items-table";
-import { useSaleDetailsQuery, useSaleMutations } from "../../queries/sales";
+import { ShoppingCart } from "lucide-react";
+
+// HOOKS
 import { useIsMobile } from "@synq/ui/use-mobile";
+
+// QUERIES & MUTATIONS
+import { useSaleDetailsQuery, useSaleMutations } from "../../queries/sales";
+
+// COMPONENTS
+import SaleItemsTable from "../tables/sale-items-table";
 import { EditSaleForm } from "../forms/edit-sale-form";
-import { type UpdateSaleFormData } from "../forms/edit-sale-form";
+
+// UTILS
+import { cn } from "@synq/ui/utils";
+import { format } from "date-fns";
 
 interface SaleDetailsSheetProps {
   saleId: string | null;
@@ -36,8 +45,10 @@ export default function SaleDetailsSheet({
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const { data: sale, isLoading } = useSaleDetailsQuery(saleId);
-  const { update } = useSaleMutations();
+  const { update, addItems } = useSaleMutations();
   const [isFormDirty, setIsFormDirty] = useState(false);
+  const tableRef = useRef<SaleItemsTableRef>(null);
+  const [isTableDirty, setIsTableDirty] = useState(false);
 
   const handleSubmit = async (data: UpdateSaleFormData) => {
     if (!sale) return;
@@ -68,6 +79,97 @@ export default function SaleDetailsSheet({
     }
   };
 
+  const handleBatchUpdateItems = useCallback(async (localChanges: Record<string, { quantity?: number; price?: number }>) => {
+    if (!sale) return;
+    
+    try {
+      // Only update items that have changes
+      const itemsToUpdate = Object.keys(localChanges).map(itemId => {
+        const item = sale.items.find(i => i.id === itemId);
+        if (!item) return null;
+        
+        const updates = localChanges[itemId] || {};
+        return {
+          id: itemId, // Include the ID for existing items
+          purchaseItemId: item.item_id, // Use item_id as the purchase item ID
+          quantity: updates.quantity !== undefined ? updates.quantity : item.quantity,
+          salePrice: updates.price !== undefined ? updates.price : item.unit_price,
+        };
+      }).filter((item): item is NonNullable<typeof item> => item !== null);
+      
+      if (itemsToUpdate.length > 0) {
+        await update.mutate({
+          saleId: sale.id,
+          updates: {
+            items: itemsToUpdate,
+          },
+        });
+        toast({
+          title: "Success",
+          description: "Items updated successfully",
+        });
+        
+        if (tableRef.current) {
+          tableRef.current.resetUpdates();
+        }
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update items",
+        variant: "destructive",
+      });
+    }
+  }, [sale, update, toast]);
+
+  // Combined save handler for both form and table changes
+  const handleSaveAll = async () => {
+    if (!sale) return;
+
+    try {
+      let hasFormUpdates = false;
+      let hasTableUpdates = false;
+      
+      // Get form updates if the form is dirty
+      if (isFormDirty) {
+        // Trigger form submission
+        const formElement = document.getElementById('edit-sale-form') as HTMLFormElement;
+        if (formElement) {
+          formElement.requestSubmit();
+          hasFormUpdates = true;
+        }
+      }
+      
+      // Get table updates if the table is dirty
+      if (isTableDirty && tableRef.current) {
+        const updates = tableRef.current.getUpdates();
+        if (updates.size > 0) {
+          // Convert Map to Record for the handleBatchUpdateItems function
+          const changesRecord: Record<string, { quantity?: number; price?: number }> = {};
+          updates.forEach((value, key) => {
+            changesRecord[key] = value;
+          });
+          
+          await handleBatchUpdateItems(changesRecord);
+          hasTableUpdates = true;
+        }
+      }
+      
+      if (!hasFormUpdates && !hasTableUpdates) {
+        toast({
+          title: "Info",
+          description: "No changes to save",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save changes",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (!saleId || isLoading) return null;
   if (!sale) return null;
 
@@ -75,8 +177,8 @@ export default function SaleDetailsSheet({
     <SheetContent
       side={isMobile ? "bottom" : "right"}
       className={cn(
-        "w-full sm:max-w-xl flex flex-col",
-        isMobile && "h-3/4 w-full",
+        "flex flex-col",
+        isMobile ? "w-full h-3/4" : "h-full w-1/2",
       )}
     >
       <div className="flex h-full flex-col">
@@ -99,29 +201,21 @@ export default function SaleDetailsSheet({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <h3 className="text-lg font-semibold">Sale Items</h3>
-                <Badge
-                  variant="secondary"
-                  className={cn(
-                    sale.status === "listed" &&
-                      "bg-blue-50 text-blue-700 hover:bg-blue-50 dark:bg-blue-950/20 dark:text-blue-300",
-                    sale.status === "completed" &&
-                      "bg-green-50 text-green-700 hover:bg-green-50 dark:bg-green-950/20 dark:text-green-300",
-                    sale.status === "cancelled" &&
-                      "bg-red-50 text-red-700 hover:bg-red-50 dark:bg-red-950/20 dark:text-red-300",
-                  )}
-                >
-                  {sale.status === "listed" ? (
-                    <ClockIcon className="mr-1 h-3 w-3" />
-                  ) : sale.status === "completed" ? (
-                    <CheckCircle2Icon className="mr-1 h-3 w-3" />
-                  ) : (
-                    <ClockIcon className="mr-1 h-3 w-3" />
-                  )}
-                  {sale.status.charAt(0).toUpperCase() + sale.status.slice(1)}
-                </Badge>
               </div>
             </div>
-            <SaleItemsTable items={sale.items} />
+            <div className="flex flex-col gap-6">
+              <div>
+                <SaleItemsTable
+                  ref={tableRef}
+                  saleId={sale?.id}
+                  showImportButton={sale?.status !== "completed"}
+                  onUpdateItem={handleBatchUpdateItems}
+                  isEditable={sale?.status !== "completed"}
+                  onDirtyChange={setIsTableDirty}
+                  hideSaveButton={true} // Hide the table's save button
+                />
+              </div>
+            </div>
           </div>
 
           <EditSaleForm
@@ -135,14 +229,12 @@ export default function SaleDetailsSheet({
           <div className="w-full space-y-4">
             <div className="flex items-center justify-center h-10">
               <p className="text-sm text-muted-foreground">
-                Sale {sale.status === "completed" ? "completed" : "created"} on{" "}
-                {format(new Date(sale.sale_date), "MMM dd, yyyy")}
+                Sale created on {format(new Date(sale.sale_date), "MMM dd, yyyy")}
               </p>
             </div>
-            {isFormDirty && (
+            {(isFormDirty || isTableDirty) && (
               <Button
-                type="submit"
-                form="edit-sale-form"
+                onClick={handleSaveAll}
                 disabled={update.isPending}
                 className="w-full"
               >
@@ -155,3 +247,4 @@ export default function SaleDetailsSheet({
     </SheetContent>
   );
 }
+

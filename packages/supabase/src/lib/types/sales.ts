@@ -105,3 +105,31 @@ export interface SaleDetails extends SaleTableRow {
 
 // For backward compatibility
 export type Sale = SaleDetails;
+
+export interface SaleItemWithDetails {
+  id: string;
+  user_id: string;
+  sale_id: string;
+  purchase_item_id: string;
+  sold_quantity: number;
+  sale_price: number;
+  created_at: string;
+  purchase_item: {
+    id: string;
+    purchase_id: string;
+    item_id: string;
+    quantity: number;
+    remaining_quantity: number;
+    unit_cost: number;
+    purchase: {
+      id: string;
+      purchase_date: string;
+    };
+    item: {
+      id: string;
+      item_name: string;
+      sku?: string;
+      category?: string;
+    };
+  };
+} 

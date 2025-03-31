@@ -15,7 +15,10 @@ interface NumberInputProps {
   name: string;
   label: string;
   disabled?: boolean;
-  step?: string;
+  step?: number;
+  min?: number;
+  placeholder?: string;
+  icon?: React.ReactNode;
 }
 
 export function NumberInput({
@@ -23,7 +26,10 @@ export function NumberInput({
   name,
   label,
   disabled = false,
-  step = "0.01",
+  step = 0.01,
+  min,
+  placeholder,
+  icon,
 }: NumberInputProps) {
   return (
     <FormField
@@ -31,14 +37,23 @@ export function NumberInput({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>{label}</FormLabel>
+          <FormLabel className="flex items-center gap-1">
+            {icon}
+            {label}
+          </FormLabel>
           <FormControl>
             <Input
               {...field}
               type="number"
               step={step}
+              min={min}
               disabled={disabled}
-              onChange={(e) => field.onChange(parseFloat(e.target.value))}
+              placeholder={placeholder}
+              value={field.value || ""}
+              onChange={(e) => {
+                const value = e.target.value;
+                field.onChange(value === "" ? 0 : parseFloat(value));
+              }}
             />
           </FormControl>
           <FormMessage />

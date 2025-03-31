@@ -1,0 +1,31 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+- Always check if the import on a component inside apps/web are organized and grouped correctly with comments each time you modify a file. In case it is not, organize them.  Example of imports organization: "use client";
+
+// REACT
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import React from "react";
+
+// FORM
+import { UPDATE_ITEM_SCHEMA } from "@ui/modules/inventory/items/queries/schemas";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+// API
+import { type ItemDetails } from "@synq/supabase/types";
+import { useItemMutations } from "@ui/modules/inventory/items/queries/items";
+
+// UI COMPONENTS
+import { Form } from "@synq/ui/form";
+import { Label } from "@synq/ui/label";
+import { useToast } from "@synq/ui/use-toast";
+
+// SHARED COMPONENTS
+import { NumberInput } from "@ui/shared/forms/number-input";
+import { TextInput } from "@ui/shared/forms/text-input";
+import { SelectInput } from "@ui/shared/forms/select-input";
+import { PurchaseBatchCard } from "@ui/modules/inventory/items/components/cards/purchase-batch-card";

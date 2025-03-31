@@ -28,6 +28,7 @@ interface SelectInputProps {
   options: SelectOption[];
   placeholder?: string;
   disabled?: boolean;
+  icon?: React.ReactNode;
 }
 
 export function SelectInput({
@@ -37,6 +38,7 @@ export function SelectInput({
   options,
   placeholder = "Select option",
   disabled = false,
+  icon,
 }: SelectInputProps) {
   return (
     <FormField
@@ -44,7 +46,10 @@ export function SelectInput({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>{label}</FormLabel>
+          <FormLabel className="flex items-center gap-1">
+            {icon}
+            {label}
+          </FormLabel>
           <Select onValueChange={field.onChange} value={field.value} disabled={disabled}>
             <FormControl>
               <SelectTrigger>

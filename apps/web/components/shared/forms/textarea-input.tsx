@@ -8,25 +8,27 @@ import {
   FormLabel,
   FormMessage,
 } from "@synq/ui/form";
-import { Input } from "@synq/ui/input";
+import { Textarea } from "@synq/ui/textarea";
 
-interface TextInputProps {
+interface TextareaInputProps {
   control: Control<any>;
   name: string;
   label: string;
   disabled?: boolean;
   placeholder?: string;
   icon?: React.ReactNode;
+  className?: string;
 }
 
-export function TextInput({
+export function TextareaInput({
   control,
   name,
   label,
   disabled = false,
   placeholder,
   icon,
-}: TextInputProps) {
+  className,
+}: TextareaInputProps) {
   return (
     <FormField
       control={control}
@@ -38,7 +40,12 @@ export function TextInput({
             {label}
           </FormLabel>
           <FormControl>
-            <Input {...field} disabled={disabled} placeholder={placeholder} />
+            <Textarea
+              {...field}
+              disabled={disabled}
+              placeholder={placeholder}
+              className={className}
+            />
           </FormControl>
           <FormMessage />
         </FormItem>
