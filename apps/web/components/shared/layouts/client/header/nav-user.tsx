@@ -5,7 +5,7 @@ import { useEffect, useState, memo, useMemo } from "react";
 import Link from "next/link";
 
 // UI COMPONENTS
-import { Avatar, AvatarFallback, AvatarImage } from "@synq/ui/avatar";
+import { Avatar, AvatarImage } from "@synq/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,11 +29,6 @@ import { BadgeCheck, LogOut } from "lucide-react";
 // API
 import { getUserMetadata, signOut } from "@synq/supabase/queries";
 
-// Helper function to get the first character of a name
-const getFirstCharacter = (fullName: string) => {
-  return fullName.charAt(0).toUpperCase() || "";
-};
-
 // Custom hook for user metadata
 const useUserMetadata = () => {
   const [userMetadata, setUserMetadata] = useState<{
@@ -49,6 +44,7 @@ const useUserMetadata = () => {
   useEffect(() => {
     const fetchUserInfo = async () => {
       const metadata = await getUserMetadata();
+      console.log(metadata);
       setUserMetadata({
         name: metadata?.full_name || "",
         email: metadata?.email || "",
@@ -66,9 +62,6 @@ const NavUser: React.FC = () => {
   const { isMobile } = useSidebar();
   const userMetadata = useUserMetadata();
 
-  // Memoize the avatar fallback character
-  const avatarFallback = useMemo(() => getFirstCharacter(userMetadata.name), [userMetadata.name]);
-
   // Memoize the dropdown content
   const dropdownContent = useMemo(() => (
     <>
@@ -81,9 +74,11 @@ const NavUser: React.FC = () => {
                 alt={userMetadata.name}
               />
             ) : (
-              <AvatarFallback className="flex items-center justify-center rounded-lg bg-gray-400 text-white">
-                {avatarFallback}
-              </AvatarFallback>
+              <AvatarImage
+                src="user/avatar_placeholder_1.png"
+                alt="Avatar placeholder"
+                className="bg-gray-400"
+              />
             )}
           </Avatar>
           <div className="grid flex-1 text-left text-sm leading-tight">
@@ -114,7 +109,7 @@ const NavUser: React.FC = () => {
         </Button>
       </DropdownMenuItem>
     </>
-  ), [userMetadata, avatarFallback]);
+  ), [userMetadata]);
 
   return (
     <SidebarMenu>
@@ -132,9 +127,11 @@ const NavUser: React.FC = () => {
                     alt={userMetadata.name}
                   />
                 ) : (
-                  <AvatarFallback className="flex items-center justify-center rounded-full bg-gray-400 text-white">
-                    {avatarFallback}
-                  </AvatarFallback>
+                  <AvatarImage
+                    src="user/avatar_placeholder_1.png"
+                    alt="Avatar placeholder"
+                    className="bg-gray-400"
+                  />
                 )}
               </Avatar>
             </SidebarMenuButton>
