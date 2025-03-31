@@ -1,13 +1,11 @@
 "use client";
 
+// REACT
 import * as React from "react";
-import {
-  ChartLine,
-  Package,
-  WalletCards,
-  Settings,
-  Receipt,
-} from "lucide-react";
+import Link from "next/link";
+import { useSelectedLayoutSegment } from "next/navigation";
+
+// UI COMPONENTS
 import {
   Sidebar,
   SidebarContent,
@@ -20,10 +18,17 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@synq/ui/sidebar";
-import Link from "next/link";
 import { cn } from "@synq/ui/utils";
-import { usePathname } from "next/navigation";
 import { SynqIcon } from "@ui/shared/icons/icons";
+
+// ICONS
+import {
+  ChartLine,
+  Package,
+  WalletCards,
+  Settings,
+  Receipt,
+} from "lucide-react";
 
 const navItems = [
   { title: "Overview", url: "/overview", icon: ChartLine },
@@ -34,7 +39,7 @@ const navItems = [
 ];
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
-  const pathname = usePathname();
+  const segment = useSelectedLayoutSegment();
   const { isMobile, setOpenMobile } = useSidebar();
 
   return (
@@ -60,7 +65,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroupContent className="flex flex-col items-center justify-center flex-1">
             <SidebarMenu className="flex flex-col gap-2 w-full">
               {navItems.map(({ title, url, icon: Icon }) => {
-                const isActive = pathname === url;
+                const isActive = segment === url.slice(1); // Remove leading slash
                 return (
                   <SidebarMenuItem key={title}>
                     <Link href={url}>
