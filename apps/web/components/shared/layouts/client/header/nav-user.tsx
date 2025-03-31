@@ -1,7 +1,10 @@
 "use client";
 
-import { useEffect, useState, memo } from "react";
-import { BadgeCheck, LogOut } from "lucide-react";
+// REACT
+import { useEffect, useState, memo, useMemo } from "react";
+import Link from "next/link";
+
+// UI COMPONENTS
 import { Avatar, AvatarFallback, AvatarImage } from "@synq/ui/avatar";
 import {
   DropdownMenu,
@@ -18,17 +21,21 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@synq/ui/sidebar";
-import Link from "next/link";
-import { getUserMetadata, signOut } from "@synq/supabase/queries";
 import { Button } from "@synq/ui/button";
+
+// ICONS
+import { BadgeCheck, LogOut } from "lucide-react";
+
+// API
+import { getUserMetadata, signOut } from "@synq/supabase/queries";
 
 // Helper function to get the first character of a name
 const getFirstCharacter = (fullName: string) => {
   return fullName.charAt(0).toUpperCase() || "";
 };
 
-const NavUser: React.FC = () => {
-  const { isMobile } = useSidebar();
+// Custom hook for user metadata
+const useUserMetadata = () => {
   const [userMetadata, setUserMetadata] = useState<{
     name: string;
     email: string;
@@ -39,7 +46,6 @@ const NavUser: React.FC = () => {
     avatar_url: "",
   });
 
-  // Fetch user info on mount
   useEffect(() => {
     const fetchUserInfo = async () => {
       const metadata = await getUserMetadata();
@@ -52,6 +58,63 @@ const NavUser: React.FC = () => {
 
     fetchUserInfo();
   }, []);
+
+  return userMetadata;
+};
+
+const NavUser: React.FC = () => {
+  const { isMobile } = useSidebar();
+  const userMetadata = useUserMetadata();
+
+  // Memoize the avatar fallback character
+  const avatarFallback = useMemo(() => getFirstCharacter(userMetadata.name), [userMetadata.name]);
+
+  // Memoize the dropdown content
+  const dropdownContent = useMemo(() => (
+    <>
+      <DropdownMenuLabel className="p-0 font-normal">
+        <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+          <Avatar className="h-8 w-8 rounded-lg">
+            {userMetadata.avatar_url ? (
+              <AvatarImage
+                src={userMetadata.avatar_url}
+                alt={userMetadata.name}
+              />
+            ) : (
+              <AvatarFallback className="flex items-center justify-center rounded-lg bg-gray-400 text-white">
+                {avatarFallback}
+              </AvatarFallback>
+            )}
+          </Avatar>
+          <div className="grid flex-1 text-left text-sm leading-tight">
+            <span className="truncate font-semibold">
+              {userMetadata.name}
+            </span>
+            <span className="truncate text-xs">{userMetadata.email}</span>
+          </div>
+        </div>
+      </DropdownMenuLabel>
+      <DropdownMenuSeparator />
+      <DropdownMenuGroup>
+        <Link href="/settings">
+          <DropdownMenuItem>
+            <BadgeCheck className="mr-2 h-4 w-4" />
+            Account
+          </DropdownMenuItem>
+        </Link>
+      </DropdownMenuGroup>
+      <DropdownMenuSeparator />
+      <DropdownMenuItem>
+        <Button
+          onClick={signOut}
+          className="flex w-full items-center gap-2"
+        >
+          <LogOut className="h-4 w-4" />
+          <span>Log out</span>
+        </Button>
+      </DropdownMenuItem>
+    </>
+  ), [userMetadata, avatarFallback]);
 
   return (
     <SidebarMenu>
@@ -70,7 +133,7 @@ const NavUser: React.FC = () => {
                   />
                 ) : (
                   <AvatarFallback className="flex items-center justify-center rounded-full bg-gray-400 text-white">
-                    {getFirstCharacter(userMetadata.name)}
+                    {avatarFallback}
                   </AvatarFallback>
                 )}
               </Avatar>
@@ -82,47 +145,7 @@ const NavUser: React.FC = () => {
             align="end"
             sideOffset={4}
           >
-            <DropdownMenuLabel className="p-0 font-normal">
-              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
-                  {userMetadata.avatar_url ? (
-                    <AvatarImage
-                      src={userMetadata.avatar_url}
-                      alt={userMetadata.name}
-                    />
-                  ) : (
-                    <AvatarFallback className="flex items-center justify-center rounded-lg bg-gray-400 text-white">
-                      {getFirstCharacter(userMetadata.name)}
-                    </AvatarFallback>
-                  )}
-                </Avatar>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">
-                    {userMetadata.name}
-                  </span>
-                  <span className="truncate text-xs">{userMetadata.email}</span>
-                </div>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <Link href="/settings">
-                <DropdownMenuItem>
-                  <BadgeCheck className="mr-2 h-4 w-4" />
-                  Account
-                </DropdownMenuItem>
-              </Link>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Button
-                onClick={signOut}
-                className="flex w-full items-center gap-2"
-              >
-                <LogOut className="h-4 w-4" />
-                <span>Log out</span>
-              </Button>
-            </DropdownMenuItem>
+            {dropdownContent}
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
