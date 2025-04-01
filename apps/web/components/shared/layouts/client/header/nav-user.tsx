@@ -75,7 +75,7 @@ const NavUser: React.FC = () => {
               />
             ) : (
               <AvatarImage
-                src="user/avatar_placeholder_1.png"
+                src="user/avatar_placeholder.png"
                 alt="Avatar placeholder"
                 className="bg-gray-400"
               />
@@ -128,7 +128,7 @@ const NavUser: React.FC = () => {
                   />
                 ) : (
                   <AvatarImage
-                    src="user/avatar_placeholder_1.png"
+                    src="user/avatar_placeholder.png"
                     alt="Avatar placeholder"
                     className="bg-gray-400"
                   />
