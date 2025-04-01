@@ -13,8 +13,26 @@ export function usePurchases(initialData?: PurchaseTableRow[]) {
   const mutations = usePurchaseMutations();
 
   const purchases = React.useMemo(() => {
-    return infiniteQuery.data?.pages.flatMap((page) => page.data) ?? [];
-  }, [infiniteQuery.data]);
+    // Create a Map to ensure unique purchases by ID
+    const uniquePurchases = new Map<string, PurchaseTableRow>();
+    
+    // Add initial data if available
+    if (initialData) {
+      initialData.forEach(purchase => {
+        uniquePurchases.set(purchase.id, purchase);
+      });
+    }
+
+    // Add data from infinite query pages
+    infiniteQuery.data?.pages.forEach(page => {
+      page.data.forEach(purchase => {
+        uniquePurchases.set(purchase.id, purchase);
+      });
+    });
+
+    // Convert Map values back to array
+    return Array.from(uniquePurchases.values());
+  }, [infiniteQuery.data, initialData]);
 
   return {
     purchases,

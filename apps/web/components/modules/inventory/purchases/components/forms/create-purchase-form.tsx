@@ -171,7 +171,7 @@ export default function CreatePurchaseForm({
                       {formItems.map((item, index) => {
                         const itemDetails = getItemDetails(item.item_id);
                         return (
-                          <TableRow key={index}>
+                          <TableRow key={item.item_id}>
                             <TableCell className="font-medium">
                               {itemDetails?.name || "Unknown Item"}
                             </TableCell>

@@ -5,6 +5,7 @@ import { AccountForm } from "@ui/modules/settings/components/forms/account-form"
 import { NotificationsForm } from "@ui/modules/settings/components/forms/notifications-form";
 import { CategoriesForm } from "@ui/modules/settings/components/forms/categories-form";
 import { Separator } from "@synq/ui/separator";
+import { getUserSettings } from "@synq/supabase/queries";
 
 export const metadata: Metadata = {
   title: "Settings",
@@ -16,26 +17,29 @@ const settingsSections = [
     key: "account",
     title: "Account Settings",
     description: "Update your account information and profile.",
-    content: <AccountForm />,
+    content: (data: any) => <AccountForm initialData={data.user} />,
     icon: <User className="w-5 h-5" />,
   },
   {
     key: "categories",
     title: "Categories",
     description: "Manage your inventory categories.",
-    content: <CategoriesForm />,
+    content: (data: any) => <CategoriesForm initialData={data.preferences.categories} />,
     icon: <FolderTree className="w-5 h-5" />,
   },
   {
     key: "notifications",
     title: "Notification Preferences",
     description: "Manage how and when you receive notifications.",
-    content: <NotificationsForm />,
+    content: (data: any) => <NotificationsForm initialData={data.preferences} />,
     icon: <Bell className="w-5 h-5" />,
   },
 ];
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  // Fetch all settings data server-side
+  const settingsData = await getUserSettings();
+
   return (
     <PageContainer>
       <div className="space-y-8">
@@ -48,7 +52,7 @@ export default function SettingsPage() {
                 <p className="text-sm text-muted-foreground">{section.description}</p>
               </div>
             </div>
-            {section.content}
+            {section.content(settingsData)}
             {index < settingsSections.length - 1 && (
               <Separator className="my-8" />
             )}

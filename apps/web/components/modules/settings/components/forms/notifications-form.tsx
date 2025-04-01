@@ -3,8 +3,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-import { toast } from "@synq/ui/use-toast";
+import { useToast } from "@synq/ui/use-toast";
 import {
   Form,
   FormControl,
@@ -14,15 +16,13 @@ import {
   FormLabel,
 } from "@synq/ui/form";
 import { Switch } from "@synq/ui/switch";
+import { Button } from "@synq/ui/button";
+import { updateUserPreferences } from "@synq/supabase/queries";
 
 const notificationsFormSchema = z.object({
-  type: z.enum(["all", "mentions", "none"], {
-    required_error: "You need to select a notification type.",
-  }),
-  mobile: z.boolean().default(false).optional(),
-  communication_emails: z.boolean().default(false).optional(),
-  social_emails: z.boolean().default(false).optional(),
-  marketing_emails: z.boolean().default(false).optional(),
+  communication_emails: z.boolean(),
+  marketing_emails: z.boolean(),
+  social_emails: z.boolean(),
   security_emails: z.boolean(),
 });
 
@@ -35,21 +35,58 @@ const defaultValues: Partial<NotificationsFormValues> = {
   security_emails: true,
 };
 
-export function NotificationsForm() {
+type NotificationsFormProps = {
+  initialData?: {
+    notifications_enabled?: boolean;
+    email_notifications?: boolean;
+    push_notifications?: boolean;
+  };
+};
+
+export function NotificationsForm({ initialData }: NotificationsFormProps) {
+  const { toast } = useToast();
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+
   const form = useForm<NotificationsFormValues>({
     resolver: zodResolver(notificationsFormSchema),
-    defaultValues,
+    defaultValues: {
+      communication_emails: initialData?.notifications_enabled ?? defaultValues.communication_emails,
+      marketing_emails: initialData?.email_notifications ?? defaultValues.marketing_emails,
+      social_emails: initialData?.push_notifications ?? defaultValues.social_emails,
+      security_emails: defaultValues.security_emails,
+    },
   });
 
-  function onSubmit(data: NotificationsFormValues) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+  async function onSubmit(data: NotificationsFormValues) {
+    try {
+      setIsLoading(true);
+      
+      // Map form values to database fields
+      const preferences = {
+        notifications_enabled: data.communication_emails,
+        email_notifications: data.marketing_emails,
+        push_notifications: data.social_emails,
+      };
+
+      await updateUserPreferences(preferences);
+
+      toast({
+        title: "Success",
+        description: "Your notification preferences have been updated.",
+      });
+
+      // Refresh the page to show updated data
+      router.refresh();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update preferences. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -73,6 +110,7 @@ export function NotificationsForm() {
                   <Switch
                     checked={field.value}
                     onCheckedChange={field.onChange}
+                    disabled={isLoading}
                   />
                 </FormControl>
               </FormItem>
@@ -93,6 +131,7 @@ export function NotificationsForm() {
                   <Switch
                     checked={field.value}
                     onCheckedChange={field.onChange}
+                    disabled={isLoading}
                   />
                 </FormControl>
               </FormItem>
@@ -113,6 +152,7 @@ export function NotificationsForm() {
                   <Switch
                     checked={field.value}
                     onCheckedChange={field.onChange}
+                    disabled={isLoading}
                   />
                 </FormControl>
               </FormItem>
@@ -133,13 +173,26 @@ export function NotificationsForm() {
                   <Switch
                     checked={field.value}
                     onCheckedChange={field.onChange}
-                    disabled
+                    disabled={isLoading}
                     aria-readonly
                   />
                 </FormControl>
               </FormItem>
             )}
           />
+        </div>
+
+        <div className="flex justify-end">
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span>Saving...</span>
+              </div>
+            ) : (
+              "Save Changes"
+            )}
+          </Button>
         </div>
       </form>
     </Form>

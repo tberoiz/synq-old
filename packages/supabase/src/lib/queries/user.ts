@@ -4,6 +4,7 @@ import { UserMetadata } from "@supabase/supabase-js";
 import { createClient } from "../client/server";
 import { redirect } from "next/navigation";
 import sharp from "sharp";
+import type { UserSettings, UserPreferencesUpdate } from "../types/user";
 
 // Error handling utility
 function handleSupabaseError(error: any, operation: string): never {
@@ -306,4 +307,103 @@ export async function updateUserProfile(prevState: any, formData: FormData) {
       message: "Profile updated successfully!",
     },
   };
+}
+
+export async function getUserSettings(): Promise<UserSettings> {
+  const supabase = await createClient();
+  
+  // Get user data and metadata
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+  if (userError) handleSupabaseError(userError, "Get user settings");
+  if (!userData.user) handleSupabaseError(new Error("User not found"), "Get user settings");
+  if (!userData.user.id) handleSupabaseError(new Error("User ID not found"), "Get user settings");
+  if (!userData.user.email) handleSupabaseError(new Error("User email not found"), "Get user settings");
+
+  // Get user metadata
+  const userMetadata = userData.user.user_metadata || {};
+
+  // Try to get user preferences
+  const { data: preferences, error: preferencesError } = await supabase
+    .from('user_preferences')
+    .select('*')
+    .eq('user_id', userData.user.id)
+    .single();
+
+  // Create default preferences
+  const defaultPreferences = {
+    id: crypto.randomUUID(),
+    user_id: userData.user.id,
+    notifications_enabled: true,
+    email_notifications: true,
+    push_notifications: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+
+  // If the table doesn't exist or there's an error, return default values
+  if (preferencesError || !preferences) {
+    console.warn('User preferences not found, using defaults:', preferencesError);
+    return {
+      user: {
+        id: userData.user.id,
+        email: userData.user.email,
+        full_name: userMetadata.full_name,
+        avatar_url: userMetadata.avatar_url,
+      },
+      preferences: defaultPreferences
+    };
+  }
+
+  return {
+    user: {
+      id: userData.user.id,
+      email: userData.user.email,
+      full_name: userMetadata.full_name,
+      avatar_url: userMetadata.avatar_url,
+    },
+    preferences
+  };
+}
+
+export async function updateUserPreferences(preferences: UserPreferencesUpdate) {
+  const supabase = await createClient();
+  
+  // Get current user
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+  if (userError) handleSupabaseError(userError, "Get user");
+  if (!userData.user) handleSupabaseError(new Error("User not found"), "Get user");
+  if (!userData.user.id) handleSupabaseError(new Error("User ID not found"), "Get user");
+
+  try {
+    // First, get the current preferences to get the id
+    const { data: currentPreferences, error: fetchError } = await supabase
+      .from('user_preferences')
+      .select('id')
+      .eq('user_id', userData.user.id)
+      .single();
+
+    if (fetchError) {
+      console.warn('Failed to fetch current preferences:', fetchError);
+      return { success: false, error: fetchError };
+    }
+
+    // Update preferences with the existing id
+    const { error: updateError } = await supabase
+      .from('user_preferences')
+      .update({
+        ...preferences,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', currentPreferences.id);
+
+    if (updateError) {
+      console.warn('Failed to update preferences:', updateError);
+      return { success: false, error: updateError };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.warn('Error updating preferences:', error);
+    return { success: false, error };
+  }
 }

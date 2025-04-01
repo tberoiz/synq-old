@@ -53,6 +53,7 @@ sql_paths = [
     './seed/002_seed_user_integrations.sql',
     './seed/004_seed_inventory_and_items.sql',
     './seed/005_seed_sales_and_orders.sql',
+    './seed/006_seed_large_dataset.sql',
     ]
 
 

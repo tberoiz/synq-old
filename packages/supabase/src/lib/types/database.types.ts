@@ -74,6 +74,36 @@ export type Database = {
           },
         ]
       }
+      user_preferences: {
+        Row: {
+          created_at: string | null
+          email_notifications: boolean | null
+          id: string
+          notifications_enabled: boolean | null
+          push_notifications: boolean | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          email_notifications?: boolean | null
+          id?: string
+          notifications_enabled?: boolean | null
+          push_notifications?: boolean | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          email_notifications?: boolean | null
+          id?: string
+          notifications_enabled?: boolean | null
+          push_notifications?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_purchase_batches: {
         Row: {
           created_at: string | null
@@ -360,6 +390,22 @@ export type Database = {
       }
     }
     Functions: {
+      create_sale: {
+        Args: {
+          p_user_id: string
+          p_purchase_item_id: string
+          p_status: Database["public"]["Enums"]["sale_status"]
+          p_platform: Database["public"]["Enums"]["sale_platform"]
+          p_sale_date: string
+          p_shipping_cost: number
+          p_tax_amount: number
+          p_platform_fees: number
+          p_notes: string
+          p_sold_quantity: number
+          p_sale_price: number
+        }
+        Returns: string
+      }
       delete_item: {
         Args: {
           item_id_param: string

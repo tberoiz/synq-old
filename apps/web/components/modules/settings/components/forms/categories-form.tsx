@@ -20,11 +20,16 @@ import { useState } from "react";
 import type { InventoryGroup } from "@synq/supabase/types";
 import { categoryKeys } from "@ui/modules/inventory/items/queries/keys";
 
-export function CategoriesForm() {
+type CategoriesFormProps = {
+  initialData?: InventoryGroup[];
+};
+
+export function CategoriesForm({ initialData }: CategoriesFormProps) {
   const supabase = createClient();
   const { data: categories, isLoading } = useQuery({
     queryKey: categoryKeys.all,
     queryFn: () => fetchCategories(supabase),
+    initialData,
   });
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);

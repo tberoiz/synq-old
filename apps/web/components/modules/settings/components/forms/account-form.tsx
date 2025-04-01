@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef } from "react";
 
 import { useToast } from "@synq/ui/use-toast";
 import { Button } from "@synq/ui/button";
@@ -19,7 +19,6 @@ import {
 } from "@synq/ui/form";
 import { Input } from "@synq/ui/input";
 import { updateUserProfile } from "@synq/supabase/queries";
-import { getUserMetadata } from "@synq/supabase/queries";
 import { Avatar, AvatarFallback, AvatarImage } from "@synq/ui/avatar";
 import { Camera, Save } from "lucide-react";
 import { SynqIcon } from "@ui/shared/icons/icons";
@@ -44,43 +43,27 @@ const accountFormSchema = z.object({
 
 type AccountFormValues = z.infer<typeof accountFormSchema>;
 
-export function AccountForm() {
+type AccountFormProps = {
+  initialData?: {
+    full_name?: string;
+    avatar_url?: string;
+  };
+};
+
+export function AccountForm({ initialData }: AccountFormProps) {
   const { toast } = useToast();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(initialData?.avatar_url || null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<AccountFormValues>({
     resolver: zodResolver(accountFormSchema),
     defaultValues: {
-      name: "",
+      name: initialData?.full_name || "",
     },
   });
-
-  // Load user data
-  useEffect(() => {
-    async function loadUserData() {
-      try {
-        const metadata = await getUserMetadata();
-        if (metadata?.full_name) {
-          form.reset({ name: metadata.full_name });
-        }
-        if (metadata?.avatar_url) {
-          setAvatarPreview(metadata.avatar_url);
-        }
-      } catch (error) {
-        console.error("Error loading user data:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load user data. Please try again.",
-          variant: "destructive",
-        });
-      }
-    }
-    loadUserData();
-  }, [form, toast]);
 
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return "0 Bytes";
