@@ -1,7 +1,7 @@
 <div align="center">
   <img src="./apps/web/public/brand/synq-icon.png" alt="Synq Logo" width="50" height="50"  />
 </div>
-<p align="center">| <a href="https://trysynq.com">Demo</a> | <a href="https://trysynq/docs">Documentation</a> |
+<p align="center">| <a href="https://trysynq.com">Website</a> | <a href="https://github.com/iamtelmo/synq">Docs</a> |
 <br />
 
 Synq is a modern inventory and sales management system designed for individual online sellers. Built for simplicity and efficiency, it helps you track your inventory, manage sales across different platforms, and gain insights into your business performance.
@@ -44,14 +44,16 @@ Synq is a modern inventory and sales management system designed for individual o
 ```
 synq/
 ├── apps/                    # Applications
-│   ├── web/               # Next.js web application (port 3000)
-│   └── desktop/           # Electron desktop application (port 3001)
-├── packages/              # Shared packages
-│   ├── ui/               # Shared UI components
-│   ├── supabase/         # Supabase client and utilities
-│   ├── eslint-config/    # Shared ESLint configuration
-│   └── typescript-config/ # Shared TypeScript configuration
-└── .github/              # GitHub workflows and templates
+│   ├── web/                 # Next.js web application (port 3000)
+│   └── desktop/             # Desktop application (port 3001)
+├── packages/                # Shared packages
+│   ├── ui/                  # Shared UI components
+│   ├── supabase/            # Supabase client and utilities
+│   ├── eslint-config/       # Shared ESLint configuration
+│   └── typescript-config/   # Shared TypeScript configuration
+├── infra/                   # Supabase for Local Development
+│   ├── supabase/        
+└── .github/                 # GitHub workflows and templates
 ```
 
 ## Getting Started
@@ -139,4 +141,5 @@ Feel free to open issues or submit pull requests if you have suggestions for imp
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the AGPL-3.0 for non-commercial use.
+
