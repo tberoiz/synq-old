@@ -19,12 +19,11 @@ Synq is a modern inventory and sales management system designed for individual o
 ## Tech Stack
 
 - **Frontend:**
-  - Next.js 15 (App Router)
-  - React 19
-  - TypeScript 5.5
-  - Tailwind CSS 3.4
-  - Radix UI components
-  - next-safe-action for server actions
+  - Next.js 
+  - React 
+  - TypeScript 
+  - Tailwind CSS
+  - Shadcn UI components
   - React Query for data fetching
   - React Hook Form with Zod validation
   - Recharts for data visualization
@@ -32,7 +31,6 @@ Synq is a modern inventory and sales management system designed for individual o
 - **Backend:**
   - Next.js API Routes
   - Supabase for authentication and database
-  - Prisma ORM for database operations
 
 - **Development:**
   - Turborepo for monorepo management
@@ -60,7 +58,7 @@ synq/
 
 ### Prerequisites
 
-- Node.js 18.17 or later
+- Node.js 20.9.0 or later
 - Yarn 1.22.19 or later
 - Docker Desktop installed and running
 - Supabase CLI installed (see [official documentation](https://supabase.com/docs/guides/cli) for installation methods)
@@ -113,8 +111,8 @@ The application will be available at:
 - `yarn build` - Build the application
 - `yarn start` - Start production server
 - `yarn lint` - Run ESLint
-- `yarn type-check` - Run TypeScript type checking
 - `yarn format` - Format code with Prettier
+- `yarn generate-types` - Generate Supabase database types
 
 ### Troubleshooting
 
