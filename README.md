@@ -1,7 +1,6 @@
 <div align="center">
   <img src="./apps/web/public/brand/synq-icon.png" alt="Synq Logo" width="50" height="50"  />
 </div>
-<p align="center">| <a href="https://trysynq.com">Website</a> | <a href="https://github.com/iamtelmo/synq">Docs</a> |
 <br />
 
 Synq is a modern inventory and sales management system designed for individual online sellers. Built for simplicity and efficiency, it helps you track your inventory, manage sales across different platforms, and gain insights into your business performance.
