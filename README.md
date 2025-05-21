@@ -132,10 +132,6 @@ If you encounter issues:
    ```
 5. Verify your environment variables in `.env.local`
 
-## Contributing
-
-Feel free to open issues or submit pull requests if you have suggestions for improvements. This is a learning project, and any feedback is welcome!
-
 ## License
 
 This project is licensed under the AGPL-3.0 for non-commercial use.
