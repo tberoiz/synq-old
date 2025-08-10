@@ -2,6 +2,9 @@
   <img src="./apps/web/public/brand/synq-icon.png" alt="Synq Logo" width="50" height="50"  />
 </div>
 <br />
+Note: This project started as a learning exercise to create modern dashboards. However, it gradually moved away from the original idea, so I decided to pivot and start fresh. You can check the original approach here: https://github.com/synqcloud/synq
+<br />
+<br />
 
 Synq is a modern inventory and sales management system designed for individual online sellers. Built for simplicity and efficiency, it helps you track your inventory, manage sales across different platforms, and gain insights into your business performance.
 
